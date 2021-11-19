@@ -18,6 +18,7 @@
 
  What more is there to do?
   - instance density control
+  - URP shaders
   - more spawning methods, perhaps procedural spawning
   - ...
 
