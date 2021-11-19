@@ -20,5 +20,8 @@
   - instance density control
   - more spawning methods, perhaps procedural spawning
   - ...
+
+ Project info:
+  - created on unity 2021.2.1f1 HDRP 12.1.0
  
 ![grass](https://user-images.githubusercontent.com/59656122/142703484-4bb21330-5e90-4cea-a69a-ff53977d595f.gif)
