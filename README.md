@@ -1,7 +1,7 @@
 # Milk_Instancer01
  GPU instancing in unity with occlusion culling, frustum culling, and LODs
  
- warning: this is like super early early alpha. if you happened to come across this by chance please check back later, some things are still broken in a few ways and this is by no means feature complete
+ warning: this is like super early early alpha. if you happened to come across this by chance please check back later, some things are still broken in a few ways and this is by no means feature complete. I am still working on this and it will be updated as I improve the system
  
  also im still setting up the readme
  
