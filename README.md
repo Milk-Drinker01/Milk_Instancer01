@@ -24,6 +24,7 @@
   - instance density control
   - URP shaders
   - more spawning methods, perhaps procedural spawning
+  - create a user friendly interface
   - ...
 
  Project info:
