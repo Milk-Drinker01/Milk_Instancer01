@@ -9,6 +9,7 @@
 
  
  This project is a vastly improved version of elliomans indirect rendering with compute shaders. https://github.com/ellioman/Indirect-Rendering-With-Compute-Shaders
+ 
  What is different in this version?
   - gpu bitonic sorting is now no longer reliant on powers of two (thanks to EmmetOT - https://github.com/EmmetOT/BufferSorter)
   - improved user interface
