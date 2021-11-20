@@ -36,12 +36,12 @@ RWStructuredBuffer<SortStruct> _ExternalKeys;
 
 int FloatToInt(float fl)
 {
-    return int(fl * 10000.0);
+    return int(fl * 1000.0);
 }
 
 float IntToFloat(int integer)
 {
-    return float(integer) / 10000.0;
+    return float(integer) / 1000.0;
 
 }
 
@@ -141,8 +141,10 @@ void BitonicSort(uint3 id : SV_DispatchThreadID)
     uint key_i = _Keys[i];
     uint key_j = _Keys[j];
     
-    int value_i = (_Values[key_i].drawCallInstanceIndex >> 16) * 10000000 + FloatToInt(_Values[key_i].distanceToCam);
-    int value_j = (_Values[key_j].drawCallInstanceIndex >> 16) * 10000000 + FloatToInt(_Values[key_j].distanceToCam);
+    //int value_i = (_Values[key_i].drawCallInstanceIndex >> 16) * 10000000 + FloatToInt(_Values[key_i].distanceToCam);
+    //int value_j = (_Values[key_j].drawCallInstanceIndex >> 16) * 10000000 + FloatToInt(_Values[key_j].distanceToCam);
+    int value_i = (_Values[key_i].drawCallInstanceIndex >> 16) * 50000 + FloatToInt(_Values[key_i].distanceToCam);
+    int value_j = (_Values[key_j].drawCallInstanceIndex >> 16) * 50000 + FloatToInt(_Values[key_j].distanceToCam);
     
     if (_Reverse)
     {

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 [System.Serializable]
 public class IndirectInstanceData
@@ -9,8 +10,13 @@ public class IndirectInstanceData
     public Mesh[] LODMeshes = new Mesh[3];
 
     public Material indirectMaterial;
-    public int count;
     [HideInInspector] public Vector3[] rotations;
     [HideInInspector] public Vector3[] positions;
     [HideInInspector] public Vector3[] scales;
+
+    public ShadowCastingMode shadowCastingMode;
+
+#if UNITY_EDITOR
+    public int index;
+#endif
 }

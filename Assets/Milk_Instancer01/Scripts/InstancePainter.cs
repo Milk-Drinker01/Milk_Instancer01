@@ -6,17 +6,23 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 [ExecuteInEditMode]
+[RequireComponent(typeof(MilkInstancer))]
 public class InstancePainter : MonoBehaviour
 {
     #region Variables
     public GameObject[] prefabs = new GameObject[0];
-    public MilkInstancer indirectRenderer;
+    public int numToAdd = 256;
+    public float areaSize = 5;
+    [HideInInspector] public MilkInstancer indirectRenderer;
 
-    [Header("debug")]
-    public IndirectInstanceData[] instances;
+    //[Header("debug")]
+    [HideInInspector] public IndirectInstanceData[] instances;
+    public PaintablePrefab[] prefabParamaters = new PaintablePrefab[0];
 
 #if UNITY_EDITOR
+    public LayerMask rayCastLayerMask;
     [HideInInspector] public GameObject[] _prefabs = new GameObject[0];
+    int[] selectionBias;
 #endif
     #endregion
 
@@ -27,6 +33,10 @@ public class InstancePainter : MonoBehaviour
     }
     public void init()
     {
+        if (indirectRenderer == null)
+        {
+            indirectRenderer = GetComponent<MilkInstancer>();
+        }
         if (!AssertInstanceData())
         {
             enabled = false;
@@ -51,12 +61,18 @@ public class InstancePainter : MonoBehaviour
         {
             if (instances[i].positions != null && instances[i].positions.Length > 0)
             {
+                instances[i].shadowCastingMode = prefabParamaters[i].instanceShadowCastingMode;
                 nonEmptyData.Add(instances[i]);
             }
         }
         if (nonEmptyData.Count > 0)
         {
             IndirectInstanceData[] nonEmptyArray = nonEmptyData.ToArray();
+            indirectRenderer.instanceShadowCastingModes = new ShadowCastingMode[nonEmptyArray.Length];
+            for (int i = 0; i < nonEmptyArray.Length; i++)
+            {
+                indirectRenderer.instanceShadowCastingModes[i] = nonEmptyArray[i].shadowCastingMode;
+            }
             indirectRenderer.Initialize(ref nonEmptyArray);
         }
         else
@@ -135,14 +151,55 @@ public class InstancePainter : MonoBehaviour
             instances[i].positions = null;
             instances[i].rotations = null;
             instances[i].scales = null;
-            instances[i].count = 0;
+            prefabParamaters[i].currentCount = 0;
         }
+#if UNITY_EDITOR
         checkPrefabList();
+#endif
         init();
     }
-    public int numToAdd = 256;
-    public float areaSize = 100;
-    public int paintType = 0;
+
+    void cloneArray(ref Vector3[] to, ref Vector3[] from, bool erase = false)
+    {
+        int range = from.Length;
+        if (erase)
+        {
+            range = to.Length;
+        }
+        for (int i = 0; i < range; i++)
+        {
+            to[i] = from[i];
+        }
+    }
+
+    // Taken from:
+    // http://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/
+    // https://www.shadertoy.com/view/4dtBWH
+    private Vector2 Nth_weyl(Vector2 p0, float n)
+    {
+        Vector2 res = p0 + n * new Vector2(0.754877669f, 0.569840296f);
+        res.x %= 1;
+        res.y %= 1;
+        return res;
+    }
+    #endregion
+    private void OnEnable()
+    {
+        if (!Application.isEditor)
+        {
+            Destroy(this);
+        }
+#if UNITY_EDITOR
+        SceneView.onSceneGUIDelegate += OnScene;
+#endif
+    }
+    public void OnDisable()
+    {
+#if UNITY_EDITOR
+        SceneView.onSceneGUIDelegate -= OnScene;
+#endif
+    }
+#if UNITY_EDITOR
     void eraseInstances(Vector3 point)
     {
         int removed = 0;
@@ -179,35 +236,65 @@ public class InstancePainter : MonoBehaviour
             cloneArray(ref instances[i].scales, ref temp);
 
 
-            instances[i].count = temp.Length;
+            prefabParamaters[i].currentCount = temp.Length;
             GC.SuppressFinalize(temp);
 
             removed = 0;
         }
         init();
     }
-    void paintInstances(Vector3 point)
+    void paintInstances(Vector3 origin, Vector3 direction, float distance)
     {
         if (rand.state == 0)
         {
             rand.InitState(1298);
         }
-        Vector3[] pos = new Vector3[numToAdd];
-        Vector3[] rot = new Vector3[numToAdd];
-        Vector3[] scale = new Vector3[numToAdd];
+
+        PaintablePrefab parameters;
         //Vector2 L = Vector2.one;
+        int[] paintTypes = new int[prefabParamaters.Length];
+        Vector3[] points = new Vector3[numToAdd];
+        RaycastHit hit;
+        Vector3 dir = Vector3.one;
+        //Vector2 ang = Vector2.zero;
+        int k = 0;
         for (int i = 0; i < numToAdd; i++)
         {
-            //pos[i] = Nth_weyl(L * i, i) * areaSize;
-            //pos[i] = new Vector3(pos[i].x - areaSize * 0.5f, 0f, pos[i].y - areaSize * 0.5f) + point;
+            //ang = UnityEngine.Random.insideUnitCircle * rand.NextFloat(areaSize);
+            dir = direction;
+            dir += UnityEngine.Random.insideUnitSphere * (areaSize / distance);
+            //dir.x += rand.NextFloat(-areaSize, areaSize);
+            //dir.y += rand.NextFloat(-areaSize, areaSize);
+            //dir.z += rand.NextFloat(-areaSize, areaSize);
+            if (Physics.Raycast(origin, dir, out hit, (distance + 5), rayCastLayerMask))
+            {
+                paintTypes[selectionBias[rand.NextInt(selectionBias.Length)]]++;
+                points[k] = hit.point;
+                k++;
+            }
+        }
+        k = 0;
+        for (int n = 0; n < prefabParamaters.Length; n++)
+        {
+            parameters = prefabParamaters[n];
+            Vector3[] pos = new Vector3[paintTypes[n]];
+            Vector3[] rot = new Vector3[paintTypes[n]];
+            Vector3[] scale = new Vector3[paintTypes[n]];
+            for (int i = 0; i < paintTypes[n]; i++)
+            {
+                //pos[i] = Nth_weyl(L * i, i) * areaSize;
+                //pos[i] = new Vector3(pos[i].x - areaSize * 0.5f, 0f, pos[i].y - areaSize * 0.5f) + point;
 
-            //pos[i] = new Vector3(rand.NextFloat(-1, 1), 0f, rand.NextFloat(-1, 1)).normalized * rand.NextFloat(0, areaSize) * .5f + point;
-            Vector2 circle = UnityEngine.Random.insideUnitCircle;
-            pos[i] = new Vector3(circle.x, 0f, circle.y) * areaSize * .5f + point;
-            rot[i] = new Vector3(0, rand.NextFloat(-180, 180), 0);
-            scale[i] = Vector3.one;
-        }    
-        addInstanceData(paintType, pos, rot, scale);
+                //pos[i] = new Vector3(rand.NextFloat(-1, 1), 0f, rand.NextFloat(-1, 1)).normalized * rand.NextFloat(0, areaSize) * .5f + point;
+                //Vector2 circle = UnityEngine.Random.insideUnitCircle;
+                //pos[i] = new Vector3(circle.x, 0f, circle.y) * areaSize * .5f + point;
+                pos[i] = points[k];
+                rot[i] = new Vector3(rand.NextFloat(parameters.xRotationRange.x, parameters.xRotationRange.y), rand.NextFloat(parameters.yRotationRange.x, parameters.yRotationRange.y), rand.NextFloat(parameters.zRotationRange.x, parameters.zRotationRange.y));
+                scale[i] = Vector3.one * rand.NextFloat(parameters.scaleRange.x, parameters.scaleRange.y);
+                k++;
+            }
+            addInstanceData(n, pos, rot, scale);
+        }
     }
     private void addInstanceData(int instanceType, Vector3[] positions, Vector3[] rotations, Vector3[] scales)
     {
@@ -245,44 +332,8 @@ public class InstancePainter : MonoBehaviour
             instances[instanceType].rotations[count - i] = rotations[i - 1];
             instances[instanceType].scales[count - i] = scales[i - 1];
         }
-        instances[instanceType].count = count;
+        prefabParamaters[instanceType].currentCount = count;
         init();
-    }
-    void cloneArray(ref Vector3[] to, ref Vector3[] from, bool erase = false)
-    {
-        int range = from.Length;
-        if (erase)
-        {
-            range = to.Length;
-        }
-        for (int i = 0; i < range; i++)
-        {
-            to[i] = from[i];
-        }
-    }
-
-    // Taken from:
-    // http://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/
-    // https://www.shadertoy.com/view/4dtBWH
-    private Vector2 Nth_weyl(Vector2 p0, float n)
-    {
-        Vector2 res = p0 + n * new Vector2(0.754877669f, 0.569840296f);
-        res.x %= 1;
-        res.y %= 1;
-        return res;
-    }
-    #endregion
-    private void OnEnable()
-    {
-        if (!Application.isEditor)
-        {
-            Destroy(this);
-        }
-        SceneView.onSceneGUIDelegate += OnScene;
-    }
-    public void OnDisable()
-    {
-        SceneView.onSceneGUIDelegate -= OnScene;
     }
     void checkPrefabList()
     {
@@ -303,18 +354,27 @@ public class InstancePainter : MonoBehaviour
             }
         }
     }
-#if UNITY_EDITOR
     private void OnValidate()
     {
-        if (paintType < 0)
-        {
-            paintType = 0;
-        }
-        if (paintType >= prefabs.Length)
-        {
-            paintType = prefabs.Length - 1;
-        }
+        //if (paintType < 0)
+        //{
+        //    paintType = 0;
+        //}
+        //if (paintType >= prefabs.Length)
+        //{
+        //    paintType = prefabs.Length - 1;
+        //}
         checkPrefabList();
+        List<int> bias = new List<int>();
+        for (int i = 0; i < prefabParamaters.Length; i++)
+        {
+            //instances[i].parameters.copyParameters(prefabParamaters[i]);
+            for (int n = 0; n < prefabParamaters[i].selectionBias; n++)
+            {
+                bias.Add(i);
+            }
+        }
+        selectionBias = bias.ToArray();
 
         if (!Application.isPlaying)
         {
@@ -324,12 +384,32 @@ public class InstancePainter : MonoBehaviour
     void rebuildInstanceDatabase()
     {
         Dictionary<GameObject, IndirectInstanceData> data = new Dictionary<GameObject, IndirectInstanceData>();
+        PaintablePrefab[] tempParamaters = new PaintablePrefab[prefabs.Length];
         for (int i = 0; i < instances.Length; i++)
         {
-            data.Add(instances[i].prefab, instances[i]);
+            bool contains = false;
+            for (int n = 0; n < prefabs.Length; n++)
+            {
+                if (prefabs[n] == instances[i].prefab)
+                {
+                    instances[i].index = i;
+                    data.Add(instances[i].prefab, instances[i]);
+                    tempParamaters[i] = new PaintablePrefab(prefabParamaters[i].prefab);
+                    tempParamaters[i].copyParameters(prefabParamaters[i]);
+                    break;
+                }
+            }
+            if (contains)
+            {
+                instances[i].index = i;
+                data.Add(instances[i].prefab, instances[i]);
+                tempParamaters[i] = new PaintablePrefab(prefabParamaters[i].prefab);
+                tempParamaters[i].copyParameters(prefabParamaters[i]);
+            }
         }
 
         instances = new IndirectInstanceData[prefabs.Length];
+        prefabParamaters = new PaintablePrefab[prefabs.Length];
         for (int i = 0; i < prefabs.Length; i++)
         {
             if (data.ContainsKey(prefabs[i]))
@@ -339,16 +419,19 @@ public class InstancePainter : MonoBehaviour
                 Material reference = prefabs[i].GetComponentInChildren<MeshRenderer>().sharedMaterial;
                 instances[i].indirectMaterial = new Material(reference.shader);
                 instances[i].indirectMaterial.CopyPropertiesFromMaterial(reference);
+                prefabParamaters[i] = new PaintablePrefab(prefabs[i]);
+                prefabParamaters[i].copyParameters(tempParamaters[instances[i].index]);
             }
             else
             {
                 instances[i] = new IndirectInstanceData();
+                prefabParamaters[i] = new PaintablePrefab(prefabs[i]);
                 instances[i].prefab = prefabs[i];
 
                 for (int lod = 0; lod < 3; lod++)
                 {
                     int child = lod;
-                    if (prefabs[i].transform.childCount < lod)
+                    if (prefabs[i].transform.childCount <= lod)
                     {
                         child = prefabs[i].transform.childCount - 1;
                     }
@@ -402,11 +485,11 @@ public class InstancePainter : MonoBehaviour
             mousePos.x *= ppp;
 
             Ray ray = scene.camera.ScreenPointToRay(mousePos);
-            if (Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(ray, out hit, rayCastLayerMask))
             {
                 if (!e.control)
                 {
-                    paintInstances(hit.point);
+                    paintInstances(ray.origin, ray.direction.normalized, hit.distance);
                 }
                 else
                 {
@@ -449,16 +532,36 @@ class InstancePainterEditor : Editor
         }
     }
 }
+#endif
 [System.Serializable]
 public class PaintablePrefab
 {
     public GameObject prefab;
+    public PaintablePrefab(GameObject _prefab)
+    {
+        prefab = _prefab;
+    }
+    [Range(0, 100)]
+    public int selectionBias = 1;
 
     public Vector2 xRotationRange = new Vector2(0, 0);
     public Vector2 yRotationRange = new Vector2(-180, 180);
     public Vector2 zRotationRange = new Vector2(0, 0);
 
     public Vector2 scaleRange = new Vector2(.5f, 1);
-}
 
-#endif
+    public ShadowCastingMode instanceShadowCastingMode = ShadowCastingMode.Off;
+
+    public int currentCount = 0;
+
+    public void copyParameters(PaintablePrefab from)
+    {
+        selectionBias = from.selectionBias;
+        xRotationRange = from.xRotationRange;
+        yRotationRange = from.yRotationRange;
+        zRotationRange = from.zRotationRange;
+        scaleRange = from.scaleRange;
+        currentCount = from.currentCount;
+        instanceShadowCastingMode = from.instanceShadowCastingMode;
+    }
+}

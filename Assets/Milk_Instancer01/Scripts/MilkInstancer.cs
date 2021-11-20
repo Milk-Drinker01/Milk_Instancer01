@@ -40,7 +40,6 @@ public class MilkInstancer : MonoBehaviour
 {
     public static MilkInstancer instance;
     [Header("Settings")]
-    public ShadowCastingMode instanceShadowCastingMode;
     public bool runCompute = true;
     public bool drawInstances = true;
     public bool drawInstanceShadows = true;
@@ -48,7 +47,7 @@ public class MilkInstancer : MonoBehaviour
     public bool enableOcclusionCulling = true;
     public bool enableDetailCulling = true;
     public bool enableLOD = true;
-    [Range(00.00f, 00.02f)] public float detailCullingPercentage = 0.005f;
+    [Range(00.00f, .05f)] public float detailCullingPercentage = 0.005f;
 
     Camera mainCam;
     bool texIs2DArray;
@@ -290,6 +289,7 @@ public class MilkInstancer : MonoBehaviour
     }
     private const string DEBUG_SHADER_LOD_KEYWORD = "_INDIRECT_DEBUG_LOD_ON";
     public bool debugDrawLOD;
+    [HideInInspector] public ShadowCastingMode[] instanceShadowCastingModes;
     private void DrawInstances()
     {
         if (debugDrawLOD != m_debugLastDrawLOD)
@@ -320,10 +320,10 @@ public class MilkInstancer : MonoBehaviour
 
             if (enableLOD)
             {
-                Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 0, irm.lod00MatPropBlock, instanceShadowCastingMode);
-                Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 1, irm.lod01MatPropBlock, instanceShadowCastingMode);
+                Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 0, irm.lod00MatPropBlock, instanceShadowCastingModes[i]);
+                Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 1, irm.lod01MatPropBlock, instanceShadowCastingModes[i]);
             }
-            Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 2, irm.lod02MatPropBlock, instanceShadowCastingMode);
+            Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 2, irm.lod02MatPropBlock, instanceShadowCastingModes[i]);
         }
     }
     private void CalculateVisibleInstances(Camera cam)
@@ -923,6 +923,7 @@ public class MilkInstancer : MonoBehaviour
         Sort(values, m_instancesSortingDataTemp, length);
 
         //copyBuff.Dispose();
+        m_instancesSortingDataTemp.Dispose();
     }
     private ComputeBuffer m_keysBuffer;
     private ComputeBuffer m_tempBuffer;

@@ -14,6 +14,8 @@ public class Character : MonoBehaviour
     {
         camera = transform.GetChild(0);
         cc = GetComponent<CharacterController>();
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
     void Update()
     {
