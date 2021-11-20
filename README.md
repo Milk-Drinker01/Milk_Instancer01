@@ -3,6 +3,8 @@
  
  warning: this is like super early early alpha. if you happened to come across this by chance please check back later, some things are still broken in a few ways and this is by no means feature complete
  
+ ![painting](https://user-images.githubusercontent.com/59656122/142706154-95b0bfae-0f23-4017-a5f3-46206b04b22f.gif)
+
  also im still setting up the readme
  
  This project is a vastly improved version of elliomans indirect rendering with compute shaders. https://github.com/ellioman/Indirect-Rendering-With-Compute-Shaders
