@@ -4,8 +4,5 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes:
-  - enabled: 1
-    path: Assets/Milk_Instancer01/Scenes/Demo 1.unity
-    guid: f8b19de3351da9f48a2da0a93b6e4409
+  m_Scenes: []
   m_configObjects: {}
