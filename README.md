@@ -12,8 +12,6 @@
   - this version works in HDRP
   - amplify shader editor examples
   - wind shader example
-  - bruh
-  - ...
 
  What more is there to do?
   - find and fix bugs
@@ -22,7 +20,7 @@
   - URP shaders
   - more spawning methods, perhaps procedural spawning
   - create a user friendly interface
-  - ...
+  - idk im sure ill think of something
 
  Project info:
   - created on unity 2021.2.1f1 HDRP 12.1.0
