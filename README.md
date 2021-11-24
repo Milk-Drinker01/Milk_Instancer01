@@ -23,9 +23,12 @@
   - create a user friendly interface
   - idk im sure ill think of something
 
+ What might i consider in the future?
+  - built in renderer support
+
  Project info:
   - created on unity 2021.2.1f1 HDRP 12.1.0
 
- ![walking](https://user-images.githubusercontent.com/59656122/143317319-14eb5d2f-3adf-45b2-9dfd-b1ea95af971b.gif)
+![walking](https://user-images.githubusercontent.com/59656122/143317319-14eb5d2f-3adf-45b2-9dfd-b1ea95af971b.gif)
 
 ![grass](https://user-images.githubusercontent.com/59656122/142703484-4bb21330-5e90-4cea-a69a-ff53977d595f.gif)
