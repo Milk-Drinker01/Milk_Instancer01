@@ -1,13 +1,8 @@
 # Milk_Instancer01
  GPU instancing in unity with occlusion culling, frustum culling, and LODs
  
- warning: this is like super early early alpha. if you happened to come across this by chance please check back later, some things are still broken in a few ways and this is by no means feature complete. I am still working on this and it will be updated as I improve the system
- 
- also im still setting up the readme
- 
- ![painting](https://user-images.githubusercontent.com/59656122/142706154-95b0bfae-0f23-4017-a5f3-46206b04b22f.gif)
+ ![painting2](https://user-images.githubusercontent.com/59656122/143315069-8fce511a-4012-48f8-8a07-b9140d8e5ca1.gif)
 
- 
  This project is a vastly improved version of elliomans indirect rendering with compute shaders. https://github.com/ellioman/Indirect-Rendering-With-Compute-Shaders
  
  What is different in this version?
@@ -17,17 +12,16 @@
   - this version works in HDRP
   - amplify shader editor examples
   - wind shader example
-  - bruh
-  - ...
 
- What more is there to do?
-  - FIX BUGS
-    - scanning requires instance numbers that are a power of 2
+
+ What am I still working on?
+  - find and fix bugs
   - instance density control
+  - shadergraph examples
   - URP shaders
   - more spawning methods, perhaps procedural spawning
   - create a user friendly interface
-  - ...
+  - idk im sure ill think of something
 
  Project info:
   - created on unity 2021.2.1f1 HDRP 12.1.0
