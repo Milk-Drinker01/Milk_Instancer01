@@ -22,6 +22,7 @@
 
  What more is there to do?
   - FIX BUGS
+    - scanning requires instance numbers that are a power of 2
   - instance density control
   - URP shaders
   - more spawning methods, perhaps procedural spawning
