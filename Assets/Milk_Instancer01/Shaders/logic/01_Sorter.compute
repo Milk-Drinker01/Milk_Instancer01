@@ -21,7 +21,6 @@ int _Block;
 int _Dimension;
 uint _Count;
 uint _NextPowerOfTwo;
-bool _Reverse;
 
 RWStructuredBuffer<uint> _Keys;
 RWStructuredBuffer<SortStruct> _Values;
@@ -52,8 +51,7 @@ void SetMin(uint3 id : SV_DispatchThreadID)
     if (id.x >= _Count)
         return;
     
-    InterlockedMin(PADDING_KEY, FloatToInt(_ExternalKeys[id.x].distanceToCam));
-    
+    InterlockedMin(PADDING_KEY, ((_ExternalKeys[id.x].drawCallInstanceIndex >> 16) * 5000000) + FloatToInt(_ExternalKeys[id.x].distanceToCam));
     //GroupMemoryBarrierWithGroupSync();
     
     //if (_ExternalKeys[id.x] == PADDING_KEY)
@@ -67,7 +65,7 @@ void SetMax(uint3 id : SV_DispatchThreadID)
     if (id.x >= _Count)
         return;
     
-    InterlockedMax(PADDING_KEY, FloatToInt(_ExternalKeys[id.x].distanceToCam));
+    InterlockedMax(PADDING_KEY, ((_ExternalKeys[id.x].drawCallInstanceIndex >> 16) * 5000000) + FloatToInt(_ExternalKeys[id.x].distanceToCam));
     
     //GroupMemoryBarrierWithGroupSync();
     
@@ -82,7 +80,7 @@ void GetPaddingIndex(uint3 id : SV_DispatchThreadID)
     if (id.x >= _Count)
         return;
     
-    int sortVal = FloatToInt(_ExternalKeys[id.x].distanceToCam);
+    int sortVal = ((_ExternalKeys[id.x].drawCallInstanceIndex >> 16) * 5000000) + FloatToInt(_ExternalKeys[id.x].distanceToCam);
     
     if (sortVal == PADDING_KEY)
         PADDING_KEY_INDEX = id.x;
@@ -144,20 +142,14 @@ void BitonicSort(uint3 id : SV_DispatchThreadID)
     //int value_i = (_Values[key_i].drawCallInstanceIndex >> 16) * 10000000 + FloatToInt(_Values[key_i].distanceToCam);
     //int value_j = (_Values[key_j].drawCallInstanceIndex >> 16) * 10000000 + FloatToInt(_Values[key_j].distanceToCam);
 
-    int value_i = ((_Values[key_i].drawCallInstanceIndex >> 16) * 5000000) + FloatToInt(_Values[key_i].distanceToCam);
-    int value_j = ((_Values[key_j].drawCallInstanceIndex >> 16) * 5000000) + FloatToInt(_Values[key_j].distanceToCam);
+    int value_i = ((_Values[key_i].drawCallInstanceIndex >> 16) * 500000) + FloatToInt(_Values[key_i].distanceToCam);
+    int value_j = ((_Values[key_j].drawCallInstanceIndex >> 16) * 500000) + FloatToInt(_Values[key_j].distanceToCam);
 
     //int value_i = ((_Values[key_i].drawCallInstanceIndex >> 16) * (maxDistance * accuracy) + 1) + FloatToInt(min(_Values[key_i].distanceToCam, maxDistance));
     //int value_j = ((_Values[key_j].drawCallInstanceIndex >> 16) * (maxDistance * accuracy) + 1) + FloatToInt(min(_Values[key_j].distanceToCam, maxDistance));
     
     //int value_i = (((int)_Values[key_i].drawCallInstanceIndex >> 16) * 5000) + _Values[key_i].distanceToCam;
     //int value_j = (((int)_Values[key_j].drawCallInstanceIndex >> 16) * 5000) + _Values[key_j].distanceToCam;
-    
-    if (_Reverse)
-    {
-        value_i = -value_i;
-        value_j = -value_j;
-    }
     
     int diff = (value_i - value_j) * ((i & _Dimension) == 0 ? 1 : -1);
     if (diff > 0)

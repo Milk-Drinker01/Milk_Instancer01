@@ -380,6 +380,16 @@ public class MilkInstancer : MonoBehaviour
             scanInstancesCS.SetBuffer(m_scanInstancesKernelID, _GroupSumArray, m_instancesGroupSumArrayBuffer);
             scanInstancesCS.SetBuffer(m_scanInstancesKernelID, _ScannedInstancePredicates, m_instancesScannedPredicates);
             scanInstancesCS.Dispatch(m_scanInstancesKernelID, m_scanInstancesGroupX, 1, 1);
+            if (scanDebug)
+            {
+                scanDebug = false;
+                uint[] data = new uint[m_instancesScannedPredicates.count];
+                m_instancesScannedPredicates.GetData(data);
+                for (int i = 0; i < data.Length; i++)
+                {
+                    Debug.Log(data[i]);
+                }
+            }
 
             // Shadows
             scanInstancesCS.SetBuffer(m_scanInstancesKernelID, _InstancePredicatesIn, m_shadowsIsVisibleBuffer);
@@ -398,7 +408,16 @@ public class MilkInstancer : MonoBehaviour
             scanGroupSumsCS.SetBuffer(m_scanGroupSumsKernelID, _GroupSumArrayIn, m_instancesGroupSumArrayBuffer);
             scanGroupSumsCS.SetBuffer(m_scanGroupSumsKernelID, _GroupSumArrayOut, m_instancesScannedGroupSumBuffer);
             scanGroupSumsCS.Dispatch(m_scanGroupSumsKernelID, m_scanThreadGroupsGroupX, 1, 1);
-
+            if (groupScanDebug)
+            {
+                groupScanDebug = false;
+                uint[] data = new uint[m_instancesScannedGroupSumBuffer.count];
+                m_instancesScannedGroupSumBuffer.GetData(data);
+                for (int i = 0; i < data.Length; i++)
+                {
+                    Debug.Log(data[i]);
+                }
+            }
             // Shadows
             scanGroupSumsCS.SetBuffer(m_scanGroupSumsKernelID, _GroupSumArrayIn, m_shadowGroupSumArrayBuffer);
             scanGroupSumsCS.SetBuffer(m_scanGroupSumsKernelID, _GroupSumArrayOut, m_shadowsScannedGroupSumBuffer);
@@ -441,9 +460,9 @@ public class MilkInstancer : MonoBehaviour
         {
             //m_lastCamPosition = camPosition;
             Graphics.ExecuteCommandBufferAsync(m_sortingCommandBuffer, ComputeQueueType.Background);
-            if (tempDebug)
+            if (sortDebug)
             {
-                tempDebug = false;
+                sortDebug = false;
                 SortingData[] data = new SortingData[m_instancesSortingData.count];
                 m_instancesSortingData.GetData(data);
                 for (int i = 0; i < data.Length; i++)
@@ -455,7 +474,10 @@ public class MilkInstancer : MonoBehaviour
         }
         Profiler.EndSample();
     }
-    public bool tempDebug;
+    public bool scanDebug;
+    public bool groupScanDebug;
+    public bool sortDebug;
+    
     private bool TryGetKernels()
     {
         return TryGetKernel("CSMain", ref createDrawDataBufferCS, ref m_createDrawDataBufferKernelID)
@@ -716,8 +738,8 @@ public class MilkInstancer : MonoBehaviour
         createDrawDataBufferCS.SetBuffer(m_createDrawDataBufferKernelID, _InstancesDrawMatrixRows01, m_instancesMatrixRows01);
         createDrawDataBufferCS.SetBuffer(m_createDrawDataBufferKernelID, _InstancesDrawMatrixRows23, m_instancesMatrixRows23);
         createDrawDataBufferCS.SetBuffer(m_createDrawDataBufferKernelID, _InstancesDrawMatrixRows45, m_instancesMatrixRows45);
-        int groupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
-        //int groupX = Mathf.Max(1, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
+        //int groupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
+        int groupX = Mathf.Max(1, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
         //int groupX = Mathf.Max(1, Mathf.CeilToInt((float)m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE)));
 
         createDrawDataBufferCS.SetInt(Shader.PropertyToID("_count"), m_numberOfInstances);
@@ -737,14 +759,15 @@ public class MilkInstancer : MonoBehaviour
         // InitConstantComputeVariables
         //-----------------------------------
         m_scanThreadGroupsGroupX = 1;
+        //m_scanThreadGroupsGroupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
 
         //m_occlusionGroupX = Mathf.Max(1, m_numberOfInstances / 64);
-        m_scanInstancesGroupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
-        m_copyInstanceDataGroupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
+        //m_scanInstancesGroupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
+        //m_copyInstanceDataGroupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
 
         m_occlusionGroupX = Mathf.Max(1, nextPowerOfTwo / 64);
-        //m_scanInstancesGroupX = Mathf.Max(1, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
-        //m_copyInstanceDataGroupX = Mathf.Max(1, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
+        m_scanInstancesGroupX = Mathf.Max(1, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
+        m_copyInstanceDataGroupX = Mathf.Max(1, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
 
         //m_occlusionGroupX = Mathf.Max(1, Mathf.CeilToInt((float)m_numberOfInstances / 64));
         //m_scanInstancesGroupX = Mathf.Max(1, Mathf.CeilToInt((float)m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE)));
@@ -771,6 +794,7 @@ public class MilkInstancer : MonoBehaviour
 
         //scanGroupSumsCS.SetInt(_NumOfGroups, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
         scanGroupSumsCS.SetInt(_NumOfGroups, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
+        //Debug.Log(nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
         //scanGroupSumsCS.SetInt(_NumOfGroups, Mathf.CeilToInt((float)m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE)));
 
         copyInstanceDataCS.SetInt(_NumOfDrawcalls, m_numberOfInstanceTypes * NUMBER_OF_DRAW_CALLS);
@@ -835,7 +859,6 @@ public class MilkInstancer : MonoBehaviour
         public static int Block { get; private set; } = Shader.PropertyToID("_Block");
         public static int Dimension { get; private set; } = Shader.PropertyToID("_Dimension");
         public static int Count { get; private set; } = Shader.PropertyToID("_Count");
-        //public static int Reverse { get; private set; } = Shader.PropertyToID("_Reverse");
         public static int NextPowerOfTwo { get; private set; } = Shader.PropertyToID("_NextPowerOfTwo");
 
         public static int KeysBuffer { get; private set; } = Shader.PropertyToID("_Keys");
@@ -915,10 +938,6 @@ public class MilkInstancer : MonoBehaviour
         m_sortingCommandBuffer.DispatchCompute(sortingCS, m_kernels.CopyBuffer, Mathf.CeilToInt((float)values.count / Util.GROUP_SIZE), 1, 1);
 
         Sort(values, m_instancesSortingDataTemp, length);
-
-        //copyBuff.Dispose();
-        m_instancesSortingDataTemp.Dispose();
-        //ReleaseComputeBuffer(ref m_instancesSortingDataTemp);
     }
     private ComputeBuffer m_keysBuffer;
     private ComputeBuffer m_tempBuffer;
@@ -940,7 +959,7 @@ public class MilkInstancer : MonoBehaviour
     {
         Debug.Assert(values.count == keys.count, "Value and key buffers must be of the same size.");
 
-        m_originalCount = length < 0 ? values.count : Mathf.Min(length, values.count);
+        m_originalCount = length < 0 ? values.count : length;
         //m_originalCount = nextPowerOfTwo;
         m_paddedCount = Mathf.NextPowerOfTwo(m_originalCount);
         m_mustTruncateValueBuffer = !Mathf.IsPowerOfTwo(m_originalCount);

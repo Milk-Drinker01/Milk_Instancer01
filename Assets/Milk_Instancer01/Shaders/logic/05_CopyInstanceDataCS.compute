@@ -64,11 +64,11 @@ inline void CSMain (
         return;
     }
     uint groupID = _groupID.x;
-    uint groupSum = _groupID.x > 0 ? _GroupSumArray[_groupID.x] : 0;
-
+    uint groupSum = groupID > 0 ? _GroupSumArray[groupID] : 0;
     //scatter results
     if (_InstancePredicatesIn[tID] == 1)
     {
+        
         uint instanceDataOutIndex = _ScannedInstancePredicates[tID] + groupSum;
         uint drawInstanceIndex = _SortingData[tID].drawCallInstanceIndex & 0xFFFF;
         //uint drawInstanceIndex = _SortingData[tID].drawCallInstanceIndex & 131071;

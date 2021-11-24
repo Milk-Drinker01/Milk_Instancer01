@@ -299,6 +299,7 @@ public class InstancePainter : MonoBehaviour
             }
             addInstanceData(n, pos, rot, scale);
         }
+        init();
         totalCount = 0;
         for (int i = 0; i < prefabParamaters.Length; i++)
         {
@@ -342,7 +343,6 @@ public class InstancePainter : MonoBehaviour
             instances[instanceType].scales[count - i] = scales[i - 1];
         }
         prefabParamaters[instanceType].currentCount = count;
-        init();
     }
     void checkPrefabList()
     {

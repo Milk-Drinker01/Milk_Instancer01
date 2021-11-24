@@ -31,9 +31,9 @@ cbuffer CB
 // Structured Buffers
 //--------------------------------------------------------------------------------------
 
-StructuredBuffer<uint> _InstancePredicatesIn;
+StructuredBuffer<uint> _InstancePredicatesIn; // in
 RWStructuredBuffer<uint> _GroupSumArray;
-RWStructuredBuffer<uint> _ScannedInstancePredicates;
+RWStructuredBuffer<uint> _ScannedInstancePredicates; //result
 
 //--------------------------------------------------------------------------------------
 // Kernels & Functions
@@ -50,6 +50,10 @@ inline void CSMain (
     )        
 {
     int tID = (int) _dispatchThreadID.x;
+    /*if (2 * tID + 1 >= _num)
+    {
+        return;
+    }*/
     int groupTID = (int) _groupThreadID.x;
     int groupID = (int) _groupID.x;
 
@@ -77,7 +81,7 @@ inline void CSMain (
     // clear the last element
     if (groupTID == 0)
     {
-        _GroupSumArray[_groupID.x] = temp[NoofElements - 1];
+        _GroupSumArray[groupID] = temp[NoofElements - 1];
         temp[NoofElements - 1] = 0;
     }
 
