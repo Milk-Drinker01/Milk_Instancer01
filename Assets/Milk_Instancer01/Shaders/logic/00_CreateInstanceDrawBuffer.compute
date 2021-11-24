@@ -81,7 +81,7 @@ float4x4 inverse(float4x4 input)
 	return transpose(cofactors) / determinant(input);
 }
 
-//int _count;
+int _count;
 [numthreads(THREAD_GROUP_SIZE_X, THREAD_GROUP_SIZE_Y, THREAD_GROUP_SIZE_Z)]
 inline void CSMain (
 		in uint3 _dispatchThreadID : SV_DispatchThreadID, // DispatchThreadID  = dot(GroupID, numthreads) + GroupThreadId;
@@ -91,10 +91,10 @@ inline void CSMain (
 	)        
 {
     uint tID = _dispatchThreadID.x;
-	/*if (tID >= _count)
+	if (tID >= _count)
 	{
 		return;
-	}*/
+	}
 	float3 position = _Positions[tID];
 	float3 scale = _Scales[tID];
     float3 rotation = _Rotations[tID];

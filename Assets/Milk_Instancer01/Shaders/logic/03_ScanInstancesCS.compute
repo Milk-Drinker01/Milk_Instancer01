@@ -40,6 +40,7 @@ RWStructuredBuffer<uint> _ScannedInstancePredicates;
 //--------------------------------------------------------------------------------------
 
 // Based on Parallel Prefix Sum (Scan) with CUDA by Mark Harris
+int _num;
 [numthreads(THREAD_GROUP_SIZE_X, THREAD_GROUP_SIZE_Y, THREAD_GROUP_SIZE_Z)]
 inline void CSMain (
         in uint3 _dispatchThreadID : SV_DispatchThreadID, // DispatchThreadID  = dot(GroupID, numthreads) + GroupThreadId;
@@ -57,6 +58,7 @@ inline void CSMain (
     temp[2 * groupTID + 1] = _InstancePredicatesIn[2 * tID + 1];
     int d;
     const int NoofElements = 2 * THREAD_GROUP_SIZE_X;
+    //const int NoofElements = 128;
 
     //perform reduction
     for (d = NoofElements >> 1; d > 0; d >>= 1)

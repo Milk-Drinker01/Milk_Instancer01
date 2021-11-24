@@ -22,9 +22,6 @@
 #define THREAD_GROUP_SIZE_Y 1
 #define THREAD_GROUP_SIZE_Z 1
 
-#define LOD00_RANGE 15
-#define LOD01_RANGE 50
-
 //--------------------------------------------------------------------------------------
 // Constant Buffers
 //--------------------------------------------------------------------------------------
@@ -148,7 +145,10 @@ inline uint IsVisibleAfterFrustumCulling(float4 clipPos)
 //--------------------------------------------------------------------------------------
 // Kernels
 //--------------------------------------------------------------------------------------
+float LOD00_RANGE = 15;
+float LOD01_RANGE = 50;
 
+int _count;
 [numthreads(THREAD_GROUP_SIZE_X, THREAD_GROUP_SIZE_Y, THREAD_GROUP_SIZE_Z)]
 inline void CSMain (
         in uint3 _dispatchThreadID : SV_DispatchThreadID, // DispatchThreadID  = dot(GroupID, numthreads) + GroupThreadId;
@@ -159,6 +159,10 @@ inline void CSMain (
 {
     // Calculate the instance index
     uint tID = _dispatchThreadID.x;
+    if (tID >= (uint)_count)
+    {
+        return;
+    }
     SortingData sortingData = _SortingData[tID];
     uint drawCall = (sortingData.drawCallInstanceIndex >> 16);
     uint index = (sortingData.drawCallInstanceIndex) & 0xFFFF;
@@ -230,13 +234,10 @@ inline void CSMain (
         isVisible *= (_ShouldDetailCull * isVisible > 0) ? IsVisibleAfterDetailCulling(clipMinX, clipMaxX, clipMinY, clipMaxY) : 1;
     }
 
-    float lod00Range = LOD00_RANGE;
-    float lod01Range = LOD01_RANGE;
-
     // Calculate the correct index to the arguments buffers
     uint argsIndex = drawCall + 1;    
-    argsIndex += 5 * (minDistanceToCamera > lod00Range);
-    argsIndex += 5 * (minDistanceToCamera > lod01Range);
+    argsIndex += 5 * (minDistanceToCamera > LOD00_RANGE);
+    argsIndex += 5 * (minDistanceToCamera > LOD01_RANGE);
     argsIndex = _ShouldLOD * argsIndex + ((_ShouldLOD == 0) * (drawCall + 11));
     
     uint shadowArgsIndex = argsIndex;//_ShouldOnlyUseLOD02Shadows ? drawCall + 11 : argsIndex;

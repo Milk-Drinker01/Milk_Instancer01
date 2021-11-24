@@ -16,13 +16,14 @@ public class InstancePainter : MonoBehaviour
     [HideInInspector] public MilkInstancer indirectRenderer;
 
     //[Header("debug")]
-    [HideInInspector] public IndirectInstanceData[] instances;
+    public IndirectInstanceData[] instances;
     public PaintablePrefab[] prefabParamaters = new PaintablePrefab[0];
 
 #if UNITY_EDITOR
     public LayerMask rayCastLayerMask;
     [HideInInspector] public GameObject[] _prefabs = new GameObject[0];
     int[] selectionBias;
+    public int totalCount = 0;
 #endif
     #endregion
 
@@ -155,6 +156,7 @@ public class InstancePainter : MonoBehaviour
         }
 #if UNITY_EDITOR
         checkPrefabList();
+        totalCount = 0;
 #endif
         init();
     }
@@ -241,9 +243,10 @@ public class InstancePainter : MonoBehaviour
 
             removed = 0;
         }
+        totalCount = 0;
         init();
     }
-    void paintInstances(Vector3 origin, Vector3 direction, float distance)
+    void paintInstances(Vector3 origin, Vector3 point, float distance)
     {
         if (rand.state == 0)
         {
@@ -261,12 +264,13 @@ public class InstancePainter : MonoBehaviour
         for (int i = 0; i < numToAdd; i++)
         {
             //ang = UnityEngine.Random.insideUnitCircle * rand.NextFloat(areaSize);
-            dir = direction;
-            dir += UnityEngine.Random.insideUnitSphere * (areaSize / distance);
+            dir = point + (UnityEngine.Random.insideUnitSphere * areaSize * .5f);
+            dir = dir - origin;
+            dir = dir.normalized;
             //dir.x += rand.NextFloat(-areaSize, areaSize);
             //dir.y += rand.NextFloat(-areaSize, areaSize);
             //dir.z += rand.NextFloat(-areaSize, areaSize);
-            if (Physics.Raycast(origin, dir, out hit, (distance + 5), rayCastLayerMask))
+            if (Physics.Raycast(origin, dir, out hit, (areaSize * areaSize) + distance, rayCastLayerMask))
             {
                 paintTypes[selectionBias[rand.NextInt(selectionBias.Length)]]++;
                 points[k] = hit.point;
@@ -294,6 +298,11 @@ public class InstancePainter : MonoBehaviour
                 k++;
             }
             addInstanceData(n, pos, rot, scale);
+        }
+        totalCount = 0;
+        for (int i = 0; i < prefabParamaters.Length; i++)
+        {
+            totalCount += prefabParamaters[i].currentCount;
         }
     }
     private void addInstanceData(int instanceType, Vector3[] positions, Vector3[] rotations, Vector3[] scales)
@@ -387,7 +396,6 @@ public class InstancePainter : MonoBehaviour
         PaintablePrefab[] tempParamaters = new PaintablePrefab[prefabs.Length];
         for (int i = 0; i < instances.Length; i++)
         {
-            bool contains = false;
             for (int n = 0; n < prefabs.Length; n++)
             {
                 if (prefabs[n] == instances[i].prefab)
@@ -398,13 +406,6 @@ public class InstancePainter : MonoBehaviour
                     tempParamaters[i].copyParameters(prefabParamaters[i]);
                     break;
                 }
-            }
-            if (contains)
-            {
-                instances[i].index = i;
-                data.Add(instances[i].prefab, instances[i]);
-                tempParamaters[i] = new PaintablePrefab(prefabParamaters[i].prefab);
-                tempParamaters[i].copyParameters(prefabParamaters[i]);
             }
         }
 
@@ -489,7 +490,7 @@ public class InstancePainter : MonoBehaviour
             {
                 if (!e.control)
                 {
-                    paintInstances(ray.origin, ray.direction.normalized, hit.distance);
+                    paintInstances(ray.origin, hit.point, hit.distance);
                 }
                 else
                 {

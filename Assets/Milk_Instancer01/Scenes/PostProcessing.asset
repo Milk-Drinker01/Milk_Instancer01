@@ -15,7 +15,7 @@ MonoBehaviour:
   active: 1
   quality:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0
   enabled:
     m_OverrideState: 1
     m_Value: 1
@@ -81,7 +81,7 @@ MonoBehaviour:
     m_Value: 64
   m_VolumetricFogBudget:
     m_OverrideState: 1
-    m_Value: 0.5
+    m_Value: 0.25
   m_ResolutionDepthRatio:
     m_OverrideState: 1
     m_Value: 0.5
@@ -303,7 +303,6 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value:
     - {fileID: 11400000, guid: 78322c7f82657514ebe48203160e3f39, type: 2}
-    - {fileID: 11400000, guid: 414f10b2a808cb640b6d94baaae0fad7, type: 2}
 --- !u!114 &-4470219638845906788
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -874,7 +873,6 @@ MonoBehaviour:
   - {fileID: 5527546358879502649}
   - {fileID: 3218775381033169954}
   - {fileID: 1398758641721503393}
-  - {fileID: 7166201212755994736}
   - {fileID: -3760234211432025861}
   - {fileID: -752876954122058207}
 --- !u!114 &1398758641721503393
@@ -1248,96 +1246,6 @@ MonoBehaviour:
   lutContribution:
     m_OverrideState: 0
     m_Value: 1
---- !u!114 &7166201212755994736
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 384c4d03a551c44448145f4093304119, type: 3}
-  m_Name: ScreenSpaceReflection
-  m_EditorClassIdentifier: 
-  active: 1
-  quality:
-    m_OverrideState: 0
-    m_Value: 1
-  enabled:
-    m_OverrideState: 1
-    m_Value: 1
-  tracing:
-    m_OverrideState: 0
-    m_Value: 1
-  m_MinSmoothness:
-    m_OverrideState: 0
-    m_Value: 0.9
-  m_SmoothnessFadeStart:
-    m_OverrideState: 0
-    m_Value: 0.9
-  reflectSky:
-    m_OverrideState: 0
-    m_Value: 1
-  usedAlgorithm:
-    m_OverrideState: 0
-    m_Value: 0
-  depthBufferThickness:
-    m_OverrideState: 0
-    m_Value: 0.01
-  screenFadeDistance:
-    m_OverrideState: 0
-    m_Value: 0.1
-  accumulationFactor:
-    m_OverrideState: 0
-    m_Value: 0.75
-  m_RayMaxIterations:
-    m_OverrideState: 0
-    m_Value: 32
-  rayMiss:
-    m_OverrideState: 0
-    m_Value: 3
-  lastBounceFallbackHierarchy:
-    m_OverrideState: 0
-    m_Value: 3
-  layerMask:
-    m_OverrideState: 0
-    m_Value:
-      serializedVersion: 2
-      m_Bits: 4294967295
-  textureLodBias:
-    m_OverrideState: 0
-    m_Value: 1
-  m_RayLength:
-    m_OverrideState: 0
-    m_Value: 50
-  m_ClampValue:
-    m_OverrideState: 0
-    m_Value: 1
-  m_Denoise:
-    m_OverrideState: 0
-    m_Value: 1
-  m_DenoiserRadius:
-    m_OverrideState: 0
-    m_Value: 8
-  m_AffectSmoothSurfaces:
-    m_OverrideState: 0
-    m_Value: 0
-  mode:
-    m_OverrideState: 0
-    m_Value: 2
-  m_FullResolution:
-    m_OverrideState: 0
-    m_Value: 0
-  sampleCount:
-    m_OverrideState: 0
-    m_Value: 1
-  bounceCount:
-    m_OverrideState: 0
-    m_Value: 1
-  m_RayMaxIterationsRT:
-    m_OverrideState: 0
-    m_Value: 48
 --- !u!114 &8996064780901264660
 MonoBehaviour:
   m_ObjectHideFlags: 3

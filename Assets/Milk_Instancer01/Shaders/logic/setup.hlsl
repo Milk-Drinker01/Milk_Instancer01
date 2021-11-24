@@ -18,7 +18,6 @@ void setup()
 #else
     uint index = unity_InstanceID + _ArgsBuffer[_ArgsOffset];
 #endif
-
     Indirect2x2Matrix rows01 = _InstancesDrawMatrixRows01[index];
     Indirect2x2Matrix rows23 = _InstancesDrawMatrixRows23[index];
     Indirect2x2Matrix rows45 = _InstancesDrawMatrixRows45[index];

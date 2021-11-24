@@ -47,6 +47,8 @@ public class MilkInstancer : MonoBehaviour
     public bool enableOcclusionCulling = true;
     public bool enableDetailCulling = true;
     public bool enableLOD = true;
+    public float lod0Range = 15;
+    public float lod1Range = 50;
     [Range(00.00f, .05f)] public float detailCullingPercentage = 0.005f;
 
     Camera mainCam;
@@ -439,9 +441,21 @@ public class MilkInstancer : MonoBehaviour
         {
             //m_lastCamPosition = camPosition;
             Graphics.ExecuteCommandBufferAsync(m_sortingCommandBuffer, ComputeQueueType.Background);
+            if (tempDebug)
+            {
+                tempDebug = false;
+                SortingData[] data = new SortingData[m_instancesSortingData.count];
+                m_instancesSortingData.GetData(data);
+                for (int i = 0; i < data.Length; i++)
+                {
+                    Debug.Log(data[i].distanceToCam);
+                }
+            }
+            
         }
         Profiler.EndSample();
     }
+    public bool tempDebug;
     private bool TryGetKernels()
     {
         return TryGetKernel("CSMain", ref createDrawDataBufferCS, ref m_createDrawDataBufferKernelID)
@@ -466,10 +480,6 @@ public class MilkInstancer : MonoBehaviour
     }
     #endregion
     #region initialization
-    public void initializePrefabs()
-    {
-
-    }
 
     public void StopDrawing(bool shouldReleaseBuffers = false)
     {
@@ -592,6 +602,7 @@ public class MilkInstancer : MonoBehaviour
             // Add the data to the renderer list
             indirectMeshes[i] = irm;
         }
+        nextPowerOfTwo = Mathf.NextPowerOfTwo(m_numberOfInstances);
 
         int computeShaderInputSize = Marshal.SizeOf(typeof(IndirectInstanceCSInput));
         int computeShaderDrawMatrixSize = Marshal.SizeOf(typeof(Indirect2x2Matrix));
@@ -624,7 +635,7 @@ public class MilkInstancer : MonoBehaviour
         m_instancesArgsBuffer.SetData(m_args);
         m_shadowArgsBuffer.SetData(m_args);
         m_instancesSortingData.SetData(sortingData);
-        m_instancesSortingDataTemp.SetData(sortingData);
+        //m_instancesSortingDataTemp.SetData(sortingData);
         m_instanceDataBuffer.SetData(instancesInputData);
 
         // Setup the Material Property blocks for our meshes...
@@ -697,7 +708,7 @@ public class MilkInstancer : MonoBehaviour
         rotationBuffer.SetData(rotations);
 
 
-        int nextPowerOfTwo = (int)Mathf.Pow(2, Mathf.CeilToInt(Mathf.Log(m_numberOfInstances, 2)));
+        //nextPowerOfTwo = (int)Mathf.Pow(2, Mathf.CeilToInt(Mathf.Log(m_numberOfInstances, 2)));
 
         createDrawDataBufferCS.SetBuffer(m_createDrawDataBufferKernelID, _Positions, positionsBuffer);
         createDrawDataBufferCS.SetBuffer(m_createDrawDataBufferKernelID, _Scales, scaleBuffer);
@@ -708,8 +719,13 @@ public class MilkInstancer : MonoBehaviour
         int groupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
         //int groupX = Mathf.Max(1, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
         //int groupX = Mathf.Max(1, Mathf.CeilToInt((float)m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE)));
-        //createDrawDataBufferCS.SetInt(Shader.PropertyToID("_count"), m_numberOfInstances);
-        //copyInstanceDataCS.SetInt(Shader.PropertyToID("_count"), m_numberOfInstances);
+
+        createDrawDataBufferCS.SetInt(Shader.PropertyToID("_count"), m_numberOfInstances);
+        scanInstancesCS.SetInt(Shader.PropertyToID("_num"), m_numberOfInstances);
+        copyInstanceDataCS.SetInt(Shader.PropertyToID("_count"), m_numberOfInstances);
+        occlusionCS.SetInt(Shader.PropertyToID("_count"), m_numberOfInstances);
+        occlusionCS.SetFloat(Shader.PropertyToID("LOD00_RANGE"), lod0Range);
+        occlusionCS.SetFloat(Shader.PropertyToID("LOD01_RANGE"), lod1Range);
 
         createDrawDataBufferCS.Dispatch(m_createDrawDataBufferKernelID, groupX, 1, 1);
 
@@ -720,15 +736,14 @@ public class MilkInstancer : MonoBehaviour
         //-----------------------------------
         // InitConstantComputeVariables
         //-----------------------------------
-
-        m_occlusionGroupX = Mathf.Max(1, m_numberOfInstances / 64);
-        m_scanInstancesGroupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
         m_scanThreadGroupsGroupX = 1;
+
+        //m_occlusionGroupX = Mathf.Max(1, m_numberOfInstances / 64);
+        m_scanInstancesGroupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
         m_copyInstanceDataGroupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
 
-        //m_occlusionGroupX = Mathf.Max(1, nextPowerOfTwo / 64);
+        m_occlusionGroupX = Mathf.Max(1, nextPowerOfTwo / 64);
         //m_scanInstancesGroupX = Mathf.Max(1, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
-        //m_scanThreadGroupsGroupX = 1;
         //m_copyInstanceDataGroupX = Mathf.Max(1, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
 
         //m_occlusionGroupX = Mathf.Max(1, Mathf.CeilToInt((float)m_numberOfInstances / 64));
@@ -769,6 +784,7 @@ public class MilkInstancer : MonoBehaviour
 
         return true;
     }
+    int nextPowerOfTwo = 0;
     //private void CreateCommandBuffers()
     //{
     //    CreateSortingCommandBuffer();
@@ -846,64 +862,42 @@ public class MilkInstancer : MonoBehaviour
         m_tempBuffer.SetCounterValue(0);
         m_valuesBuffer.SetCounterValue(0);
 
-        //sortingCS.SetInt(Properties.Count, m_originalCount);
         m_sortingCommandBuffer.SetComputeIntParam(sortingCS, Properties.Count, m_originalCount);
-        //sortingCS.SetInt(Properties.NextPowerOfTwo, m_paddedCount);
         m_sortingCommandBuffer.SetComputeIntParam(sortingCS, Properties.NextPowerOfTwo, m_paddedCount);
 
         int minMaxKernel = m_isReverseSort ? m_kernels.SetMin : m_kernels.SetMax;
-
-        //sortingCS.SetBool(Properties.Reverse, m_isReverseSort);
-        //m_sortingCommandBuffer.set(Properties.Reverse, m_isReverseSort);
 
         m_paddingInput[0] = m_isReverseSort ? int.MaxValue : int.MinValue;
         m_paddingInput[1] = 0;
 
         m_paddingBuffer.SetData(m_paddingInput);
 
-        //sortingCS.SetBuffer(minMaxKernel, Properties.ExternalKeysBuffer, m_externalKeysBuffer);
         m_sortingCommandBuffer.SetComputeBufferParam(sortingCS, minMaxKernel, Properties.ExternalKeysBuffer, m_externalKeysBuffer);
-        //sortingCS.SetBuffer(minMaxKernel, Properties.PaddingBuffer, m_paddingBuffer);
         m_sortingCommandBuffer.SetComputeBufferParam(sortingCS, minMaxKernel, Properties.PaddingBuffer, m_paddingBuffer);
 
         // first determine either the minimum value or maximum value of the given data, depending on whether it's a reverse sort or not, 
         // to serve as the padding value for non-power-of-two sized inputs
-        //sortingCS.Dispatch(minMaxKernel, Mathf.CeilToInt((float)m_originalCount / Util.GROUP_SIZE), 1, 1);
         m_sortingCommandBuffer.DispatchCompute(sortingCS, minMaxKernel, Mathf.CeilToInt((float)m_originalCount / Util.GROUP_SIZE), 1, 1);
 
-        //sortingCS.SetBuffer(m_kernels.GetPaddingIndex, Properties.ExternalKeysBuffer, m_externalKeysBuffer);
         m_sortingCommandBuffer.SetComputeBufferParam(sortingCS, m_kernels.GetPaddingIndex, Properties.ExternalKeysBuffer, m_externalKeysBuffer);
-        //sortingCS.SetBuffer(m_kernels.GetPaddingIndex, Properties.PaddingBuffer, m_paddingBuffer);
         m_sortingCommandBuffer.SetComputeBufferParam(sortingCS, m_kernels.GetPaddingIndex, Properties.PaddingBuffer, m_paddingBuffer);
-        //sortingCS.Dispatch(m_kernels.GetPaddingIndex, Mathf.CeilToInt((float)m_originalCount / Util.GROUP_SIZE), 1, 1);
         m_sortingCommandBuffer.DispatchCompute(sortingCS, m_kernels.GetPaddingIndex, Mathf.CeilToInt((float)m_originalCount / Util.GROUP_SIZE), 1, 1);
 
         // setting up the second kernel, the padding kernel. because the sort only works on power of two sized buffers,
         // this will pad the buffer with duplicates of the greatest (or least, if reverse sort) integer to be truncated later
-        //sortingCS.SetBuffer(m_kernels.PadBuffer, Properties.ExternalKeysBuffer, m_externalKeysBuffer);
         m_sortingCommandBuffer.SetComputeBufferParam(sortingCS, m_kernels.PadBuffer, Properties.ExternalKeysBuffer, m_externalKeysBuffer);
-        //sortingCS.SetBuffer(m_kernels.PadBuffer, Properties.ExternalValuesBuffer, m_externalValuesBuffer);
         m_sortingCommandBuffer.SetComputeBufferParam(sortingCS, m_kernels.PadBuffer, Properties.ExternalValuesBuffer, m_externalValuesBuffer);
-        //sortingCS.SetBuffer(m_kernels.PadBuffer, Properties.ValuesBuffer, m_valuesBuffer);
         m_sortingCommandBuffer.SetComputeBufferParam(sortingCS, m_kernels.PadBuffer, Properties.ValuesBuffer, m_valuesBuffer);
-        //sortingCS.SetBuffer(m_kernels.PadBuffer, Properties.PaddingBuffer, m_paddingBuffer);
         m_sortingCommandBuffer.SetComputeBufferParam(sortingCS, m_kernels.PadBuffer, Properties.PaddingBuffer, m_paddingBuffer);
-        //sortingCS.SetBuffer(m_kernels.PadBuffer, Properties.TempBuffer, m_tempBuffer);
         m_sortingCommandBuffer.SetComputeBufferParam(sortingCS, m_kernels.PadBuffer, Properties.TempBuffer, m_tempBuffer);
 
-        //sortingCS.Dispatch(m_kernels.PadBuffer, Mathf.CeilToInt((float)m_paddedCount / Util.GROUP_SIZE), 1, 1);
         m_sortingCommandBuffer.DispatchCompute(sortingCS, m_kernels.PadBuffer, Mathf.CeilToInt((float)m_paddedCount / Util.GROUP_SIZE), 1, 1);
 
         // initialize the keys buffer for use with the sort algorithm proper
         Util.CalculateWorkSize(m_paddedCount, out x, out y, out z);
 
-        //sortingCS.SetInt(Properties.Count, m_paddedCount);
         m_sortingCommandBuffer.SetComputeIntParam(sortingCS, Properties.Count, m_paddedCount);
-
-        //sortingCS.SetBuffer(m_kernels.Init, Properties.KeysBuffer, m_keysBuffer);
         m_sortingCommandBuffer.SetComputeBufferParam(sortingCS, m_kernels.Init, Properties.KeysBuffer, m_keysBuffer);
-
-        //sortingCS.Dispatch(m_kernels.Init, x, y, z);
         m_sortingCommandBuffer.DispatchCompute(sortingCS, m_kernels.Init, x, y, z);
     }
     public void Sort(ComputeBuffer values, int length = -1)
@@ -924,6 +918,7 @@ public class MilkInstancer : MonoBehaviour
 
         //copyBuff.Dispose();
         m_instancesSortingDataTemp.Dispose();
+        //ReleaseComputeBuffer(ref m_instancesSortingDataTemp);
     }
     private ComputeBuffer m_keysBuffer;
     private ComputeBuffer m_tempBuffer;
@@ -946,6 +941,7 @@ public class MilkInstancer : MonoBehaviour
         Debug.Assert(values.count == keys.count, "Value and key buffers must be of the same size.");
 
         m_originalCount = length < 0 ? values.count : Mathf.Min(length, values.count);
+        //m_originalCount = nextPowerOfTwo;
         m_paddedCount = Mathf.NextPowerOfTwo(m_originalCount);
         m_mustTruncateValueBuffer = !Mathf.IsPowerOfTwo(m_originalCount);
         m_externalValuesBuffer = values;
@@ -1361,10 +1357,10 @@ class InstancingEditor : Editor
         base.OnInspectorGUI();
         MilkInstancer comp = (MilkInstancer)target;
         comp.checkIfOnlyInstance();
-        if (GUILayout.Button("ranomize"))
-        {
-            comp.initializePrefabs();
-        }
+        //if (GUILayout.Button("ranomize"))
+        //{
+            
+        //}
     }
 }
 #endif
