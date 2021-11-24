@@ -98,7 +98,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 100}
   m_MaxSize: {x: 8096, y: 8096}
   vertical: 0
-  controlID: 3008
+  controlID: 92
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -194,7 +194,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 99
+  controlID: 205
 --- !u!114 &9
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -219,7 +219,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 100
+  controlID: 206
 --- !u!114 &10
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -244,7 +244,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 101
+  controlID: 207
 --- !u!114 &11
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -345,8 +345,8 @@ MonoBehaviour:
     y: 0
     width: 360
     height: 947
-  m_MinSize: {x: 275, y: 50}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 276, y: 71}
+  m_MaxSize: {x: 4001, y: 4021}
   m_ActualView: {fileID: 23}
   m_Panes:
   - {fileID: 23}
@@ -421,8 +421,8 @@ MonoBehaviour:
   m_minNodePos: {x: -853.452, y: -864.3276}
   m_maxNodePos: {x: 260.4995, y: 457.7267}
   m_isDirty: 0
-  m_saveIsDirty: 0
-  m_repaintIsDirty: 0
+  m_saveIsDirty: 1
+  m_repaintIsDirty: 1
   m_liveShaderEditing: 0
   m_shaderIsModified: 0
   m_lastOpenedLocation: Assets/Milk_Instancer01/Shaders/StandardShading.asset
@@ -516,11 +516,11 @@ MonoBehaviour:
   m_selectionMode: 0
   m_duplicatePreventionBuffer:
     m_availableUVChannelsArray: ffffffffffffffffffffffffffffffff
-  m_inactivityTime: 355.50256079999997
-  m_lastTimeSaved: 350.89065059999996
+  m_inactivityTime: 37.4500489
+  m_lastTimeSaved: 73.6825416
   m_cacheSaveOp: 0
   m_mainGraphInstance: {fileID: 0}
-  m_cameraOffset: {x: 1033.844, y: 350.0659}
+  m_cameraOffset: {x: 877, y: 435.5}
   m_cameraZoom: 1
   m_minNodePos: {x: -577.408, y: -263.5142}
   m_maxNodePos: {x: 72, y: 46.79654}
@@ -533,13 +533,20 @@ MonoBehaviour:
   m_zoomChanged: 0
   m_lastWindowWidth: 1754
   m_graphCount: 1
-  m_currentInactiveTime: 225.00881730000003
+  m_currentInactiveTime: 37.90446010000001
   m_currentNodeAvailability: 1
   m_nodeParametersWindowMaximized: 1
   m_paletteWindowMaximized: 1
   m_isShaderFunctionWindow: 0
   m_openedAssetFromNode: 0
   m_messages:
+  - ItemType: 0
+    ItemMessage: 'No Master node assigned.
+
+      Shader file will only have node
+      info'
+    ItemTime: 58.5125846862793
+    ItemOwnerId: -1
   - ItemType: 0
     ItemMessage: 'Detected Asynchronous Shader Compilation. This can cause slowdowns
       when saving not only ASE shaders but other shaders as well.
@@ -550,7 +557,7 @@ MonoBehaviour:
 
       This message can be turned
       off via Preferences > Amplify Shader Editor > Show Async Message.'
-    ItemTime: 314.2579650878906
+    ItemTime: 58.51138687133789
     ItemOwnerId: -1
   m_maxMsgWidth: 400
   m_maximizeMessages: 0
@@ -683,9 +690,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 44160000
+      m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: ccecffffdcecffff24edffff90edffff66f0ffffacf2ffff04fbffff
+      m_ExpandedIDs: 04fbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -967,9 +974,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: -23.523006, y: -7.7107315, z: 51.147903}
+    m_Target: {x: -4.1102414, y: 1.0827683, z: -30.060116}
     speed: 2
-    m_Value: {x: -23.523006, y: -7.7107315, z: 51.147903}
+    m_Value: {x: -4.1102414, y: 1.0827683, z: -30.060116}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -1016,13 +1023,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: -0.29371813, y: 0.6224536, z: -0.2714297, w: -0.6732519}
+    m_Target: {x: 0.06452466, y: 0.3019916, z: -0.020712832, w: 0.9512467}
     speed: 2
-    m_Value: {x: -0.29983237, y: 0.6213695, z: -0.2787639, w: -0.6680503}
+    m_Value: {x: 0.07027428, y: 0.29890895, z: -0.022308383, w: 0.951429}
   m_Size:
-    m_Target: 23.973305
+    m_Target: 6.9778004
     speed: 2
-    m_Value: 22.940962
+    m_Value: 6.9778004
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -1101,9 +1108,9 @@ MonoBehaviour:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 4a7d0000
-    m_LastClickedID: 32074
-    m_ExpandedIDs: 00000000287d000000ca9a3b
+    m_SelectedIDs: 467c0000
+    m_LastClickedID: 31814
+    m_ExpandedIDs: 00000000327c0000447c000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1131,7 +1138,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000287d00002a7d0000
+    m_ExpandedIDs: 00000000327c0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1158,7 +1165,7 @@ MonoBehaviour:
   m_ListAreaState:
     m_SelectedInstanceIDs: 
     m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 1
+    m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: c623000044830000987b0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -1246,28 +1253,28 @@ MonoBehaviour:
   m_Recording: 1
   m_ActiveNativePlatformSupportModuleName: 
   m_AllModules:
-  - rid: 5791645078001811490
-  - rid: 5791645078001811491
-  - rid: 5791645078001811492
-  - rid: 5791645078001811493
-  - rid: 5791645078001811494
-  - rid: 5791645078001811495
-  - rid: 5791645078001811496
-  - rid: 5791645078001811497
-  - rid: 5791645078001811498
-  - rid: 5791645078001811499
-  - rid: 5791645078001811500
-  - rid: 5791645078001811501
-  - rid: 5791645078001811502
-  - rid: 5791645078001811503
-  - rid: 5791645078001811504
-  - rid: 5791645078001811505
+  - rid: 5791645078174826496
+  - rid: 5791645078174826497
+  - rid: 5791645078174826498
+  - rid: 5791645078174826499
+  - rid: 5791645078174826500
+  - rid: 5791645078174826501
+  - rid: 5791645078174826502
+  - rid: 5791645078174826503
+  - rid: 5791645078174826504
+  - rid: 5791645078174826505
+  - rid: 5791645078174826506
+  - rid: 5791645078174826507
+  - rid: 5791645078174826508
+  - rid: 5791645078174826509
+  - rid: 5791645078174826510
+  - rid: 5791645078174826511
   m_CallstackRecordMode: 1
   m_ClearOnPlay: 0
   references:
     version: 2
     RefIds:
-    - rid: 5791645078001811490
+    - rid: 5791645078174826496
       type: {class: CPUProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
       data:
         m_Identifier: UnityEditorInternal.Profiling.CPUProfilerModule, UnityEditor.CoreModule,
@@ -1733,7 +1740,7 @@ MonoBehaviour:
           <threadId>k__BackingField: 33508
           <threadIndex>k__BackingField: 0
           m_GroupName: 
-    - rid: 5791645078001811491
+    - rid: 5791645078174826497
       type: {class: GPUProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
       data:
         m_Identifier: UnityEditorInternal.Profiling.GPUProfilerModule, UnityEditor.CoreModule,
@@ -2071,13 +2078,13 @@ MonoBehaviour:
           <threadId>k__BackingField: 0
           <threadIndex>k__BackingField: -1
           m_GroupName: 
-    - rid: 5791645078001811492
+    - rid: 5791645078174826498
       type: {class: RenderingProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
       data:
         m_Identifier: UnityEditorInternal.Profiling.RenderingProfilerModule, UnityEditor.CoreModule,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         m_PaneScroll: {x: 0, y: 0}
-    - rid: 5791645078001811493
+    - rid: 5791645078174826499
       type: {class: MemoryProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
       data:
         m_Identifier: UnityEditorInternal.Profiling.MemoryProfilerModule, UnityEditor.CoreModule,
@@ -2107,7 +2114,7 @@ MonoBehaviour:
           oldMinSizes: 
           oldMaxSizes: 
           oldSplitSize: 0
-    - rid: 5791645078001811494
+    - rid: 5791645078174826500
       type: {class: AudioProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
       data:
         m_Identifier: UnityEditorInternal.Profiling.AudioProfilerModule, UnityEditor.CoreModule,
@@ -2116,31 +2123,31 @@ MonoBehaviour:
         m_ShowInactiveDSPChains: 0
         m_HighlightAudibleDSPChains: 1
         m_DSPGraphZoomFactor: 1
-    - rid: 5791645078001811495
+    - rid: 5791645078174826501
       type: {class: VideoProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
       data:
         m_Identifier: UnityEditorInternal.Profiling.VideoProfilerModule, UnityEditor.CoreModule,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         m_PaneScroll: {x: 0, y: 0}
-    - rid: 5791645078001811496
+    - rid: 5791645078174826502
       type: {class: PhysicsProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
       data:
         m_Identifier: UnityEditorInternal.Profiling.PhysicsProfilerModule, UnityEditor.CoreModule,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         m_PaneScroll: {x: 0, y: 0}
-    - rid: 5791645078001811497
+    - rid: 5791645078174826503
       type: {class: Physics2DProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
       data:
         m_Identifier: UnityEditorInternal.Profiling.Physics2DProfilerModule, UnityEditor.CoreModule,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         m_PaneScroll: {x: 0, y: 0}
-    - rid: 5791645078001811498
+    - rid: 5791645078174826504
       type: {class: NetworkingMessagesProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
       data:
         m_Identifier: UnityEditorInternal.Profiling.NetworkingMessagesProfilerModule,
           UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         m_PaneScroll: {x: 0, y: 0}
-    - rid: 5791645078001811499
+    - rid: 5791645078174826505
       type: {class: NetworkingOperationsProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
       data:
         m_Identifier: UnityEditorInternal.Profiling.NetworkingOperationsProfilerModule,
@@ -2187,45 +2194,45 @@ MonoBehaviour:
         - ObjectHide
         - CRC
         - ClientAuthority
-    - rid: 5791645078001811500
+    - rid: 5791645078174826506
       type: {class: UIProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
       data:
         m_Identifier: UnityEditorInternal.Profiling.UIProfilerModule, UnityEditor.CoreModule,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         m_PaneScroll: {x: 0, y: 0}
-    - rid: 5791645078001811501
+    - rid: 5791645078174826507
       type: {class: UIDetailsProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
       data:
         m_Identifier: UnityEditorInternal.Profiling.UIDetailsProfilerModule, UnityEditor.CoreModule,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         m_PaneScroll: {x: 0, y: 0}
-    - rid: 5791645078001811502
+    - rid: 5791645078174826508
       type: {class: GlobalIlluminationProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
       data:
         m_Identifier: UnityEditorInternal.Profiling.GlobalIlluminationProfilerModule,
           UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         m_PaneScroll: {x: 0, y: 0}
-    - rid: 5791645078001811503
+    - rid: 5791645078174826509
       type: {class: VirtualTexturingProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
       data:
         m_Identifier: UnityEditorInternal.Profiling.VirtualTexturingProfilerModule,
           UnityEditor.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         m_PaneScroll: {x: 0, y: 0}
         m_VTProfilerView:
-          rid: 5791645078001811506
-    - rid: 5791645078001811504
+          rid: 5791645078174826512
+    - rid: 5791645078174826510
       type: {class: FileIOProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
       data:
         m_Identifier: UnityEditorInternal.Profiling.FileIOProfilerModule, UnityEditor.CoreModule,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         m_PaneScroll: {x: 0, y: 0}
-    - rid: 5791645078001811505
+    - rid: 5791645078174826511
       type: {class: AssetLoadingProfilerModule, ns: UnityEditorInternal.Profiling, asm: UnityEditor.CoreModule}
       data:
         m_Identifier: UnityEditorInternal.Profiling.AssetLoadingProfilerModule, UnityEditor.CoreModule,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
         m_PaneScroll: {x: 0, y: 0}
-    - rid: 5791645078001811506
+    - rid: 5791645078174826512
       type: {class: VirtualTexturingProfilerView, ns: UnityEditor, asm: UnityEditor.CoreModule}
       data:
         m_SortAscending: 0
