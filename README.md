@@ -13,7 +13,8 @@
   - amplify shader editor examples
   - wind shader example
 
- What more is there to do?
+
+ What am I still working on?
   - find and fix bugs
   - instance density control
   - shadergraph examples
