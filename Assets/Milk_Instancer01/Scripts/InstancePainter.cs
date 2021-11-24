@@ -16,7 +16,7 @@ public class InstancePainter : MonoBehaviour
     [HideInInspector] public MilkInstancer indirectRenderer;
 
     //[Header("debug")]
-    public IndirectInstanceData[] instances;
+    [HideInInspector] public IndirectInstanceData[] instances;
     public PaintablePrefab[] prefabParamaters = new PaintablePrefab[0];
 
 #if UNITY_EDITOR
