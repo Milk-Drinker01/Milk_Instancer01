@@ -18,7 +18,7 @@
   - find and fix bugs
   - instance density control
   - shadergraph examples
-  - support more that 256 * 256 instances
+  - support more that 256 * 256 (65536) instances
   - URP shaders
   - more spawning methods, perhaps procedural spawning
   - create a user friendly interface
