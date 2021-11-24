@@ -1,8 +1,8 @@
 # Milk_Instancer01
  GPU instancing in unity with occlusion culling, frustum culling, and LODs
  
- ![painting](https://user-images.githubusercontent.com/59656122/142706154-95b0bfae-0f23-4017-a5f3-46206b04b22f.gif)
- 
+ ![painting2](https://user-images.githubusercontent.com/59656122/143315069-8fce511a-4012-48f8-8a07-b9140d8e5ca1.gif)
+
  This project is a vastly improved version of elliomans indirect rendering with compute shaders. https://github.com/ellioman/Indirect-Rendering-With-Compute-Shaders
  
  What is different in this version?
