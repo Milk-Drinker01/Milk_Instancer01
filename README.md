@@ -1,5 +1,5 @@
 # Milk_Instancer01
- GPU instancing in unity with occlusion culling, frustum culling, and LODs
+ Unity indirect GPU instancing & painting with occlusion culling, frustum culling, and LODs
  
  ![painting2](https://user-images.githubusercontent.com/59656122/143315069-8fce511a-4012-48f8-8a07-b9140d8e5ca1.gif)
 
