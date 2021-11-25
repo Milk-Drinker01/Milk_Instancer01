@@ -20,7 +20,7 @@
   - shadergraph examples
   - support more that 256 * 256 (65536) instances
   - URP shaders
-  - more spawning methods, perhaps procedural spawning
+  - more spawning methods, perhaps procedural terrain spawning
   - create a user friendly interface
   - idk im sure ill think of something
 
