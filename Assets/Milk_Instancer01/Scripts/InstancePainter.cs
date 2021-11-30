@@ -69,7 +69,8 @@ public class InstancePainter : MonoBehaviour
         if (nonEmptyData.Count > 0)
         {
             IndirectInstanceData[] nonEmptyArray = nonEmptyData.ToArray();
-            indirectRenderer.instanceShadowCastingModes = new ShadowCastingMode[nonEmptyArray.Length];
+            //indirectRenderer.instanceShadowCastingModes = new ShadowCastingMode[nonEmptyArray.Length];
+            indirectRenderer.instanceShadowCastingModes = new bool[nonEmptyArray.Length];
             for (int i = 0; i < nonEmptyArray.Length; i++)
             {
                 indirectRenderer.instanceShadowCastingModes[i] = nonEmptyArray[i].shadowCastingMode;
@@ -246,7 +247,7 @@ public class InstancePainter : MonoBehaviour
         totalCount = 0;
         init();
     }
-    void paintInstances(Vector3 origin, Vector3 point, float distance)
+    void paintInstances(Vector3 origin, Vector3 point, float distance, Vector3 normal)
     {
         if (rand.state == 0)
         {
@@ -259,17 +260,16 @@ public class InstancePainter : MonoBehaviour
         Vector3[] points = new Vector3[numToAdd];
         RaycastHit hit;
         Vector3 dir = Vector3.one;
-        //Vector2 ang = Vector2.zero;
+        Vector2 ang = Vector2.zero;
         int k = 0;
         for (int i = 0; i < numToAdd; i++)
         {
-            //ang = UnityEngine.Random.insideUnitCircle * rand.NextFloat(areaSize);
-            dir = point + (UnityEngine.Random.insideUnitSphere * areaSize * .5f);
+            ang = UnityEngine.Random.insideUnitCircle * rand.NextFloat(areaSize * .5f);
+            dir = point + Vector3.ProjectOnPlane((UnityEngine.Random.insideUnitSphere * areaSize * .5f), normal);
+            //dir = Vector3.ProjectOnPlane(new Vector3(ang.x, 0, ang.y), normal) + point;
             dir = dir - origin;
             dir = dir.normalized;
-            //dir.x += rand.NextFloat(-areaSize, areaSize);
-            //dir.y += rand.NextFloat(-areaSize, areaSize);
-            //dir.z += rand.NextFloat(-areaSize, areaSize);
+            //Debug.DrawRay(origin, dir * 50, Color.blue, 15);
             if (Physics.Raycast(origin, dir, out hit, (areaSize * areaSize) + distance, rayCastLayerMask))
             {
                 paintTypes[selectionBias[rand.NextInt(selectionBias.Length)]]++;
@@ -484,13 +484,14 @@ public class InstancePainter : MonoBehaviour
             float ppp = EditorGUIUtility.pixelsPerPoint;
             mousePos.y = scene.camera.pixelHeight - mousePos.y * ppp;
             mousePos.x *= ppp;
+            //Quaternion rot = scene.camera.transform.rotation;
 
             Ray ray = scene.camera.ScreenPointToRay(mousePos);
             if (Physics.Raycast(ray, out hit, rayCastLayerMask))
             {
                 if (!e.control)
                 {
-                    paintInstances(ray.origin, hit.point, hit.distance);
+                    paintInstances(ray.origin, hit.point, hit.distance, hit.normal);
                 }
                 else
                 {
@@ -551,7 +552,8 @@ public class PaintablePrefab
 
     public Vector2 scaleRange = new Vector2(.5f, 1);
 
-    public ShadowCastingMode instanceShadowCastingMode = ShadowCastingMode.Off;
+    //public ShadowCastingMode instanceShadowCastingMode = ShadowCastingMode.Off;
+    public bool instanceShadowCastingMode = false;
 
     public int currentCount = 0;
 

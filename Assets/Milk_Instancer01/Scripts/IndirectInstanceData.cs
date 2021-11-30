@@ -14,7 +14,8 @@ public class IndirectInstanceData
     [HideInInspector] public Vector3[] positions;
     [HideInInspector] public Vector3[] scales;
 
-    public ShadowCastingMode shadowCastingMode;
+    //public ShadowCastingMode shadowCastingMode;
+    public bool shadowCastingMode;
 
 #if UNITY_EDITOR
     public int index;

@@ -274,7 +274,7 @@ public class MilkInstancer : MonoBehaviour
             CalculateVisibleInstances(cam);
             Profiler.EndSample();
         }
-
+        checkDebugLOD();
         if (drawInstances)
         {
             Profiler.BeginSample("DrawInstances()");
@@ -282,17 +282,16 @@ public class MilkInstancer : MonoBehaviour
             Profiler.EndSample();
         }
 
-        //if (drawInstanceShadows)
-        //{
-        //    Profiler.BeginSample("DrawInstanceShadows()");
-        //    DrawInstanceShadows();
-        //    Profiler.EndSample();
-        //}
+        if (drawInstanceShadows)
+        {
+            Profiler.BeginSample("DrawInstanceShadows()");
+            DrawInstanceShadows();
+            Profiler.EndSample();
+        }
     }
     private const string DEBUG_SHADER_LOD_KEYWORD = "_INDIRECT_DEBUG_LOD_ON";
     public bool debugDrawLOD;
-    [HideInInspector] public ShadowCastingMode[] instanceShadowCastingModes;
-    private void DrawInstances()
+    void checkDebugLOD()
     {
         if (debugDrawLOD != m_debugLastDrawLOD)
         {
@@ -313,8 +312,11 @@ public class MilkInstancer : MonoBehaviour
                 }
             }
         }
-
-        //Debug.Log(Time.time);
+    }
+    //[HideInInspector] public ShadowCastingMode[] instanceShadowCastingModes;
+    [HideInInspector] public bool[] instanceShadowCastingModes;
+    private void DrawInstances()
+    {
         for (int i = 0; i < indirectMeshes.Length; i++)
         {
             int argsIndex = i * ARGS_BYTE_SIZE_PER_INSTANCE_TYPE;
@@ -322,10 +324,31 @@ public class MilkInstancer : MonoBehaviour
 
             if (enableLOD)
             {
-                Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 0, irm.lod00MatPropBlock, instanceShadowCastingModes[i]);
-                Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 1, irm.lod01MatPropBlock, instanceShadowCastingModes[i]);
+                //Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 0, irm.lod00MatPropBlock, instanceShadowCastingModes[i]);
+                Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 0, irm.lod00MatPropBlock, ShadowCastingMode.Off);
+                //Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 1, irm.lod01MatPropBlock, instanceShadowCastingModes[i]);
+                Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 1, irm.lod01MatPropBlock, ShadowCastingMode.Off);
             }
-            Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 2, irm.lod02MatPropBlock, instanceShadowCastingModes[i]);
+            //Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 2, irm.lod02MatPropBlock, instanceShadowCastingModes[i]);
+            Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 2, irm.lod02MatPropBlock, ShadowCastingMode.Off);
+        }
+    }
+    private void DrawInstanceShadows()
+    {
+        for (int i = 0; i < indirectMeshes.Length; i++)
+        {
+            if (instanceShadowCastingModes[i])
+            {
+                int argsIndex = i * ARGS_BYTE_SIZE_PER_INSTANCE_TYPE;
+                IndirectRenderingMesh irm = indirectMeshes[i];
+
+                if (enableLOD)
+                {
+                    Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_shadowArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 0, irm.shadowLod00MatPropBlock, ShadowCastingMode.ShadowsOnly);
+                    Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_shadowArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 1, irm.shadowLod01MatPropBlock, ShadowCastingMode.ShadowsOnly);
+                }
+                Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_shadowArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 2, irm.shadowLod02MatPropBlock, ShadowCastingMode.ShadowsOnly);
+            }
         }
     }
     private void CalculateVisibleInstances(Camera cam)
@@ -459,6 +482,10 @@ public class MilkInstancer : MonoBehaviour
         Profiler.BeginSample("LOD Sorting");
         {
             //m_lastCamPosition = camPosition;
+
+            m_paddingInput[0] = int.MinValue;
+            m_paddingInput[1] = 0;
+            m_paddingBuffer.SetData(m_paddingInput);
             Graphics.ExecuteCommandBufferAsync(m_sortingCommandBuffer, ComputeQueueType.Background);
             if (sortDebug)
             {
@@ -599,6 +626,7 @@ public class MilkInstancer : MonoBehaviour
                 rotations.Add(iid.rotations[j]);
                 scales.Add(iid.scales[j]);
 
+                //Debug.Log(((((uint)i * NUMBER_OF_ARGS_PER_INSTANCE_TYPE) << 16) + ((uint)m_numberOfInstances)) >> 16);
                 sortingData.Add(new SortingData()
                 {
                     drawCallInstanceIndex = ((((uint)i * NUMBER_OF_ARGS_PER_INSTANCE_TYPE) << 16) + ((uint)m_numberOfInstances)),
@@ -758,8 +786,6 @@ public class MilkInstancer : MonoBehaviour
         //-----------------------------------
         // InitConstantComputeVariables
         //-----------------------------------
-        m_scanThreadGroupsGroupX = 1;
-        //m_scanThreadGroupsGroupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
 
         //m_occlusionGroupX = Mathf.Max(1, m_numberOfInstances / 64);
         //m_scanInstancesGroupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
@@ -767,6 +793,7 @@ public class MilkInstancer : MonoBehaviour
 
         m_occlusionGroupX = Mathf.Max(1, nextPowerOfTwo / 64);
         m_scanInstancesGroupX = Mathf.Max(1, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
+        m_scanThreadGroupsGroupX = 1;
         m_copyInstanceDataGroupX = Mathf.Max(1, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
 
         //m_occlusionGroupX = Mathf.Max(1, Mathf.CeilToInt((float)m_numberOfInstances / 64));
@@ -888,9 +915,11 @@ public class MilkInstancer : MonoBehaviour
         m_sortingCommandBuffer.SetComputeIntParam(sortingCS, Properties.Count, m_originalCount);
         m_sortingCommandBuffer.SetComputeIntParam(sortingCS, Properties.NextPowerOfTwo, m_paddedCount);
 
-        int minMaxKernel = m_isReverseSort ? m_kernels.SetMin : m_kernels.SetMax;
+        //int minMaxKernel = m_isReverseSort ? m_kernels.SetMin : m_kernels.SetMax;
+        int minMaxKernel = m_kernels.SetMax;
 
-        m_paddingInput[0] = m_isReverseSort ? int.MaxValue : int.MinValue;
+        //m_paddingInput[0] = m_isReverseSort ? int.MaxValue : int.MinValue;
+        m_paddingInput[0] = int.MinValue;
         m_paddingInput[1] = 0;
 
         m_paddingBuffer.SetData(m_paddingInput);
@@ -948,7 +977,7 @@ public class MilkInstancer : MonoBehaviour
     private ComputeBuffer m_externalKeysBuffer;
 
     private bool m_mustTruncateValueBuffer = false;
-    private bool m_isReverseSort = false;
+    //private bool m_isReverseSort = false;
     private int m_originalCount = 0;
     private int m_paddedCount = 0;
 

@@ -32,6 +32,7 @@ RWStructuredBuffer<SortStruct> _ExternalKeys;
 
 #define PADDING_KEY _PaddingBuffer[0]
 #define PADDING_KEY_INDEX _PaddingBuffer[1]
+#define typeOffset 1000000
 
 int FloatToInt(float fl)
 {
@@ -41,7 +42,6 @@ int FloatToInt(float fl)
 float IntToFloat(int integer)
 {
     return float(integer) / 10000.0;
-
 }
 
 // determine the lowest value in the data
@@ -49,9 +49,11 @@ float IntToFloat(int integer)
 void SetMin(uint3 id : SV_DispatchThreadID)
 {
     if (id.x >= _Count)
+    {
         return;
+    }
     
-    InterlockedMin(PADDING_KEY, ((_ExternalKeys[id.x].drawCallInstanceIndex >> 16) * 5000000) + FloatToInt(_ExternalKeys[id.x].distanceToCam));
+    InterlockedMin(PADDING_KEY, (_ExternalKeys[id.x].drawCallInstanceIndex >> 16) * typeOffset + FloatToInt(_ExternalKeys[id.x].distanceToCam));
     //GroupMemoryBarrierWithGroupSync();
     
     //if (_ExternalKeys[id.x] == PADDING_KEY)
@@ -63,9 +65,11 @@ void SetMin(uint3 id : SV_DispatchThreadID)
 void SetMax(uint3 id : SV_DispatchThreadID)
 {
     if (id.x >= _Count)
+    {
         return;
+    }
     
-    InterlockedMax(PADDING_KEY, ((_ExternalKeys[id.x].drawCallInstanceIndex >> 16) * 5000000) + FloatToInt(_ExternalKeys[id.x].distanceToCam));
+    InterlockedMax(PADDING_KEY, (_ExternalKeys[id.x].drawCallInstanceIndex >> 16) * typeOffset + FloatToInt(_ExternalKeys[id.x].distanceToCam));
     
     //GroupMemoryBarrierWithGroupSync();
     
@@ -78,12 +82,16 @@ void SetMax(uint3 id : SV_DispatchThreadID)
 void GetPaddingIndex(uint3 id : SV_DispatchThreadID)
 {
     if (id.x >= _Count)
+    {
         return;
+    }
     
-    int sortVal = ((_ExternalKeys[id.x].drawCallInstanceIndex >> 16) * 5000000) + FloatToInt(_ExternalKeys[id.x].distanceToCam);
+    int sortVal = (_ExternalKeys[id.x].drawCallInstanceIndex >> 16) * typeOffset + FloatToInt(_ExternalKeys[id.x].distanceToCam);
     
     if (sortVal == PADDING_KEY)
+    {
         PADDING_KEY_INDEX = id.x;
+    }
 }
 
 // copy the original data into a new buffer which is the size of the next power of two.
@@ -93,7 +101,9 @@ void GetPaddingIndex(uint3 id : SV_DispatchThreadID)
 void PadBuffer(uint3 id : SV_DispatchThreadID)
 {
     if (id.x >= _NextPowerOfTwo)
+    {
         return;
+    }
     
     uint i = id.x;
     
@@ -133,8 +143,10 @@ void BitonicSort(uint3 id : SV_DispatchThreadID)
     uint i = id.x + id.y * MAX_DIM_THREADS;
     uint j = i ^ _Block;
 	
-    if (j < i || i >= _Count) 
+    if (j < i || i >= _Count)
+    {
         return;
+    }
 	
     uint key_i = _Keys[i];
     uint key_j = _Keys[j];
@@ -142,8 +154,8 @@ void BitonicSort(uint3 id : SV_DispatchThreadID)
     //int value_i = (_Values[key_i].drawCallInstanceIndex >> 16) * 10000000 + FloatToInt(_Values[key_i].distanceToCam);
     //int value_j = (_Values[key_j].drawCallInstanceIndex >> 16) * 10000000 + FloatToInt(_Values[key_j].distanceToCam);
 
-    int value_i = ((_Values[key_i].drawCallInstanceIndex >> 16) * 500000) + FloatToInt(_Values[key_i].distanceToCam);
-    int value_j = ((_Values[key_j].drawCallInstanceIndex >> 16) * 500000) + FloatToInt(_Values[key_j].distanceToCam);
+    int value_i = (_Values[key_i].drawCallInstanceIndex >> 16) * typeOffset + FloatToInt(_Values[key_i].distanceToCam);
+    int value_j = (_Values[key_j].drawCallInstanceIndex >> 16) * typeOffset + FloatToInt(_Values[key_j].distanceToCam);
 
     //int value_i = ((_Values[key_i].drawCallInstanceIndex >> 16) * (maxDistance * accuracy) + 1) + FloatToInt(min(_Values[key_i].distanceToCam, maxDistance));
     //int value_j = ((_Values[key_j].drawCallInstanceIndex >> 16) * (maxDistance * accuracy) + 1) + FloatToInt(min(_Values[key_j].distanceToCam, maxDistance));
@@ -164,7 +176,9 @@ void BitonicSort(uint3 id : SV_DispatchThreadID)
 void OverwriteAndTruncate(uint3 id : SV_DispatchThreadID)
 {
     if (id.x >= _Count)
+    {
         return;
+    }
     
     _ExternalValues[id.x] = _Temp[_Keys[id.x]];
 }
@@ -177,7 +191,9 @@ RWStructuredBuffer<SortStruct> _Data;
 void CopyBuffer(uint3 id : SV_DispatchThreadID)
 {
     if (id.x >= _Count)
+    {
         return;
+    }
     
     _Data[id.x] = _Input[id.x];
 } 
