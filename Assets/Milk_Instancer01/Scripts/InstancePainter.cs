@@ -262,6 +262,11 @@ public class InstancePainter : MonoBehaviour
         Vector3 dir = Vector3.one;
         Vector2 ang = Vector2.zero;
         int k = 0;
+        List<Vector3>[] tempBS = new List<Vector3>[prefabParamaters.Length];
+        for (int i = 0; i < tempBS.Length; i++)
+        {
+            tempBS[i] = new List<Vector3>();
+        }
         for (int i = 0; i < numToAdd; i++)
         {
             ang = UnityEngine.Random.insideUnitCircle * rand.NextFloat(areaSize * .5f);
@@ -272,9 +277,35 @@ public class InstancePainter : MonoBehaviour
             //Debug.DrawRay(origin, dir * 50, Color.blue, 15);
             if (Physics.Raycast(origin, dir, out hit, (areaSize * areaSize) + distance, rayCastLayerMask))
             {
-                paintTypes[selectionBias[rand.NextInt(selectionBias.Length)]]++;
-                points[k] = hit.point;
-                k++;
+                int type = selectionBias[rand.NextInt(selectionBias.Length)];
+                bool bad = false;
+                if (instances[type] != null && instances[type].positions != null)
+                {
+                    for (int n = 0; n < instances[type].positions.Length; n++)
+                    {
+                        if (Vector3.Distance(hit.point, instances[type].positions[n]) < prefabParamaters[type].minDistance)
+                        {
+                            bad = true;
+                        }
+                    }
+                }
+                if (!bad)
+                {
+                    for (int n = 0; n < tempBS[type].Count; n++)
+                    {
+                        if (Vector3.Distance(hit.point, tempBS[type][n]) < prefabParamaters[type].minDistance)
+                        {
+                            bad = true;
+                        }
+                    }
+                }
+                if (!bad)
+                {
+                    tempBS[type].Add(hit.point);
+                    paintTypes[type]++;
+                    points[k] = hit.point;
+                    k++;
+                }
             }
         }
         k = 0;
@@ -545,7 +576,8 @@ public class PaintablePrefab
     }
     [Range(0, 100)]
     public int selectionBias = 1;
-
+    [Range(0, 5)]
+    public float minDistance = 1;
     public Vector2 xRotationRange = new Vector2(0, 0);
     public Vector2 yRotationRange = new Vector2(-180, 180);
     public Vector2 zRotationRange = new Vector2(0, 0);
