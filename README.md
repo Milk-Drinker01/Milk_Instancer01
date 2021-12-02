@@ -13,16 +13,25 @@
   - amplify shader editor examples
   - wind shader example
 
+Features
+  - instance density control
+  - paint prefabs on any object
+  - multiple prefab support
+  - per-instance occlusion culling
+  - frustum culling
+  - up to 3 LODs
+  - ASE examples
+
 
  What am I still working on?
   - find and fix bugs
-  - instance density control
   - shadergraph examples
-  - support more that 256 * 256 (65536) instances
+  - support more than 256 * 256 (65536) instances
   - URP shaders
   - more spawning methods, perhaps procedural terrain spawning
   - create a user friendly interface
   - idk im sure ill think of something
+
 
  What might i consider in the future?
   - built in renderer support
