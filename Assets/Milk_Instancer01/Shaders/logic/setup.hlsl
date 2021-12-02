@@ -30,4 +30,11 @@ void setup()
 }
 #endif
 
+void Instancing_float(float3 Position, out float3 Out) {
+    Out = 0;
+#ifndef SHADERGRAPH_PREVIEW
+    Out = Position;
+#endif
+}
+
 #endif

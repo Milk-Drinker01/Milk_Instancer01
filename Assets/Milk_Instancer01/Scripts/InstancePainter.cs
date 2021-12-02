@@ -253,11 +253,17 @@ public class InstancePainter : MonoBehaviour
         {
             rand.InitState(1298);
         }
+        if (transform.childCount == 0)
+        {
+            new GameObject("rotation helper").transform.SetParent(transform);
+        }
+        Transform helper = transform.GetChild(0);
 
         PaintablePrefab parameters;
         //Vector2 L = Vector2.one;
         int[] paintTypes = new int[prefabParamaters.Length];
         Vector3[] points = new Vector3[numToAdd];
+        Vector3[] rotations = new Vector3[numToAdd];
         RaycastHit hit;
         Vector3 dir = Vector3.one;
         Vector2 ang = Vector2.zero;
@@ -301,9 +307,17 @@ public class InstancePainter : MonoBehaviour
                 }
                 if (!bad)
                 {
+                    parameters = prefabParamaters[type];
+
                     tempBS[type].Add(hit.point);
                     paintTypes[type]++;
                     points[k] = hit.point;
+                    //Quaternion rot = Quaternion.LookRotation(hit.normal) * Quaternion.Euler(90, 0, 0);
+
+                    Quaternion bruh = Quaternion.Euler(rand.NextFloat(parameters.xRotationRange.x, parameters.xRotationRange.y), rand.NextFloat(parameters.yRotationRange.x, parameters.yRotationRange.y), rand.NextFloat(parameters.zRotationRange.x, parameters.zRotationRange.y));
+                    transform.rotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
+                    helper.localRotation = bruh;
+                    rotations[k] = helper.rotation.eulerAngles;
                     k++;
                 }
             }
@@ -324,7 +338,8 @@ public class InstancePainter : MonoBehaviour
                 //Vector2 circle = UnityEngine.Random.insideUnitCircle;
                 //pos[i] = new Vector3(circle.x, 0f, circle.y) * areaSize * .5f + point;
                 pos[i] = points[k];
-                rot[i] = new Vector3(rand.NextFloat(parameters.xRotationRange.x, parameters.xRotationRange.y), rand.NextFloat(parameters.yRotationRange.x, parameters.yRotationRange.y), rand.NextFloat(parameters.zRotationRange.x, parameters.zRotationRange.y));
+                rot[i] = rotations[k];
+                //rot[i] = rotations[k];
                 scale[i] = Vector3.one * rand.NextFloat(parameters.scaleRange.x, parameters.scaleRange.y);
                 k++;
             }
@@ -451,6 +466,7 @@ public class InstancePainter : MonoBehaviour
                 Material reference = prefabs[i].GetComponentInChildren<MeshRenderer>().sharedMaterial;
                 instances[i].indirectMaterial = new Material(reference.shader);
                 instances[i].indirectMaterial.CopyPropertiesFromMaterial(reference);
+
                 prefabParamaters[i] = new PaintablePrefab(prefabs[i]);
                 prefabParamaters[i].copyParameters(tempParamaters[instances[i].index]);
             }

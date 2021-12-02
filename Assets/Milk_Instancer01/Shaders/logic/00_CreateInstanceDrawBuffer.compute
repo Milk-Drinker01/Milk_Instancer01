@@ -102,7 +102,7 @@ inline void CSMain (
 	float4x4 xRotationMatrix = rotationMatrix(float3(1, 0, 0), radians(rotation.x));
 	float4x4 yRotationMatrix = rotationMatrix(float3(0, 1, 0), radians(rotation.y));
 	float4x4 zRotationMatrix = rotationMatrix(float3(0, 0, 1), radians(rotation.z));
-	float4x4 rotMatrix = mul(yRotationMatrix, mul(zRotationMatrix, xRotationMatrix));
+	float4x4 rotMatrix = mul(yRotationMatrix, mul(xRotationMatrix, zRotationMatrix));
 
 	float4x4 translation = {
 		scale.x, 0, 0, position.x,
