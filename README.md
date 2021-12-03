@@ -20,16 +20,17 @@ Features
   - per-instance occlusion culling
   - frustum culling
   - up to 3 LODs
-  - ASE examples
+  - Amplify Shader Editor examples
+  - ShaderGraph examples
+  - wind shader example (ASE and SG)
 
 
  What am I still working on?
   - find and fix bugs
-  - shadergraph examples
   - support more than 256 * 256 (65536) instances
   - URP shaders
   - more spawning methods, perhaps procedural terrain spawning
-  - create a user friendly interface
+  - create a user friendly interface + gizmos
   - idk im sure ill think of something
 
 
