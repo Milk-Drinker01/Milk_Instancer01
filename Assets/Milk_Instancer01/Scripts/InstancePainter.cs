@@ -216,7 +216,7 @@ public class InstancePainter : MonoBehaviour
             length = instances[i].positions.Length;
             for (int n = 0; n < length; n++)
             {
-                if (Vector3.Distance(instances[i].positions[n], point) < areaSize)
+                if (Vector3.Distance(instances[i].positions[n], point) < areaSize / 2)
                 {
                     removed++;
                     instances[i].positions[n] = instances[i].positions[length - removed];
@@ -440,20 +440,21 @@ public class InstancePainter : MonoBehaviour
     {
         Dictionary<GameObject, IndirectInstanceData> data = new Dictionary<GameObject, IndirectInstanceData>();
         PaintablePrefab[] tempParamaters = new PaintablePrefab[prefabs.Length];
-        for (int i = 0; i < instances.Length; i++)
+        for (int n = 0; n < prefabs.Length; n++)
         {
-            for (int n = 0; n < prefabs.Length; n++)
+            for (int i = 0; i < instances.Length; i++)
             {
                 if (prefabs[n] == instances[i].prefab)
                 {
-                    instances[i].index = i;
+                    instances[i].index = n;
                     data.Add(instances[i].prefab, instances[i]);
-                    tempParamaters[i] = new PaintablePrefab(prefabParamaters[i].prefab);
-                    tempParamaters[i].copyParameters(prefabParamaters[i]);
+                    tempParamaters[n] = new PaintablePrefab(prefabParamaters[i].prefab);
+                    tempParamaters[n].copyParameters(prefabParamaters[i]);
                     break;
                 }
             }
         }
+        
 
         instances = new IndirectInstanceData[prefabs.Length];
         prefabParamaters = new PaintablePrefab[prefabs.Length];
@@ -517,6 +518,10 @@ public class InstancePainter : MonoBehaviour
             _prefabs[i] = prefabs[i];
         }
     }
+    bool drawGizmo = false;
+    Vector3 gizmoPosition = Vector3.zero;
+    Vector3 gizmoNormal = Vector3.up;
+    bool gizmoErase = false;
     void OnScene(SceneView scene)
     {
         if (Selection.activeTransform != null && Selection.activeTransform.gameObject != gameObject)
@@ -524,26 +529,58 @@ public class InstancePainter : MonoBehaviour
             return;
         }
         Event e = Event.current;
-        if ((e.type == EventType.MouseDrag || e.type == EventType.MouseDown) && e.button == 0)
-        {
-            RaycastHit hit;
-            Vector3 mousePos = e.mousePosition;
-            float ppp = EditorGUIUtility.pixelsPerPoint;
-            mousePos.y = scene.camera.pixelHeight - mousePos.y * ppp;
-            mousePos.x *= ppp;
-            //Quaternion rot = scene.camera.transform.rotation;
+        RaycastHit hit;
+        Vector3 mousePos = e.mousePosition;
+        float ppp = EditorGUIUtility.pixelsPerPoint;
+        mousePos.y = scene.camera.pixelHeight - mousePos.y * ppp;
+        mousePos.x *= ppp;
+        //Quaternion rot = scene.camera.transform.rotation;
 
-            Ray ray = scene.camera.ScreenPointToRay(mousePos);
-            if (Physics.Raycast(ray, out hit, rayCastLayerMask))
+        Ray ray = scene.camera.ScreenPointToRay(mousePos);
+        if (Physics.Raycast(ray, out hit, 999, rayCastLayerMask))
+        {
+            drawGizmo = true;
+            gizmoPosition = hit.point;
+            gizmoNormal = hit.normal;
+
+            if (!e.control)
             {
-                if (!e.control)
+                gizmoErase = false;
+                if ((e.type == EventType.MouseDrag || e.type == EventType.MouseDown) && e.button == 0)
                 {
                     paintInstances(ray.origin, hit.point, hit.distance, hit.normal);
                 }
-                else
+            }
+            else
+            {
+                gizmoErase = true;
+                if ((e.type == EventType.MouseDrag || e.type == EventType.MouseDown) && e.button == 0)
                 {
                     eraseInstances(hit.point);
                 }
+            }
+        }
+        else
+        {
+            drawGizmo = false;
+        }
+        
+    }
+    void OnDrawGizmosSelected()
+    {
+        if (drawGizmo)
+        {
+            if (!gizmoErase)
+            {
+                Gizmos.color = new Color(.6f, .6f, 1, .25f);
+                Gizmos.DrawSphere(gizmoPosition, areaSize / 2);
+                Gizmos.DrawLine(gizmoPosition, gizmoPosition + (3 * gizmoNormal));
+            }
+            else
+            {
+                Gizmos.color = new Color(1, .6f, .6f, .25f);
+                Gizmos.DrawSphere(gizmoPosition, areaSize / 2);
+                Gizmos.DrawLine(gizmoPosition, gizmoPosition + (3 * gizmoNormal));
             }
         }
     }
