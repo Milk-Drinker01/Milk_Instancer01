@@ -1,6 +1,6 @@
 Using pre-set license
 Built from '2021.2/staging' branch; Version is '2021.2.1f1 (c20c6d589440) revision 12717165'; Using compiler version '192829333'; Build Type 'Release'
-OS: 'Windows 10 Home; OS build 19043.1348; Version 2009; 64bit' Language: 'en' Physical Memory: 32686 MB
+OS: 'Windows 10 Home; OS build 19043.1466; Version 2009; 64bit' Language: 'en' Physical Memory: 32686 MB
 BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1, IsPro: 0
 
 COMMAND LINE ARGUMENTS:
@@ -15,7 +15,7 @@ D:/Unity/Projects/Milk_Instancer01
 -logFile
 Logs/AssetImportWorker0.log
 -srvPort
-57007
+57720
 Successfully changed project path to: D:/Unity/Projects/Milk_Instancer01
 D:/Unity/Projects/Milk_Instancer01
 [UnityMemory] Configuration Parameters - Can be set up in boot.config
@@ -47,7 +47,7 @@ D:/Unity/Projects/Milk_Instancer01
     "memorysetup-temp-allocator-size-cloud-worker=32768"
     "memorysetup-temp-allocator-size-gi-baking-worker=262144"
     "memorysetup-temp-allocator-size-gfx=262144"
-Refreshing native plugins compatible for Editor in 537.29 ms, found 3 plugins.
+Refreshing native plugins compatible for Editor in 152.53 ms, found 3 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Initialize engine version: 2021.2.1f1 (c20c6d589440)
 [Subsystems] Discovering subsystems at path D:/Unity/Editors/2021.2.1f1/Editor/Data/Resources/UnitySubsystems
@@ -58,47 +58,145 @@ Direct3D:
     Renderer: NVIDIA GeForce RTX 2080 SUPER (ID=0x1e81)
     Vendor:   NVIDIA
     VRAM:     8010 MB
-    Driver:   30.0.14.9613
+    Driver:   30.0.14.9709
 Initialize mono
 Mono path[0] = 'D:/Unity/Editors/2021.2.1f1/Editor/Data/Managed'
 Mono path[1] = 'D:/Unity/Editors/2021.2.1f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-win32'
 Mono config path = 'D:/Unity/Editors/2021.2.1f1/Editor/Data/MonoBleedingEdge/etc'
-Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56576
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56316
 Begin MonoManager ReloadAssembly
 Registering precompiled unity dll's ...
 Register platform support module: D:/Unity/Editors/2021.2.1f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
-Registered in 0.136769 seconds.
+Registered in 0.002755 seconds.
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 191.81 ms, found 3 plugins.
+Refreshing native plugins compatible for Editor in 145.02 ms, found 3 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Mono: successfully reloaded assembly
-- Completed reload, in  5.955 seconds
+- Completed reload, in  0.754 seconds
 Domain Reload Profiling:
-	ReloadAssembly (5956ms)
-		BeginReloadAssembly (3126ms)
+	ReloadAssembly (755ms)
+		BeginReloadAssembly (57ms)
 			ExecutionOrderSort (0ms)
 			DisableScriptedObjects (0ms)
 			BackupInstance (0ms)
 			ReleaseScriptingObjects (0ms)
 			CreateAndSetChildDomain (1ms)
-		EndReloadAssembly (1081ms)
-			LoadAssemblies (3125ms)
+		EndReloadAssembly (475ms)
+			LoadAssemblies (56ms)
 			RebuildTransferFunctionScriptingTraits (0ms)
-			SetupTypeCache (478ms)
+			SetupTypeCache (93ms)
 			ReleaseScriptCaches (0ms)
-			RebuildScriptCaches (32ms)
-			SetupLoadedEditorAssemblies (509ms)
+			RebuildScriptCaches (24ms)
+			SetupLoadedEditorAssemblies (313ms)
 				LogAssemblyErrors (0ms)
-				InitializePlatformSupportModulesInManaged (6ms)
+				InitializePlatformSupportModulesInManaged (5ms)
 				SetLoadedEditorAssemblies (0ms)
-				RefreshPlugins (192ms)
-				BeforeProcessingInitializeOnLoad (2ms)
-				ProcessInitializeOnLoadAttributes (210ms)
-				ProcessInitializeOnLoadMethodAttributes (98ms)
+				RefreshPlugins (145ms)
+				BeforeProcessingInitializeOnLoad (1ms)
+				ProcessInitializeOnLoadAttributes (123ms)
+				ProcessInitializeOnLoadMethodAttributes (39ms)
 				AfterProcessingInitializeOnLoad (0ms)
 				EditorAssembliesLoaded (0ms)
 			ExecutionOrderSort2 (0ms)
 			AwakeInstancesAfterBackupRestoration (0ms)
 Platform modules already initialized, skipping
 Registering precompiled user dll's ...
-Registered in 0.005436 seconds.
+Registered in 0.004559 seconds.
+Begin MonoManager ReloadAssembly
+Symbol file LoadedFromMemory doesn't match image D:\Unity\Projects\Milk_Instancer01\Library\PackageCache\com.unity.visualscripting@1.7.2\Editor\VisualScripting.Core\Dependencies\YamlDotNet\Unity.VisualScripting.YamlDotNet.dll
+Symbol file LoadedFromMemory doesn't match image D:\Unity\Projects\Milk_Instancer01\Library\PackageCache\com.unity.visualscripting@1.7.2\Editor\VisualScripting.Core\Dependencies\DotNetZip\Unity.VisualScripting.IonicZip.dll
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 151.92 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  2.025 seconds
+Domain Reload Profiling:
+	ReloadAssembly (2026ms)
+		BeginReloadAssembly (144ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (5ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (19ms)
+		EndReloadAssembly (1801ms)
+			LoadAssemblies (71ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (329ms)
+			ReleaseScriptCaches (1ms)
+			RebuildScriptCaches (107ms)
+			SetupLoadedEditorAssemblies (1194ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (9ms)
+				SetLoadedEditorAssemblies (0ms)
+				RefreshPlugins (152ms)
+				BeforeProcessingInitializeOnLoad (116ms)
+				ProcessInitializeOnLoadAttributes (775ms)
+				ProcessInitializeOnLoadMethodAttributes (138ms)
+				AfterProcessingInitializeOnLoad (2ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (4ms)
+Platform modules already initialized, skipping
+========================================================================
+Worker process is ready to serve import requests
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.06 seconds
+Refreshing native plugins compatible for Editor in 1.61 ms, found 3 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 7331 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 77 unused Assets / (4.4 MB). Loaded Objects now: 7770.
+Memory consumption went from 362.6 MB to 358.2 MB.
+Total: 5.677900 ms (FindLiveObjects: 0.726800 ms CreateObjectMapping: 0.841300 ms MarkObjects: 3.062900 ms  DeleteObjects: 1.045100 ms)
+
+AssetImportParameters requested are different than current active one (requested -> active):
+  custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
+  custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
+  custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
+  custom:video-encoder-webm-vp8: eb34c28f22e8b96e1ab97ce403110664 -> 
+  custom:video-codec-MediaFoundation-h265: 746d11721c4dcdbdad8f713fa42b33f4 -> 
+  custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+  custom:framework-win-MediaFoundation: 216162199b28c13a410421893ffa2e32 -> 
+  custom:container-demuxer-ogg: 62fdf1f143b41e24485cea50d1cbac27 -> 
+  custom:video-decoder-webm-vp8: 9c59270c3fd7afecdb556c50c9e8de78 -> 
+  custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+========================================================================
+Received Import Request.
+  Time since last request: 278359.532826 seconds.
+  path: Assets/Milk_Instancer01/Shaders/FoliageShading.asset
+  artifactKey: Guid(327aa30652bb0fd488ed810b7ca6e7b2) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Milk_Instancer01/Shaders/FoliageShading.asset using Guid(327aa30652bb0fd488ed810b7ca6e7b2) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '0cc87fb0e2443d420f20cabe51346811') in 0.041334 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 21.932585 seconds.
+  path: Assets/Milk_Instancer01/Shaders/instancerWind.shader
+  artifactKey: Guid(9a7040f63cba5f444b5e29cb70b66156) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Milk_Instancer01/Shaders/instancerWind.shader using Guid(9a7040f63cba5f444b5e29cb70b66156) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '9c887ae858666e2fe28051bf9620adc9') in 0.034691 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 28.815182 seconds.
+  path: Assets/Milk_Instancer01/Shaders/instancer.shader
+  artifactKey: Guid(547e520743b05c44da49a1c79873f2ef) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Milk_Instancer01/Shaders/instancer.shader using Guid(547e520743b05c44da49a1c79873f2ef) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a199fde7befef326da2e843e2cfcda8f') in 0.010114 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 13.065784 seconds.
+  path: Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Meadow_Grass_01_Var1_Prefab.prefab
+  artifactKey: Guid(26555b26396cb3e4c98a3fe5b98ad384) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Meadow_Grass_01_Var1_Prefab.prefab using Guid(26555b26396cb3e4c98a3fe5b98ad384) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a9d446c6a87c73bbd94f78e18e0f78f4') in 3.471422 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 0.000050 seconds.
+  path: Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Meadow_Grass_01_Var5_Prefab.prefab
+  artifactKey: Guid(3307d021f8c7f6d41bd96741ce7ac05e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Meadow_Grass_01_Var5_Prefab.prefab using Guid(3307d021f8c7f6d41bd96741ce7ac05e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '7224d32da4d3f6e5e30326504cf837bb') in 0.078267 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 0.000035 seconds.
+  path: Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Meadow_Grass_01_Var6_Prefab.prefab
+  artifactKey: Guid(d3c9d0f652fa2454eb70f623ca29ddc4) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Meadow_Grass_01_Var6_Prefab.prefab using Guid(d3c9d0f652fa2454eb70f623ca29ddc4) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '69ae2eab050d8ac5b25c2cad9fe54452') in 0.059672 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 0.000023 seconds.
+  path: Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Meadow_Grass_01_Var4_Prefab.prefab
+  artifactKey: Guid(10828e5ac37bd8d4da40f0e24eedc4e6) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Meadow_Grass_01_Var4_Prefab.prefab using Guid(10828e5ac37bd8d4da40f0e24eedc4e6) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'ea3e526a97d6255d8273b1cf8af9864d') in 0.053653 seconds 

@@ -6,18 +6,18 @@ Shader "Milk_Instancer/Lit"
 	{
 		[HideInInspector] _AlphaCutoff("Alpha Cutoff ", Range(0, 1)) = 0.5
 		[HideInInspector] _EmissionColor("Emission Color", Color) = (1,1,1,1)
-		_albedo("albedo", 2D) = "white" {}
-		[Normal]_normal("normal", 2D) = "bump" {}
-		_normalstrength("normal strength", Float) = 1
+		_MainTex("Base Color Map", 2D) = "white" {}
+		[Normal]_NormalMap("Normal Map", 2D) = "bump" {}
+		_NormalScale("Normal Map Strength", Float) = 1
 		[Normal]_bentnormal("bent normal", 2D) = "bump" {}
-		_maskmap("mask map", 2D) = "gray" {}
-		_Color("Color", Color) = (1,1,1,1)
+		_MaskMap("Mask Map", 2D) = "gray" {}
+		_BaseColor("Base Color", Color) = (1,1,1,1)
 		_MetalicMin("Metalic Min", Range( 0 , 1)) = 0
 		_MetalicMax("Metalic Max", Range( 0 , 1)) = 1
-		_SmoothnessMin("Smoothness Min", Range( 0 , 1)) = 0
-		_SmoothnessMax("Smoothness Max", Range( 0 , 1)) = 1
-		_AOMin("AO Min", Range( 0 , 1)) = 0
-		[ASEEnd]_AOMax("AO Max", Range( 0 , 1)) = 1
+		_SmoothnessRemapMin("Smoothness Min", Range( 0 , 1)) = 0
+		_SmoothnessRemapMax("Smoothness Max", Range( 0 , 1)) = 1
+		_AORemapMin("AO Min", Range( 0 , 1)) = 0
+		[ASEEnd]_AORemapMax("AO Max", Range( 0 , 1)) = 1
 
 		[HideInInspector] _RenderQueueType("Render Queue Type", Float) = 1
 		[HideInInspector] [ToggleUI] _AddPrecomputedVelocity("Add Precomputed Velocity", Float) = 1
@@ -336,14 +336,14 @@ Shader "Milk_Instancer/Lit"
 			#endif
 
 			CBUFFER_START( UnityPerMaterial )
-			float4 _Color;
-			float _normalstrength;
+			float4 _BaseColor;
+			float _NormalScale;
 			float _MetalicMin;
 			float _MetalicMax;
-			float _SmoothnessMin;
-			float _SmoothnessMax;
-			float _AOMin;
-			float _AOMax;
+			float _SmoothnessRemapMin;
+			float _SmoothnessRemapMax;
+			float _AORemapMin;
+			float _AORemapMax;
 			float4 _EmissionColor;
 			float _AlphaCutoff;
 			float _RenderQueueType;
@@ -393,10 +393,10 @@ Shader "Milk_Instancer/Lit"
 				float _TessMaxDisp;
 			#endif
 			CBUFFER_END
-			sampler2D _albedo;
-			sampler2D _normal;
+			sampler2D _MainTex;
+			sampler2D _NormalMap;
 			sampler2D _bentnormal;
-			sampler2D _maskmap;
+			sampler2D _MaskMap;
 
 
 			#include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/Material.hlsl"
@@ -811,17 +811,17 @@ Shader "Milk_Instancer/Lit"
 
 				GlobalSurfaceDescription surfaceDescription = (GlobalSurfaceDescription)0;
 				float2 texCoord2_g1 = packedInput.ase_texcoord5.xy * float2( 1,1 ) + float2( 0,0 );
-				float4 tex2DNode11_g1 = tex2D( _albedo, texCoord2_g1 );
+				float4 tex2DNode11_g1 = tex2D( _MainTex, texCoord2_g1 );
 				
-				float3 unpack13_g1 = UnpackNormalScale( tex2D( _normal, texCoord2_g1 ), _normalstrength );
-				unpack13_g1.z = lerp( 1, unpack13_g1.z, saturate(_normalstrength) );
+				float3 unpack13_g1 = UnpackNormalScale( tex2D( _NormalMap, texCoord2_g1 ), _NormalScale );
+				unpack13_g1.z = lerp( 1, unpack13_g1.z, saturate(_NormalScale) );
 				
-				float3 unpack25_g1 = UnpackNormalScale( tex2D( _bentnormal, texCoord2_g1 ), _normalstrength );
-				unpack25_g1.z = lerp( 1, unpack25_g1.z, saturate(_normalstrength) );
+				float3 unpack25_g1 = UnpackNormalScale( tex2D( _bentnormal, texCoord2_g1 ), _NormalScale );
+				unpack25_g1.z = lerp( 1, unpack25_g1.z, saturate(_NormalScale) );
 				
-				float4 tex2DNode12_g1 = tex2D( _maskmap, texCoord2_g1 );
+				float4 tex2DNode12_g1 = tex2D( _MaskMap, texCoord2_g1 );
 				
-				surfaceDescription.Albedo = ( _Color * tex2DNode11_g1 ).rgb;
+				surfaceDescription.Albedo = ( _BaseColor * tex2DNode11_g1 ).rgb;
 				surfaceDescription.Normal = unpack13_g1;
 				surfaceDescription.BentNormal = unpack25_g1;
 				surfaceDescription.CoatMask = 0;
@@ -832,9 +832,9 @@ Shader "Milk_Instancer/Lit"
 				#endif
 
 				surfaceDescription.Emission = 0;
-				surfaceDescription.Smoothness = (_SmoothnessMin + (tex2DNode12_g1.a - 0.0) * (_SmoothnessMax - _SmoothnessMin) / (1.0 - 0.0));
-				surfaceDescription.Occlusion = (_AOMin + (tex2DNode12_g1.g - 0.0) * (_AOMax - _AOMin) / (1.0 - 0.0));
-				surfaceDescription.Alpha = ( _Color.a * tex2DNode11_g1.a );
+				surfaceDescription.Smoothness = (_SmoothnessRemapMin + (tex2DNode12_g1.a - 0.0) * (_SmoothnessRemapMax - _SmoothnessRemapMin) / (1.0 - 0.0));
+				surfaceDescription.Occlusion = (_AORemapMin + (tex2DNode12_g1.g - 0.0) * (_AORemapMax - _AORemapMin) / (1.0 - 0.0));
+				surfaceDescription.Alpha = ( _BaseColor.a * tex2DNode11_g1.a );
 
 				#ifdef _ALPHATEST_ON
 				surfaceDescription.AlphaClipThreshold = _AlphaCutoff;
@@ -956,14 +956,14 @@ Shader "Milk_Instancer/Lit"
 			#endif
 			
 			CBUFFER_START( UnityPerMaterial )
-			float4 _Color;
-			float _normalstrength;
+			float4 _BaseColor;
+			float _NormalScale;
 			float _MetalicMin;
 			float _MetalicMax;
-			float _SmoothnessMin;
-			float _SmoothnessMax;
-			float _AOMin;
-			float _AOMax;
+			float _SmoothnessRemapMin;
+			float _SmoothnessRemapMax;
+			float _AORemapMin;
+			float _AORemapMax;
 			float4 _EmissionColor;
 			float _AlphaCutoff;
 			float _RenderQueueType;
@@ -1013,10 +1013,10 @@ Shader "Milk_Instancer/Lit"
 				float _TessMaxDisp;
 			#endif
 			CBUFFER_END
-			sampler2D _albedo;
-			sampler2D _normal;
+			sampler2D _MainTex;
+			sampler2D _NormalMap;
 			sampler2D _bentnormal;
-			sampler2D _maskmap;
+			sampler2D _MaskMap;
 
 
 			#include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/Material.hlsl"
@@ -1413,17 +1413,17 @@ Shader "Milk_Instancer/Lit"
 				BuiltinData builtinData;
 				GlobalSurfaceDescription surfaceDescription = (GlobalSurfaceDescription)0;
 				float2 texCoord2_g1 = packedInput.ase_texcoord.xy * float2( 1,1 ) + float2( 0,0 );
-				float4 tex2DNode11_g1 = tex2D( _albedo, texCoord2_g1 );
+				float4 tex2DNode11_g1 = tex2D( _MainTex, texCoord2_g1 );
 				
-				float3 unpack13_g1 = UnpackNormalScale( tex2D( _normal, texCoord2_g1 ), _normalstrength );
-				unpack13_g1.z = lerp( 1, unpack13_g1.z, saturate(_normalstrength) );
+				float3 unpack13_g1 = UnpackNormalScale( tex2D( _NormalMap, texCoord2_g1 ), _NormalScale );
+				unpack13_g1.z = lerp( 1, unpack13_g1.z, saturate(_NormalScale) );
 				
-				float3 unpack25_g1 = UnpackNormalScale( tex2D( _bentnormal, texCoord2_g1 ), _normalstrength );
-				unpack25_g1.z = lerp( 1, unpack25_g1.z, saturate(_normalstrength) );
+				float3 unpack25_g1 = UnpackNormalScale( tex2D( _bentnormal, texCoord2_g1 ), _NormalScale );
+				unpack25_g1.z = lerp( 1, unpack25_g1.z, saturate(_NormalScale) );
 				
-				float4 tex2DNode12_g1 = tex2D( _maskmap, texCoord2_g1 );
+				float4 tex2DNode12_g1 = tex2D( _MaskMap, texCoord2_g1 );
 				
-				surfaceDescription.Albedo = ( _Color * tex2DNode11_g1 ).rgb;
+				surfaceDescription.Albedo = ( _BaseColor * tex2DNode11_g1 ).rgb;
 				surfaceDescription.Normal = unpack13_g1;
 				surfaceDescription.BentNormal = unpack25_g1;
 				surfaceDescription.CoatMask = 0;
@@ -1434,9 +1434,9 @@ Shader "Milk_Instancer/Lit"
 				#endif
 
 				surfaceDescription.Emission = 0;
-				surfaceDescription.Smoothness = (_SmoothnessMin + (tex2DNode12_g1.a - 0.0) * (_SmoothnessMax - _SmoothnessMin) / (1.0 - 0.0));
-				surfaceDescription.Occlusion = (_AOMin + (tex2DNode12_g1.g - 0.0) * (_AOMax - _AOMin) / (1.0 - 0.0));
-				surfaceDescription.Alpha = ( _Color.a * tex2DNode11_g1.a );
+				surfaceDescription.Smoothness = (_SmoothnessRemapMin + (tex2DNode12_g1.a - 0.0) * (_SmoothnessRemapMax - _SmoothnessRemapMin) / (1.0 - 0.0));
+				surfaceDescription.Occlusion = (_AORemapMin + (tex2DNode12_g1.g - 0.0) * (_AORemapMax - _AORemapMin) / (1.0 - 0.0));
+				surfaceDescription.Alpha = ( _BaseColor.a * tex2DNode11_g1.a );
 
 				#ifdef _ALPHATEST_ON
 				surfaceDescription.AlphaClipThreshold = _AlphaCutoff;
@@ -1553,14 +1553,14 @@ Shader "Milk_Instancer/Lit"
 			#endif
 
 			CBUFFER_START( UnityPerMaterial )
-			float4 _Color;
-			float _normalstrength;
+			float4 _BaseColor;
+			float _NormalScale;
 			float _MetalicMin;
 			float _MetalicMax;
-			float _SmoothnessMin;
-			float _SmoothnessMax;
-			float _AOMin;
-			float _AOMax;
+			float _SmoothnessRemapMin;
+			float _SmoothnessRemapMax;
+			float _AORemapMin;
+			float _AORemapMax;
 			float4 _EmissionColor;
 			float _AlphaCutoff;
 			float _RenderQueueType;
@@ -1610,7 +1610,7 @@ Shader "Milk_Instancer/Lit"
 				float _TessMaxDisp;
 			#endif
 			CBUFFER_END
-			sampler2D _albedo;
+			sampler2D _MainTex;
 
 
 			#include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/Material.hlsl"
@@ -1965,9 +1965,9 @@ Shader "Milk_Instancer/Lit"
 
 				AlphaSurfaceDescription surfaceDescription = (AlphaSurfaceDescription)0;
 				float2 texCoord2_g1 = packedInput.ase_texcoord1.xy * float2( 1,1 ) + float2( 0,0 );
-				float4 tex2DNode11_g1 = tex2D( _albedo, texCoord2_g1 );
+				float4 tex2DNode11_g1 = tex2D( _MainTex, texCoord2_g1 );
 				
-				surfaceDescription.Alpha = ( _Color.a * tex2DNode11_g1.a );
+				surfaceDescription.Alpha = ( _BaseColor.a * tex2DNode11_g1.a );
 
 				#ifdef _ALPHATEST_ON
 				surfaceDescription.AlphaClipThreshold = _AlphaCutoff;
@@ -2051,14 +2051,14 @@ Shader "Milk_Instancer/Lit"
 			#endif
 
 			CBUFFER_START( UnityPerMaterial )
-			float4 _Color;
-			float _normalstrength;
+			float4 _BaseColor;
+			float _NormalScale;
 			float _MetalicMin;
 			float _MetalicMax;
-			float _SmoothnessMin;
-			float _SmoothnessMax;
-			float _AOMin;
-			float _AOMax;
+			float _SmoothnessRemapMin;
+			float _SmoothnessRemapMax;
+			float _AORemapMin;
+			float _AORemapMax;
 			float4 _EmissionColor;
 			float _AlphaCutoff;
 			float _RenderQueueType;
@@ -2109,7 +2109,7 @@ Shader "Milk_Instancer/Lit"
 			#endif
 			CBUFFER_END
 
-			sampler2D _albedo;
+			sampler2D _MainTex;
 
 
 			#include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/Material.hlsl"
@@ -2463,9 +2463,9 @@ Shader "Milk_Instancer/Lit"
 
 				SceneSurfaceDescription surfaceDescription = (SceneSurfaceDescription)0;
 				float2 texCoord2_g1 = packedInput.ase_texcoord1.xy * float2( 1,1 ) + float2( 0,0 );
-				float4 tex2DNode11_g1 = tex2D( _albedo, texCoord2_g1 );
+				float4 tex2DNode11_g1 = tex2D( _MainTex, texCoord2_g1 );
 				
-				surfaceDescription.Alpha = ( _Color.a * tex2DNode11_g1.a );
+				surfaceDescription.Alpha = ( _BaseColor.a * tex2DNode11_g1.a );
 
 				#ifdef _ALPHATEST_ON
 				surfaceDescription.AlphaClipThreshold = _AlphaCutoff;
@@ -2561,14 +2561,14 @@ Shader "Milk_Instancer/Lit"
 			#endif
 			
 			CBUFFER_START( UnityPerMaterial )
-			float4 _Color;
-			float _normalstrength;
+			float4 _BaseColor;
+			float _NormalScale;
 			float _MetalicMin;
 			float _MetalicMax;
-			float _SmoothnessMin;
-			float _SmoothnessMax;
-			float _AOMin;
-			float _AOMax;
+			float _SmoothnessRemapMin;
+			float _SmoothnessRemapMax;
+			float _AORemapMin;
+			float _AORemapMax;
 			float4 _EmissionColor;
 			float _AlphaCutoff;
 			float _RenderQueueType;
@@ -2618,9 +2618,9 @@ Shader "Milk_Instancer/Lit"
 				float _TessMaxDisp;
 			#endif
 			CBUFFER_END
-			sampler2D _normal;
-			sampler2D _maskmap;
-			sampler2D _albedo;
+			sampler2D _NormalMap;
+			sampler2D _MaskMap;
+			sampler2D _MainTex;
 
 
 			#include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/Material.hlsl"
@@ -2992,16 +2992,16 @@ Shader "Milk_Instancer/Lit"
 
 				SmoothSurfaceDescription surfaceDescription = (SmoothSurfaceDescription)0;
 				float2 texCoord2_g1 = packedInput.ase_texcoord3.xy * float2( 1,1 ) + float2( 0,0 );
-				float3 unpack13_g1 = UnpackNormalScale( tex2D( _normal, texCoord2_g1 ), _normalstrength );
-				unpack13_g1.z = lerp( 1, unpack13_g1.z, saturate(_normalstrength) );
+				float3 unpack13_g1 = UnpackNormalScale( tex2D( _NormalMap, texCoord2_g1 ), _NormalScale );
+				unpack13_g1.z = lerp( 1, unpack13_g1.z, saturate(_NormalScale) );
 				
-				float4 tex2DNode12_g1 = tex2D( _maskmap, texCoord2_g1 );
+				float4 tex2DNode12_g1 = tex2D( _MaskMap, texCoord2_g1 );
 				
-				float4 tex2DNode11_g1 = tex2D( _albedo, texCoord2_g1 );
+				float4 tex2DNode11_g1 = tex2D( _MainTex, texCoord2_g1 );
 				
 				surfaceDescription.Normal = unpack13_g1;
-				surfaceDescription.Smoothness = (_SmoothnessMin + (tex2DNode12_g1.a - 0.0) * (_SmoothnessMax - _SmoothnessMin) / (1.0 - 0.0));
-				surfaceDescription.Alpha = ( _Color.a * tex2DNode11_g1.a );
+				surfaceDescription.Smoothness = (_SmoothnessRemapMin + (tex2DNode12_g1.a - 0.0) * (_SmoothnessRemapMax - _SmoothnessRemapMin) / (1.0 - 0.0));
+				surfaceDescription.Alpha = ( _BaseColor.a * tex2DNode11_g1.a );
 
 				#ifdef _ALPHATEST_ON
 				surfaceDescription.AlphaClipThreshold = _AlphaCutoff;
@@ -3104,14 +3104,14 @@ Shader "Milk_Instancer/Lit"
 			#endif
 			
 			CBUFFER_START( UnityPerMaterial )
-			float4 _Color;
-			float _normalstrength;
+			float4 _BaseColor;
+			float _NormalScale;
 			float _MetalicMin;
 			float _MetalicMax;
-			float _SmoothnessMin;
-			float _SmoothnessMax;
-			float _AOMin;
-			float _AOMax;
+			float _SmoothnessRemapMin;
+			float _SmoothnessRemapMax;
+			float _AORemapMin;
+			float _AORemapMax;
 			float4 _EmissionColor;
 			float _AlphaCutoff;
 			float _RenderQueueType;
@@ -3161,9 +3161,9 @@ Shader "Milk_Instancer/Lit"
 				float _TessMaxDisp;
 			#endif
 			CBUFFER_END
-			sampler2D _normal;
-			sampler2D _maskmap;
-			sampler2D _albedo;
+			sampler2D _NormalMap;
+			sampler2D _MaskMap;
+			sampler2D _MainTex;
 
 
 			#include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/Material.hlsl"
@@ -3581,16 +3581,16 @@ Shader "Milk_Instancer/Lit"
 
 				SmoothSurfaceDescription surfaceDescription = (SmoothSurfaceDescription)0;
 				float2 texCoord2_g1 = packedInput.ase_texcoord3.xy * float2( 1,1 ) + float2( 0,0 );
-				float3 unpack13_g1 = UnpackNormalScale( tex2D( _normal, texCoord2_g1 ), _normalstrength );
-				unpack13_g1.z = lerp( 1, unpack13_g1.z, saturate(_normalstrength) );
+				float3 unpack13_g1 = UnpackNormalScale( tex2D( _NormalMap, texCoord2_g1 ), _NormalScale );
+				unpack13_g1.z = lerp( 1, unpack13_g1.z, saturate(_NormalScale) );
 				
-				float4 tex2DNode12_g1 = tex2D( _maskmap, texCoord2_g1 );
+				float4 tex2DNode12_g1 = tex2D( _MaskMap, texCoord2_g1 );
 				
-				float4 tex2DNode11_g1 = tex2D( _albedo, texCoord2_g1 );
+				float4 tex2DNode11_g1 = tex2D( _MainTex, texCoord2_g1 );
 				
 				surfaceDescription.Normal = unpack13_g1;
-				surfaceDescription.Smoothness = (_SmoothnessMin + (tex2DNode12_g1.a - 0.0) * (_SmoothnessMax - _SmoothnessMin) / (1.0 - 0.0));
-				surfaceDescription.Alpha = ( _Color.a * tex2DNode11_g1.a );
+				surfaceDescription.Smoothness = (_SmoothnessRemapMin + (tex2DNode12_g1.a - 0.0) * (_SmoothnessRemapMax - _SmoothnessRemapMin) / (1.0 - 0.0));
+				surfaceDescription.Alpha = ( _BaseColor.a * tex2DNode11_g1.a );
 
 				#ifdef _ALPHATEST_ON
 				surfaceDescription.AlphaClipThreshold = _AlphaCutoff;
@@ -3711,14 +3711,14 @@ Shader "Milk_Instancer/Lit"
 
 			// CBuffer must be declared before Material.hlsl since it internaly uses _BlendMode now
 			CBUFFER_START( UnityPerMaterial )
-			float4 _Color;
-			float _normalstrength;
+			float4 _BaseColor;
+			float _NormalScale;
 			float _MetalicMin;
 			float _MetalicMax;
-			float _SmoothnessMin;
-			float _SmoothnessMax;
-			float _AOMin;
-			float _AOMax;
+			float _SmoothnessRemapMin;
+			float _SmoothnessRemapMax;
+			float _AORemapMin;
+			float _AORemapMax;
 			float4 _EmissionColor;
 			float _AlphaCutoff;
 			float _RenderQueueType;
@@ -3768,10 +3768,10 @@ Shader "Milk_Instancer/Lit"
 				float _TessMaxDisp;
 			#endif
 			CBUFFER_END
-			sampler2D _albedo;
-			sampler2D _normal;
+			sampler2D _MainTex;
+			sampler2D _NormalMap;
 			sampler2D _bentnormal;
-			sampler2D _maskmap;
+			sampler2D _MaskMap;
 
 
 			#include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/Material.hlsl"
@@ -4279,17 +4279,17 @@ Shader "Milk_Instancer/Lit"
 
 				GlobalSurfaceDescription surfaceDescription = (GlobalSurfaceDescription)0;
 				float2 texCoord2_g1 = packedInput.ase_texcoord7.xy * float2( 1,1 ) + float2( 0,0 );
-				float4 tex2DNode11_g1 = tex2D( _albedo, texCoord2_g1 );
+				float4 tex2DNode11_g1 = tex2D( _MainTex, texCoord2_g1 );
 				
-				float3 unpack13_g1 = UnpackNormalScale( tex2D( _normal, texCoord2_g1 ), _normalstrength );
-				unpack13_g1.z = lerp( 1, unpack13_g1.z, saturate(_normalstrength) );
+				float3 unpack13_g1 = UnpackNormalScale( tex2D( _NormalMap, texCoord2_g1 ), _NormalScale );
+				unpack13_g1.z = lerp( 1, unpack13_g1.z, saturate(_NormalScale) );
 				
-				float3 unpack25_g1 = UnpackNormalScale( tex2D( _bentnormal, texCoord2_g1 ), _normalstrength );
-				unpack25_g1.z = lerp( 1, unpack25_g1.z, saturate(_normalstrength) );
+				float3 unpack25_g1 = UnpackNormalScale( tex2D( _bentnormal, texCoord2_g1 ), _NormalScale );
+				unpack25_g1.z = lerp( 1, unpack25_g1.z, saturate(_NormalScale) );
 				
-				float4 tex2DNode12_g1 = tex2D( _maskmap, texCoord2_g1 );
+				float4 tex2DNode12_g1 = tex2D( _MaskMap, texCoord2_g1 );
 				
-				surfaceDescription.Albedo = ( _Color * tex2DNode11_g1 ).rgb;
+				surfaceDescription.Albedo = ( _BaseColor * tex2DNode11_g1 ).rgb;
 				surfaceDescription.Normal = unpack13_g1;
 				surfaceDescription.BentNormal = unpack25_g1;
 				surfaceDescription.CoatMask = 0;
@@ -4300,9 +4300,9 @@ Shader "Milk_Instancer/Lit"
 				#endif
 
 				surfaceDescription.Emission = 0;
-				surfaceDescription.Smoothness = (_SmoothnessMin + (tex2DNode12_g1.a - 0.0) * (_SmoothnessMax - _SmoothnessMin) / (1.0 - 0.0));
-				surfaceDescription.Occlusion = (_AOMin + (tex2DNode12_g1.g - 0.0) * (_AOMax - _AOMin) / (1.0 - 0.0));
-				surfaceDescription.Alpha = ( _Color.a * tex2DNode11_g1.a );
+				surfaceDescription.Smoothness = (_SmoothnessRemapMin + (tex2DNode12_g1.a - 0.0) * (_SmoothnessRemapMax - _SmoothnessRemapMin) / (1.0 - 0.0));
+				surfaceDescription.Occlusion = (_AORemapMin + (tex2DNode12_g1.g - 0.0) * (_AORemapMax - _AORemapMin) / (1.0 - 0.0));
+				surfaceDescription.Alpha = ( _BaseColor.a * tex2DNode11_g1.a );
 
 				#ifdef _ALPHATEST_ON
 				surfaceDescription.AlphaClipThreshold = _AlphaCutoff;
@@ -4484,7 +4484,7 @@ Shader "Milk_Instancer/Lit"
 }
 /*ASEBEGIN
 Version=18921
--1761;239;1754;865;1029.509;347.7323;1;True;True
+-1836;44;1754;893;1029.509;361.7323;1;True;True
 Node;AmplifyShaderEditor.FunctionNode;11;-260.9839,14.46393;Inherit;False;StandardShading;0;;1;5e7e2ae5299f0b54ea8330c3cad1f8cb;0;0;7;COLOR;24;FLOAT3;23;FLOAT3;26;FLOAT;20;FLOAT;19;FLOAT;18;FLOAT;22
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;1;0,0;Float;False;False;-1;2;Rendering.HighDefinition.LightingShaderGraphGUI;0;1;New Amplify Shader;53b46d85872c5b24c8f4f0a1c3fe4c87;True;META;0;1;META;0;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;True;7;d3d11;metal;vulkan;xboxone;xboxseries;playstation;switch;0;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;2;False;-1;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;1;LightMode=Meta;False;False;0;;0;0;Standard;0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;2;0,0;Float;False;False;-1;2;Rendering.HighDefinition.LightingShaderGraphGUI;0;1;New Amplify Shader;53b46d85872c5b24c8f4f0a1c3fe4c87;True;ShadowCaster;0;2;ShadowCaster;0;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;True;7;d3d11;metal;vulkan;xboxone;xboxseries;playstation;switch;0;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;0;True;-27;False;True;False;False;False;False;0;False;-1;False;False;False;False;False;False;False;False;False;True;1;False;-1;True;3;False;-1;False;True;1;LightMode=ShadowCaster;False;False;0;;0;0;Standard;0;False;0
@@ -4505,4 +4505,4 @@ WireConnection;0;7;11;19
 WireConnection;0;8;11;18
 WireConnection;0;9;11;22
 ASEEND*/
-//CHKSM=8EC14091362F8ABFCB9315C4BF2FF60256144CA6
+//CHKSM=097BD8EEC80DF8BE2F17803266DE6B85902AB279
