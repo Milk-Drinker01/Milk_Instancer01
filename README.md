@@ -27,15 +27,12 @@ Features
 
  What am I still working on?
   - find and fix bugs
-  - support more than 256 * 256 (65536) instances
+  - world streaming
   - URP shaders
   - more spawning methods, perhaps procedural terrain spawning
   - create a user friendly interface + gizmos
-  - idk im sure ill think of something
-
-
- What might i consider in the future?
   - built in renderer support
+  - idk im sure ill think of something
 
  Project info:
   - created on unity 2021.2.1f1 HDRP 12.1.0
