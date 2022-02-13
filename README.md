@@ -1,7 +1,7 @@
 # Milk_Instancer01
  Unity indirect GPU instancing & painting with occlusion culling, frustum culling, and LODs
  
- ![painting2](https://user-images.githubusercontent.com/59656122/143315069-8fce511a-4012-48f8-8a07-b9140d8e5ca1.gif)
+ ![painting (2)](https://user-images.githubusercontent.com/59656122/150681820-37e0c5b9-d7b3-4eaa-9f09-4b6b49b648e5.gif)
 
  This project is a vastly improved version of elliomans indirect rendering with compute shaders. https://github.com/ellioman/Indirect-Rendering-With-Compute-Shaders
  
@@ -27,15 +27,12 @@ Features
 
  What am I still working on?
   - find and fix bugs
-  - support more than 256 * 256 (65536) instances
+  - world streaming
   - URP shaders
   - more spawning methods, perhaps procedural terrain spawning
   - create a user friendly interface + gizmos
-  - idk im sure ill think of something
-
-
- What might i consider in the future?
   - built in renderer support
+  - idk im sure ill think of something
 
  Project info:
   - created on unity 2021.2.1f1 HDRP 12.1.0
