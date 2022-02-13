@@ -9,7 +9,8 @@ public class IndirectInstanceData
     public GameObject prefab;
     public Mesh[] LODMeshes = new Mesh[3];
 
-    public Material indirectMaterial;
+    public Material[] indirectMaterial;
+    public int[] lodMaterials = new int[3];
     [HideInInspector] public Vector3[] rotations;
     [HideInInspector] public Vector3[] positions;
     [HideInInspector] public Vector3[] scales;

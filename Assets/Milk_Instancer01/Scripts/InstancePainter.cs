@@ -16,7 +16,7 @@ public class InstancePainter : MonoBehaviour
     [HideInInspector] public MilkInstancer indirectRenderer;
 
     //[Header("debug")]
-    [HideInInspector] public IndirectInstanceData[] instances;
+     public IndirectInstanceData[] instances;
     public PaintablePrefab[] prefabParamaters = new PaintablePrefab[0];
 
 #if UNITY_EDITOR
@@ -464,10 +464,45 @@ public class InstancePainter : MonoBehaviour
             {
                 instances[i] = data[prefabs[i]];
 
-                Material reference = prefabs[i].GetComponentInChildren<MeshRenderer>().sharedMaterial;
-                instances[i].indirectMaterial = new Material(reference.shader);
-                instances[i].indirectMaterial.CopyPropertiesFromMaterial(reference);
+                instances[i].lodMaterials = new int[3];
+                //Material reference = prefabs[i].GetComponentInChildren<MeshRenderer>().sharedMaterial;
+                //List<Material> materials = new List<Material>();
+                Material[] materials = new Material[3];
+                Material lastMaterial = prefabs[i].transform.GetChild(0).GetComponentInChildren<MeshRenderer>().sharedMaterial;
 
+                int numDiff = 0;
+                Material _newMat = new Material(lastMaterial.shader);
+                _newMat.CopyPropertiesFromMaterial(lastMaterial);
+                materials[0] = _newMat;
+                instances[i].lodMaterials[0] = numDiff;
+
+                for (int m = 1; m < 3; m++)
+                {
+                    if (prefabs[i].transform.childCount <= m)
+                    {
+                        instances[i].lodMaterials[m] = numDiff;
+                    }
+                    else
+                    {
+                        Material reference = prefabs[i].transform.GetChild(m).GetComponentInChildren<MeshRenderer>().sharedMaterial;
+                        if (reference != lastMaterial)
+                        {
+                            numDiff++;
+                            Material newMat = new Material(reference.shader);
+                            newMat.CopyPropertiesFromMaterial(reference);
+                            materials[numDiff] = newMat;
+                            lastMaterial = reference;
+                        }
+                        instances[i].lodMaterials[m] = numDiff;
+                    }
+                }
+
+                numDiff++;
+                instances[i].indirectMaterial = new Material[numDiff];
+                for (int m = 0; m < numDiff; m++)
+                {
+                    instances[i].indirectMaterial[m] = materials[m];
+                }
                 prefabParamaters[i] = new PaintablePrefab(prefabs[i]);
                 prefabParamaters[i].copyParameters(tempParamaters[instances[i].index]);
             }
@@ -506,9 +541,49 @@ public class InstancePainter : MonoBehaviour
                     lodMesh.CombineMeshes(combine);
                     instances[i].LODMeshes[lod] = lodMesh;
                 }
-                Material reference = prefabs[i].GetComponentInChildren<MeshRenderer>().sharedMaterial;
-                instances[i].indirectMaterial = new Material(reference.shader);
-                instances[i].indirectMaterial.CopyPropertiesFromMaterial(reference);
+
+                instances[i].lodMaterials = new int[3];
+                //List<Material> materials = new List<Material>();
+                Material[] materials = new Material[3];
+                Material lastMaterial = prefabs[i].transform.GetChild(0).GetComponentInChildren<MeshRenderer>().sharedMaterial;
+
+                int numDiff = 0;
+                Material _newMat = new Material(lastMaterial.shader);
+                _newMat.CopyPropertiesFromMaterial(lastMaterial);
+                materials[0]=_newMat;
+                instances[i].lodMaterials[0] = numDiff;
+
+                for (int m = 1; m < 3; m++)
+                {
+                    if (prefabs[i].transform.childCount <= m)
+                    {
+                        instances[i].lodMaterials[m] = numDiff;
+                    }
+                    else
+                    {
+                        Material reference = prefabs[i].transform.GetChild(m).GetComponentInChildren<MeshRenderer>().sharedMaterial;
+                        if (reference != lastMaterial)
+                        {
+                            numDiff++;
+                            Material newMat = new Material(reference.shader);
+                            newMat.CopyPropertiesFromMaterial(reference);
+                            materials[numDiff] = newMat;
+                            lastMaterial = reference;
+                        }
+                        instances[i].lodMaterials[m] = numDiff;
+                    }
+                }
+
+                numDiff++;
+                instances[i].indirectMaterial = new Material[numDiff];
+                for (int m = 0; m < numDiff; m++)
+                {
+                    instances[i].indirectMaterial[m] = materials[m];
+                }
+
+                //Material reference = prefabs[i].GetComponentInChildren<MeshRenderer>().sharedMaterial;
+                //instances[i].indirectMaterial = new Material(reference.shader);
+                //instances[i].indirectMaterial.CopyPropertiesFromMaterial(reference);
             }
         }
 

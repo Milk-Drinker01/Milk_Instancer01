@@ -344,6 +344,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - SmoothnessRemapMax: 0.675
+    - SmoothnessRemapMin: 0
     - _AOMax: 1
     - _AOMin: 0
     - _AORemapMax: 1
@@ -514,6 +516,8 @@ Material:
     - _ThicknessMax: 0.525
     - _ThicknessMin: 0
     - _ThicknessMultiplier: 1
+    - _ThicknessRemapMax: 1
+    - _ThicknessRemapMin: 0
     - _TransmissionEnable: 1
     - _TransmissionSelfOcclusion: 1
     - _TransmissionThicknessScale: 1

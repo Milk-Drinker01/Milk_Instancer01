@@ -301,14 +301,14 @@ public class MilkInstancer : MonoBehaviour
             {
                 for (int i = 0; i < indirectMeshes.Length; i++)
                 {
-                    indirectMeshes[i].material.EnableKeyword(DEBUG_SHADER_LOD_KEYWORD);
+                    indirectMeshes[i].material[0].EnableKeyword(DEBUG_SHADER_LOD_KEYWORD);
                 }
             }
             else
             {
                 for (int i = 0; i < indirectMeshes.Length; i++)
                 {
-                    indirectMeshes[i].material.DisableKeyword(DEBUG_SHADER_LOD_KEYWORD);
+                    indirectMeshes[i].material[0].DisableKeyword(DEBUG_SHADER_LOD_KEYWORD);
                 }
             }
         }
@@ -325,12 +325,12 @@ public class MilkInstancer : MonoBehaviour
             if (enableLOD)
             {
                 //Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 0, irm.lod00MatPropBlock, instanceShadowCastingModes[i]);
-                Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 0, irm.lod00MatPropBlock, ShadowCastingMode.Off);
+                Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material[irm.lod0Material], m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 0, irm.lod00MatPropBlock, ShadowCastingMode.Off);
                 //Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 1, irm.lod01MatPropBlock, instanceShadowCastingModes[i]);
-                Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 1, irm.lod01MatPropBlock, ShadowCastingMode.Off);
+                Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material[irm.lod1Material], m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 1, irm.lod01MatPropBlock, ShadowCastingMode.Off);
             }
             //Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 2, irm.lod02MatPropBlock, instanceShadowCastingModes[i]);
-            Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 2, irm.lod02MatPropBlock, ShadowCastingMode.Off);
+            Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material[irm.lod2Material], m_bounds, m_instancesArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 2, irm.lod02MatPropBlock, ShadowCastingMode.Off);
         }
     }
     private void DrawInstanceShadows()
@@ -344,10 +344,10 @@ public class MilkInstancer : MonoBehaviour
 
                 if (enableLOD)
                 {
-                    Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_shadowArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 0, irm.shadowLod00MatPropBlock, ShadowCastingMode.ShadowsOnly);
-                    Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_shadowArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 1, irm.shadowLod01MatPropBlock, ShadowCastingMode.ShadowsOnly);
+                    Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material[irm.lod0Material], m_bounds, m_shadowArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 0, irm.shadowLod00MatPropBlock, ShadowCastingMode.ShadowsOnly);
+                    Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material[irm.lod1Material], m_bounds, m_shadowArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 1, irm.shadowLod01MatPropBlock, ShadowCastingMode.ShadowsOnly);
                 }
-                Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material, m_bounds, m_shadowArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 2, irm.shadowLod02MatPropBlock, ShadowCastingMode.ShadowsOnly);
+                Graphics.DrawMeshInstancedIndirect(irm.mesh, 0, irm.material[irm.lod2Material], m_bounds, m_shadowArgsBuffer, argsIndex + ARGS_BYTE_SIZE_PER_DRAW_CALL * 2, irm.shadowLod02MatPropBlock, ShadowCastingMode.ShadowsOnly);
             }
         }
     }
@@ -568,6 +568,10 @@ public class MilkInstancer : MonoBehaviour
         {
             IndirectRenderingMesh irm = new IndirectRenderingMesh();
             IndirectInstanceData iid = _instances[i];
+
+            irm.lod0Material = iid.lodMaterials[0];
+            irm.lod1Material = iid.lodMaterials[1];
+            irm.lod2Material = iid.lodMaterials[2];
 
             // Initialize Mesh
             irm.numOfVerticesLod00 = (uint)iid.LODMeshes[0].vertexCount;
@@ -1363,7 +1367,10 @@ public class MilkInstancer : MonoBehaviour
 public class IndirectRenderingMesh
 {
     public Mesh mesh;
-    public Material material;
+    public Material[] material;
+    public int lod0Material;
+    public int lod1Material;
+    public int lod2Material;
     public MaterialPropertyBlock lod00MatPropBlock;
     public MaterialPropertyBlock lod01MatPropBlock;
     public MaterialPropertyBlock lod02MatPropBlock;
