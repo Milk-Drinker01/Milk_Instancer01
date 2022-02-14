@@ -14,6 +14,7 @@
   - wind shader example
 
 Features
+  - HDRP instancing
   - instance density control
   - paint prefabs on any object
   - multiple prefab support
