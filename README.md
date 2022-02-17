@@ -24,11 +24,12 @@ Features
   - Amplify Shader Editor examples
   - ShaderGraph examples
   - wind shader example (ASE and SG)
+  - Multi-Material Prefab support (for things like trees)
 
 
  What am I still working on?
   - find and fix bugs
-  - world streaming
+  - world streaming/detail zones
   - URP shaders
   - more spawning methods, perhaps procedural terrain spawning
   - create a user friendly interface + gizmos
