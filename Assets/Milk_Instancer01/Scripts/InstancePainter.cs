@@ -15,9 +15,11 @@ public class InstancePainter : MonoBehaviour
     public float areaSize = 5;
     [HideInInspector] public MilkInstancer indirectRenderer;
 
-    //[Header("debug")]
-     public IndirectInstanceData[] instances;
+    
+    public IndirectInstanceData[] instances;
     public PaintablePrefab[] prefabParamaters = new PaintablePrefab[0];
+    [Header("debug")]
+    public bool disableInstancingAtRunTime;
 
 #if UNITY_EDITOR
     public LayerMask rayCastLayerMask;
@@ -30,7 +32,21 @@ public class InstancePainter : MonoBehaviour
     #region non-editor functions
     private void Awake()
     {
-        init();
+        if (disableInstancingAtRunTime && Application.isPlaying)
+        {
+            foreach(IndirectInstanceData d in instances)
+            {
+                for (int i = 0; i < d.positions.Length; i++)
+                {
+                    Instantiate(d.prefab, d.positions[i], Quaternion.Euler(d.rotations[i]), transform);
+                }
+            }
+            GetComponent<MilkInstancer>().enabled = false;
+        }
+        else
+        {
+            init();
+        }
     }
     public void init()
     {
@@ -70,11 +86,6 @@ public class InstancePainter : MonoBehaviour
         {
             IndirectInstanceData[] nonEmptyArray = nonEmptyData.ToArray();
             //indirectRenderer.instanceShadowCastingModes = new ShadowCastingMode[nonEmptyArray.Length];
-            indirectRenderer.instanceShadowCastingModes = new bool[nonEmptyArray.Length];
-            for (int i = 0; i < nonEmptyArray.Length; i++)
-            {
-                indirectRenderer.instanceShadowCastingModes[i] = nonEmptyArray[i].shadowCastingMode;
-            }
             indirectRenderer.Initialize(ref nonEmptyArray);
         }
         else
@@ -436,10 +447,11 @@ public class InstancePainter : MonoBehaviour
             init();
         }
     }
+    PaintablePrefab[] tempParamaters;
     void rebuildInstanceDatabase()
     {
         Dictionary<GameObject, IndirectInstanceData> data = new Dictionary<GameObject, IndirectInstanceData>();
-        PaintablePrefab[] tempParamaters = new PaintablePrefab[prefabs.Length];
+        tempParamaters = new PaintablePrefab[prefabs.Length];
         for (int n = 0; n < prefabs.Length; n++)
         {
             for (int i = 0; i < instances.Length; i++)
@@ -464,45 +476,8 @@ public class InstancePainter : MonoBehaviour
             {
                 instances[i] = data[prefabs[i]];
 
-                instances[i].lodMaterials = new int[3];
-                //Material reference = prefabs[i].GetComponentInChildren<MeshRenderer>().sharedMaterial;
-                //List<Material> materials = new List<Material>();
-                Material[] materials = new Material[3];
-                Material lastMaterial = prefabs[i].transform.GetChild(0).GetComponentInChildren<MeshRenderer>().sharedMaterial;
+                setInstanceMaterials(i);
 
-                int numDiff = 0;
-                Material _newMat = new Material(lastMaterial.shader);
-                _newMat.CopyPropertiesFromMaterial(lastMaterial);
-                materials[0] = _newMat;
-                instances[i].lodMaterials[0] = numDiff;
-
-                for (int m = 1; m < 3; m++)
-                {
-                    if (prefabs[i].transform.childCount <= m)
-                    {
-                        instances[i].lodMaterials[m] = numDiff;
-                    }
-                    else
-                    {
-                        Material reference = prefabs[i].transform.GetChild(m).GetComponentInChildren<MeshRenderer>().sharedMaterial;
-                        if (reference != lastMaterial)
-                        {
-                            numDiff++;
-                            Material newMat = new Material(reference.shader);
-                            newMat.CopyPropertiesFromMaterial(reference);
-                            materials[numDiff] = newMat;
-                            lastMaterial = reference;
-                        }
-                        instances[i].lodMaterials[m] = numDiff;
-                    }
-                }
-
-                numDiff++;
-                instances[i].indirectMaterial = new Material[numDiff];
-                for (int m = 0; m < numDiff; m++)
-                {
-                    instances[i].indirectMaterial[m] = materials[m];
-                }
                 prefabParamaters[i] = new PaintablePrefab(prefabs[i]);
                 prefabParamaters[i].copyParameters(tempParamaters[instances[i].index]);
             }
@@ -519,71 +494,80 @@ public class InstancePainter : MonoBehaviour
                     {
                         child = prefabs[i].transform.childCount - 1;
                     }
-                    List<MeshFilter> filters = new List<MeshFilter>();
-                    List<Matrix4x4> transforms = new List<Matrix4x4>();
-                    foreach (MeshFilter filt in prefabs[i].transform.GetChild(child).GetComponentsInChildren<MeshFilter>())
-                    {
-                        filters.Add(filt);
-                        transforms.Add(filt.transform.localToWorldMatrix);
-                    }
-                    MeshFilter[] meshFilters = filters.ToArray();
-                    CombineInstance[] combine = new CombineInstance[meshFilters.Length];
-                    int c = 0;
-                    while (c < meshFilters.Length)
-                    {
-                        combine[c].mesh = meshFilters[c].sharedMesh;
-                        combine[c].transform = transforms[c];
 
-                        c++;
+                    Dictionary<Material, List<subMeshInstance>> baseMaterials = new Dictionary<Material, List<subMeshInstance>>();
+
+                    MeshRenderer[] rends = prefabs[i].transform.GetChild(child).GetComponentsInChildren<MeshRenderer>();
+                    for (int r = 0; r < rends.Length; r++)
+                    {
+                        for (int m = 0; m < rends[r].sharedMaterials.Length; m++)
+                        {
+                            if (!baseMaterials.ContainsKey(rends[r].sharedMaterials[m]))
+                            {
+                                baseMaterials.Add(rends[r].sharedMaterials[m], new List<subMeshInstance>());
+                            }
+                            baseMaterials[rends[r].sharedMaterials[m]].Add(new subMeshInstance(rends[r].GetComponent<MeshFilter>(), m));
+                        }
                     }
 
+                    List<Mesh> newMeshes = new List<Mesh>();
+                    foreach (KeyValuePair<Material, List<subMeshInstance>> pair in baseMaterials)
+                    {
+                        List<CombineInstance> matcombine = new List<CombineInstance>();
+                        for (int j = 0; j < pair.Value.Count; j++)
+                        {
+                            CombineInstance ci = new CombineInstance();
+
+                            ci.mesh = pair.Value[j].mesh.sharedMesh;
+                            ci.subMeshIndex = pair.Value[j].index;
+                            //ci.transform = filters[i].transform.localToWorldMatrix;
+                            ci.transform = pair.Value[j].mesh.transform.localToWorldMatrix;
+
+                            matcombine.Add(ci);
+                        }
+                        Mesh matMesh = new Mesh();
+                        matMesh.CombineMeshes(matcombine.ToArray(), true, true);
+                        newMeshes.Add(matMesh);
+                    }
+
+                    List<CombineInstance> combine = new List<CombineInstance>();
+                    for (int m = 0; m < newMeshes.Count; m++)
+                    {
+                        CombineInstance ci = new CombineInstance();
+
+                        ci.mesh = newMeshes[m];
+                        ci.subMeshIndex = 0;
+                        //ci.transform = filters[i].transform.localToWorldMatrix;
+                        ci.transform = prefabs[i].transform.localToWorldMatrix;
+
+                        combine.Add(ci);
+                    }
                     Mesh lodMesh = new Mesh();
-                    lodMesh.CombineMeshes(combine);
+                    lodMesh.CombineMeshes(combine.ToArray(), false, true);
+                    //List<MeshFilter> filters = new List<MeshFilter>();
+                    //List<Matrix4x4> transforms = new List<Matrix4x4>();
+                    //foreach (MeshFilter filt in prefabs[i].transform.GetChild(child).GetComponentsInChildren<MeshFilter>())
+                    //{
+                    //    filters.Add(filt);
+                    //    transforms.Add(filt.transform.localToWorldMatrix);
+                    //}
+                    //MeshFilter[] meshFilters = filters.ToArray();
+                    //CombineInstance[] combine = new CombineInstance[meshFilters.Length];
+                    //int c = 0;
+                    //while (c < meshFilters.Length)
+                    //{
+                    //    combine[c].mesh = meshFilters[c].sharedMesh;
+                    //    combine[c].transform = transforms[c];
+
+                    //    c++;
+                    //}
+
+                    //Mesh lodMesh = new Mesh();
+                    //lodMesh.CombineMeshes(combine, false);
                     instances[i].LODMeshes[lod] = lodMesh;
                 }
 
-                instances[i].lodMaterials = new int[3];
-                //List<Material> materials = new List<Material>();
-                Material[] materials = new Material[3];
-                Material lastMaterial = prefabs[i].transform.GetChild(0).GetComponentInChildren<MeshRenderer>().sharedMaterial;
-
-                int numDiff = 0;
-                Material _newMat = new Material(lastMaterial.shader);
-                _newMat.CopyPropertiesFromMaterial(lastMaterial);
-                materials[0]=_newMat;
-                instances[i].lodMaterials[0] = numDiff;
-
-                for (int m = 1; m < 3; m++)
-                {
-                    if (prefabs[i].transform.childCount <= m)
-                    {
-                        instances[i].lodMaterials[m] = numDiff;
-                    }
-                    else
-                    {
-                        Material reference = prefabs[i].transform.GetChild(m).GetComponentInChildren<MeshRenderer>().sharedMaterial;
-                        if (reference != lastMaterial)
-                        {
-                            numDiff++;
-                            Material newMat = new Material(reference.shader);
-                            newMat.CopyPropertiesFromMaterial(reference);
-                            materials[numDiff] = newMat;
-                            lastMaterial = reference;
-                        }
-                        instances[i].lodMaterials[m] = numDiff;
-                    }
-                }
-
-                numDiff++;
-                instances[i].indirectMaterial = new Material[numDiff];
-                for (int m = 0; m < numDiff; m++)
-                {
-                    instances[i].indirectMaterial[m] = materials[m];
-                }
-
-                //Material reference = prefabs[i].GetComponentInChildren<MeshRenderer>().sharedMaterial;
-                //instances[i].indirectMaterial = new Material(reference.shader);
-                //instances[i].indirectMaterial.CopyPropertiesFromMaterial(reference);
+                setInstanceMaterials(i);
             }
         }
 
@@ -593,6 +577,43 @@ public class InstancePainter : MonoBehaviour
             _prefabs[i] = prefabs[i];
         }
     }
+    void setInstanceMaterials(int i)
+    {
+        instances[i].lodMaterialIndexes = new gayWorkAround[3];
+        instances[i].lodMaterialIndexes[0] = new gayWorkAround();
+        instances[i].lodMaterialIndexes[1] = new gayWorkAround();
+        instances[i].lodMaterialIndexes[2] = new gayWorkAround();
+
+        List<Material> baseMaterials = new List<Material>();
+        List<Material> newMaterials = new List<Material>();
+        List<int> materialIndexes = new List<int>();
+        for (int c = 0; c < Mathf.Min(3, prefabs[i].transform.childCount); c++)
+        {
+            materialIndexes.Clear();
+            MeshRenderer[] rends = prefabs[i].transform.GetChild(c).GetComponentsInChildren<MeshRenderer>();
+            for (int r = 0; r < rends.Length; r++)
+            {
+                Material[] mats = rends[r].sharedMaterials;
+                for (int m = 0; m < rends[r].sharedMaterials.Length; m++)
+                {
+                    if (!baseMaterials.Contains(rends[r].sharedMaterials[m]))
+                    {
+                        baseMaterials.Add(rends[r].sharedMaterials[m]);
+
+                        Material newMat = new Material(rends[r].sharedMaterials[m].shader);
+                        newMat.CopyPropertiesFromMaterial(rends[r].sharedMaterials[m]);
+                        newMaterials.Add(newMat);
+                    }
+                    materialIndexes.Add(baseMaterials.IndexOf(rends[r].sharedMaterials[m]));
+                }
+            }
+
+            instances[i].lodMaterialIndexes[c].workaround = materialIndexes.ToArray();
+        }
+        instances[i].indirectMaterial = newMaterials.ToArray();
+    }
+
+
     bool drawGizmo = false;
     Vector3 gizmoPosition = Vector3.zero;
     Vector3 gizmoNormal = Vector3.up;

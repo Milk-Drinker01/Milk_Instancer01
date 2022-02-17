@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.HighDefinition;
 
 // based off eliomans indirect isntancer using compute shaders. 
 
@@ -169,9 +170,28 @@ public class MilkInstancer : MonoBehaviour
     {
 
     }
-
+    float maxShadowDistance = 150;
     private void Awake()
     {
+        if (QualitySettings.renderPipeline == null)
+        {
+            maxShadowDistance = QualitySettings.shadowDistance;
+        }
+        else
+        {
+            foreach (Volume pr in GameObject.FindObjectsOfType<Volume>())
+            {
+                VolumeProfile v;
+                v = pr.GetComponent<Volume>().profile;
+
+                HDShadowSettings s;
+                v.TryGet(out s);
+                if (s != null)
+                {
+                    maxShadowDistance = (float)s.maxShadowDistance;
+                }
+            }
+        }
         mainCam = Camera.main;
     }
     private void Update()
@@ -384,7 +404,7 @@ public class MilkInstancer : MonoBehaviour
         Profiler.BeginSample("02 Occlusion");
         {
             // Input
-            occlusionCS.SetFloat(_ShadowDistance, QualitySettings.shadowDistance);
+            occlusionCS.SetFloat(_ShadowDistance, maxShadowDistance);
             occlusionCS.SetMatrix(_UNITY_MATRIX_MVP, m_MVP);
             occlusionCS.SetVector(_CamPosition, camPosition);
 
@@ -551,110 +571,136 @@ public class MilkInstancer : MonoBehaviour
         }
         ReleaseBuffers();
         instancesInputData.Clear();
-        m_numberOfInstanceTypes = _instances.Length;
+        m_numberOfInstanceTypes = 0;
+        for (int i = 0; i < _instances.Length; i++)
+        {
+            m_numberOfInstanceTypes += Mathf.Max(_instances[i].lodMaterialIndexes[0].workaround.Length, _instances[i].lodMaterialIndexes[1].workaround.Length, _instances[i].lodMaterialIndexes[2].workaround.Length);
+        }
+        instanceShadowCastingModes = new bool[m_numberOfInstanceTypes];
         m_numberOfInstances = 0;
         camPosition = Camera.main.transform.position;
         m_bounds.center = Vector3.zero;
         m_bounds.extents = Vector3.one * 10000;
         createDepthTexture();
         indirectMeshes = new IndirectRenderingMesh[m_numberOfInstanceTypes];
+        
         m_args = new uint[m_numberOfInstanceTypes * NUMBER_OF_ARGS_PER_INSTANCE_TYPE];
         List<Vector3> positions = new List<Vector3>();
         List<Vector3> scales = new List<Vector3>();
         List<Vector3> rotations = new List<Vector3>();
         List<SortingData> sortingData = new List<SortingData>();
 
-        for (int i = 0; i < m_numberOfInstanceTypes; i++)
+        int currentInstanceType = 0;
+        for (int i = 0; i < _instances.Length; i++)
         {
-            IndirectRenderingMesh irm = new IndirectRenderingMesh();
+            int max = Mathf.Max(_instances[i].lodMaterialIndexes[0].workaround.Length, _instances[i].lodMaterialIndexes[1].workaround.Length, _instances[i].lodMaterialIndexes[2].workaround.Length);
             IndirectInstanceData iid = _instances[i];
-
-            irm.lod0Material = iid.lodMaterials[0];
-            irm.lod1Material = iid.lodMaterials[1];
-            irm.lod2Material = iid.lodMaterials[2];
-
-            // Initialize Mesh
-            irm.numOfVerticesLod00 = (uint)iid.LODMeshes[0].vertexCount;
-            irm.numOfVerticesLod01 = (uint)iid.LODMeshes[1].vertexCount;
-            irm.numOfVerticesLod02 = (uint)iid.LODMeshes[2].vertexCount;
-            irm.numOfIndicesLod00 = iid.LODMeshes[0].GetIndexCount(0);
-            irm.numOfIndicesLod01 = iid.LODMeshes[1].GetIndexCount(0);
-            irm.numOfIndicesLod02 = iid.LODMeshes[2].GetIndexCount(0);
-
-            irm.mesh = new Mesh();
-            irm.mesh.name = iid.prefab.name;
-            irm.mesh.CombineMeshes(
-                new CombineInstance[] {
-                    new CombineInstance() { mesh = iid.LODMeshes[0]},
-                    new CombineInstance() { mesh = iid.LODMeshes[1]},
-                    new CombineInstance() { mesh = iid.LODMeshes[2]}
-                },
-                true,       // Merge Submeshes 
-                false,      // Use Matrices
-                false       // Has lightmap data
-            );
-
-            // Arguments
-            int argsIndex = i * NUMBER_OF_ARGS_PER_INSTANCE_TYPE;
-
-            // Buffer with arguments has to have five integer numbers
-            // LOD00
-            m_args[argsIndex + 0] = irm.numOfIndicesLod00;                          // 0 - index count per instance, 
-            m_args[argsIndex + 1] = 0;                                              // 1 - instance count
-            m_args[argsIndex + 2] = 0;                                              // 2 - start index location
-            m_args[argsIndex + 3] = 0;                                              // 3 - base vertex location
-            m_args[argsIndex + 4] = 0;                                              // 4 - start instance location
-
-            // LOD01
-            m_args[argsIndex + 5] = irm.numOfIndicesLod01;                          // 0 - index count per instance, 
-            m_args[argsIndex + 6] = 0;                                              // 1 - instance count
-            m_args[argsIndex + 7] = m_args[argsIndex + 0] + m_args[argsIndex + 2];  // 2 - start index location
-            m_args[argsIndex + 8] = 0;                                              // 3 - base vertex location
-            m_args[argsIndex + 9] = 0;                                              // 4 - start instance location
-
-            // LOD02
-            m_args[argsIndex + 10] = irm.numOfIndicesLod02;                         // 0 - index count per instance, 
-            m_args[argsIndex + 11] = 0;                                             // 1 - instance count
-            m_args[argsIndex + 12] = m_args[argsIndex + 5] + m_args[argsIndex + 7]; // 2 - start index location
-            m_args[argsIndex + 13] = 0;                                             // 3 - base vertex location
-            m_args[argsIndex + 14] = 0;                                             // 4 - start instance location
-
-            // Materials
-            irm.material = iid.indirectMaterial;//new Material(iid.indirectMaterial);
-            Bounds originalBounds = CalculateBounds(iid.prefab);
-
-            // Add the instance data (positions, rotations, scaling, bounds...)
-            for (int j = 0; j < iid.positions.Length; j++)
+            for (int t = 0; t < max; t++)
             {
-                positions.Add(iid.positions[j]);
-                rotations.Add(iid.rotations[j]);
-                scales.Add(iid.scales[j]);
+                instanceShadowCastingModes[currentInstanceType] = iid.shadowCastingMode;
+                IndirectRenderingMesh irm = new IndirectRenderingMesh();
 
-                //Debug.Log(((((uint)i * NUMBER_OF_ARGS_PER_INSTANCE_TYPE) << 16) + ((uint)m_numberOfInstances)) >> 16);
-                sortingData.Add(new SortingData()
+                irm.lod0Material = iid.lodMaterialIndexes[0].workaround[0];
+                irm.lod1Material = iid.lodMaterialIndexes[1].workaround[0];
+                irm.lod2Material = iid.lodMaterialIndexes[2].workaround[0];
+
+                // Initialize Mesh
+                irm.numOfVerticesLod00 = (uint)iid.LODMeshes[0].vertexCount;
+                irm.numOfVerticesLod01 = (uint)iid.LODMeshes[1].vertexCount;
+                irm.numOfVerticesLod02 = (uint)iid.LODMeshes[2].vertexCount;
+                if (iid.LODMeshes[0].subMeshCount > t)
                 {
-                    drawCallInstanceIndex = ((((uint)i * NUMBER_OF_ARGS_PER_INSTANCE_TYPE) << 16) + ((uint)m_numberOfInstances)),
-                    distanceToCam = Vector3.Distance(iid.positions[j], camPosition)
-                });
-
-                // Calculate the renderer bounds
-                Bounds b = new Bounds();
-                b.center = iid.positions[j];
-                Vector3 s = originalBounds.size;
-                s.Scale(iid.scales[j]);
-                b.size = s;
-
-                instancesInputData.Add(new IndirectInstanceCSInput()
+                    irm.numOfIndicesLod00 = iid.LODMeshes[0].GetIndexCount(t);
+                    irm.lod0Material = iid.lodMaterialIndexes[0].workaround[t];
+                }
+                if (iid.LODMeshes[1].subMeshCount > t)
                 {
-                    boundsCenter = b.center,
-                    boundsExtents = b.extents,
-                });
+                    irm.numOfIndicesLod01 = iid.LODMeshes[1].GetIndexCount(t);
+                    irm.lod1Material = iid.lodMaterialIndexes[1].workaround[t];
+                }
+                if (iid.LODMeshes[2].subMeshCount > t)
+                {
+                    irm.numOfIndicesLod02 = iid.LODMeshes[2].GetIndexCount(t);
+                    irm.lod2Material = iid.lodMaterialIndexes[2].workaround[t];
+                }
 
-                m_numberOfInstances++;
+                irm.mesh = new Mesh();
+                irm.mesh.name = iid.prefab.name;
+                irm.mesh.CombineMeshes(
+                    new CombineInstance[] {
+                    new CombineInstance() { mesh = iid.LODMeshes[0], subMeshIndex = t},
+                    new CombineInstance() { mesh = iid.LODMeshes[1], subMeshIndex = t},
+                    new CombineInstance() { mesh = iid.LODMeshes[2], subMeshIndex = t}
+                    },
+                    true,       // Merge Submeshes 
+                    false,      // Use Matrices
+                    false       // Has lightmap data
+                );
+
+                // Arguments
+                int argsIndex = currentInstanceType * NUMBER_OF_ARGS_PER_INSTANCE_TYPE;
+
+                // Buffer with arguments has to have five integer numbers
+                // LOD00
+                m_args[argsIndex + 0] = irm.numOfIndicesLod00;                          // 0 - index count per instance, 
+                m_args[argsIndex + 1] = 0;                                              // 1 - instance count
+                m_args[argsIndex + 2] = 0;                                              // 2 - start index location
+                m_args[argsIndex + 3] = 0;                                              // 3 - base vertex location
+                m_args[argsIndex + 4] = 0;                                              // 4 - start instance location
+
+                // LOD01
+                m_args[argsIndex + 5] = irm.numOfIndicesLod01;                          // 0 - index count per instance, 
+                m_args[argsIndex + 6] = 0;                                              // 1 - instance count
+                m_args[argsIndex + 7] = m_args[argsIndex + 0] + m_args[argsIndex + 2];  // 2 - start index location
+                m_args[argsIndex + 8] = 0;                                              // 3 - base vertex location
+                m_args[argsIndex + 9] = 0;                                              // 4 - start instance location
+
+                // LOD02
+                m_args[argsIndex + 10] = irm.numOfIndicesLod02;                         // 0 - index count per instance, 
+                m_args[argsIndex + 11] = 0;                                             // 1 - instance count
+                m_args[argsIndex + 12] = m_args[argsIndex + 5] + m_args[argsIndex + 7]; // 2 - start index location
+                m_args[argsIndex + 13] = 0;                                             // 3 - base vertex location
+                m_args[argsIndex + 14] = 0;                                             // 4 - start instance location
+
+                // Materials
+                irm.material = iid.indirectMaterial;//new Material(iid.indirectMaterial);
+                Bounds originalBounds = CalculateBounds(iid.prefab);
+
+                // Add the instance data (positions, rotations, scaling, bounds...)
+                for (int j = 0; j < iid.positions.Length; j++)
+                {
+                    positions.Add(iid.positions[j]);
+                    rotations.Add(iid.rotations[j]);
+                    scales.Add(iid.scales[j]);
+
+                    //Debug.Log(((((uint)i * NUMBER_OF_ARGS_PER_INSTANCE_TYPE) << 16) + ((uint)m_numberOfInstances)) >> 16);
+                    sortingData.Add(new SortingData()
+                    {
+                        drawCallInstanceIndex = ((((uint)currentInstanceType * NUMBER_OF_ARGS_PER_INSTANCE_TYPE) << 16) + ((uint)m_numberOfInstances)),
+                        distanceToCam = Vector3.Distance(iid.positions[j], camPosition)
+                    });
+
+                    // Calculate the renderer bounds
+                    Bounds b = new Bounds();
+                    b.center = iid.positions[j];
+                    Vector3 s = originalBounds.size;
+                    s.Scale(iid.scales[j]);
+                    b.size = s;
+
+                    instancesInputData.Add(new IndirectInstanceCSInput()
+                    {
+                        boundsCenter = b.center,
+                        boundsExtents = b.extents,
+                    });
+
+                    m_numberOfInstances++;
+                }
+
+                // Add the data to the renderer list
+                indirectMeshes[currentInstanceType] = irm;
+
+                currentInstanceType++;
             }
-
-            // Add the data to the renderer list
-            indirectMeshes[i] = irm;
         }
         nextPowerOfTwo = Mathf.NextPowerOfTwo(m_numberOfInstances);
 
@@ -1380,9 +1426,9 @@ public class IndirectRenderingMesh
     public uint numOfVerticesLod00;
     public uint numOfVerticesLod01;
     public uint numOfVerticesLod02;
-    public uint numOfIndicesLod00;
-    public uint numOfIndicesLod01;
-    public uint numOfIndicesLod02;
+    public uint numOfIndicesLod00 = 0;
+    public uint numOfIndicesLod01 = 0;
+    public uint numOfIndicesLod02 = 0;
 }
 
 #if UNITY_EDITOR

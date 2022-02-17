@@ -10,7 +10,9 @@ public class IndirectInstanceData
     public Mesh[] LODMeshes = new Mesh[3];
 
     public Material[] indirectMaterial;
-    public int[] lodMaterials = new int[3];
+
+
+    public gayWorkAround[] lodMaterialIndexes = new gayWorkAround[3];
     [HideInInspector] public Vector3[] rotations;
     [HideInInspector] public Vector3[] positions;
     [HideInInspector] public Vector3[] scales;
@@ -21,4 +23,9 @@ public class IndirectInstanceData
 #if UNITY_EDITOR
     public int index;
 #endif
+}
+[System.Serializable]
+public class gayWorkAround
+{
+    public int[] workaround = new int[1];
 }

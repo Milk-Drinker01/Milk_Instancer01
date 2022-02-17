@@ -90,17 +90,17 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: stump
-    second: {fileID: 2100000, guid: 41f1e6792b62a9a4eb680d67c54c42cf, type: 2}
+    second: {fileID: 2100000, guid: dfcd770944b665d40a90af4e851a136f, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: trunk
-    second: {fileID: 2100000, guid: 0ee7a0c96b952ba47a0019c58749a6e8, type: 2}
+    second: {fileID: 2100000, guid: 694b2320f0a175247ae3f6c4d975ed4e, type: 2}
   materials:
-    materialImportMode: 0
+    materialImportMode: 2
     materialName: 1
     materialSearch: 1
-    materialLocation: 0
+    materialLocation: 1
   animations:
     legacyGenerateAnimations: 0
     bakeSimulation: 0
