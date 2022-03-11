@@ -7,6 +7,9 @@ using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
+#if UNITY_EDITOR
+using UnityEngine.UI;
+#endif
 
 // based off eliomans indirect isntancer using compute shaders. 
 
@@ -71,7 +74,16 @@ public class MilkInstancer : MonoBehaviour
     [ReadOnly] public List<IndirectInstanceCSInput> instancesInputData = new List<IndirectInstanceCSInput>();
     [ReadOnly] public IndirectRenderingMesh[] indirectMeshes;
 
-    #region compute buffers
+    [Header("debug")]
+#if UNITY_EDITOR
+    public bool scanDebug;
+    public bool groupScanDebug;
+    public bool sortDebug;
+    public RawImage depthTex;
+    
+#endif
+
+#region compute buffers
     private ComputeBuffer m_instancesIsVisibleBuffer;
     private ComputeBuffer m_instancesGroupSumArrayBuffer;
     private ComputeBuffer m_instancesScannedGroupSumBuffer;
@@ -94,11 +106,11 @@ public class MilkInstancer : MonoBehaviour
     private ComputeBuffer m_shadowCulledMatrixRows01;
     private ComputeBuffer m_shadowCulledMatrixRows23;
     private ComputeBuffer m_shadowCulledMatrixRows45;
-    #endregion
-    #region command buffers
+#endregion
+#region command buffers
     private CommandBuffer m_sortingCommandBuffer;
-    #endregion
-    #region kernel IDS
+#endregion
+#region kernel IDS
     private int m_createDrawDataBufferKernelID;
     private int m_sortingCSKernelID;
     private int m_sortingTransposeKernelID;
@@ -106,8 +118,8 @@ public class MilkInstancer : MonoBehaviour
     private int m_scanInstancesKernelID;
     private int m_scanGroupSumsKernelID;
     private int m_copyInstanceDataKernelID;
-    #endregion
-    #region shader property IDs
+#endregion
+#region shader property IDs
     private static readonly int _Data = Shader.PropertyToID("_Data");
     private static readonly int _Input = Shader.PropertyToID("_Input");
     private static readonly int _ShouldFrustumCull = Shader.PropertyToID("_ShouldFrustumCull");
@@ -149,7 +161,7 @@ public class MilkInstancer : MonoBehaviour
     private static readonly int _InstancesCulledMatrixRows01 = Shader.PropertyToID("_InstancesCulledMatrixRows01");
     private static readonly int _InstancesCulledMatrixRows23 = Shader.PropertyToID("_InstancesCulledMatrixRows23");
     private static readonly int _InstancesCulledMatrixRows45 = Shader.PropertyToID("_InstancesCulledMatrixRows45");
-    #endregion
+#endregion
     private int m_numberOfInstanceTypes;
     private int m_numberOfInstances;
     private int m_occlusionGroupX;
@@ -279,7 +291,7 @@ public class MilkInstancer : MonoBehaviour
 
     Bounds m_bounds;
 
-    #region draw
+#region draw
     public void renderInstances(Camera cam)
     {
         rendered = false;
@@ -521,9 +533,6 @@ public class MilkInstancer : MonoBehaviour
         }
         Profiler.EndSample();
     }
-    public bool scanDebug;
-    public bool groupScanDebug;
-    public bool sortDebug;
     
     private bool TryGetKernels()
     {
@@ -547,8 +556,8 @@ public class MilkInstancer : MonoBehaviour
         kernelID = cs.FindKernel(kernelName);
         return true;
     }
-    #endregion
-    #region initialization
+#endregion
+#region initialization
 
     public void StopDrawing(bool shouldReleaseBuffers = false)
     {
@@ -1175,12 +1184,29 @@ public class MilkInstancer : MonoBehaviour
         yield return new WaitForSeconds(.1f);
         DestroyImmediate(obj);
     }
-    #endregion
-    #region compute shader setup
-    public bool doDepthCalculations = true;
+#endregion
+#region compute shader setup
+    //public bool doDepthCalculations = true;
     void renderingDone(UnityEngine.Rendering.ScriptableRenderContext context, Camera camera)
     {
-        if ((Application.isPlaying && camera != Camera.main) || !doDepthCalculations)
+        if ((Application.isPlaying))
+        {
+            if (camera != Camera.main)
+            {
+                return;
+            }
+        }
+        else
+        {
+#if UNITY_EDITOR
+            if (camera.name != "SceneCamera")
+            {
+                return;
+            }
+#endif
+        }
+        //Debug.Log(camera.name);
+        if (!enableOcclusionCulling)
         {
             return;
         }
@@ -1188,6 +1214,16 @@ public class MilkInstancer : MonoBehaviour
         if (HDRPDepthTexture == null)
         {
             HDRPDepthTexture = Shader.GetGlobalTexture("_CameraDepthTexture");
+#if UNITY_EDITOR
+            if (depthTex)
+            {
+                depthTex.texture = hiZDepthTexture;
+                depthTex.texture = HDRPDepthTexture;
+            }
+#endif
+            CopyTextureWithComputeShader(HDRPDepthTexture, hiZDepthTexture, 0);
+            //occlusionCS.SetTexture(m_occlusionKernelID, _HiZMap, HDRPDepthTexture);
+            return;
             if (HDRPDepthTexture != null && HDRPDepthTexture.dimension == UnityEngine.Rendering.TextureDimension.Tex2DArray)
             {
                 texIs2DArray = true;
@@ -1364,6 +1400,8 @@ public class MilkInstancer : MonoBehaviour
             hiZMipTextures[i].Create();
             hiZMipTextures[i].hideFlags = HideFlags.HideAndDontSave;
         }
+
+        occlusionCS.SetTexture(m_occlusionKernelID, _HiZMap, hiZDepthTexture);
         return true;
     }
     public void checkScreenSizeChange(Camera cam)
@@ -1384,7 +1422,7 @@ public class MilkInstancer : MonoBehaviour
     {
         return new Vector2(cam.pixelWidth, cam.pixelHeight);
     }
-    #endregion
+#endregion
 
 #if UNITY_EDITOR
     void OnScene(SceneView scene)

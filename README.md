@@ -24,11 +24,12 @@ Features
   - Amplify Shader Editor examples
   - ShaderGraph examples
   - wind shader example (ASE and SG)
+  - Multi-Material Prefab support (for things like trees)
 
 
  What am I still working on?
   - find and fix bugs
-  - world streaming
+  - world streaming/detail zones
   - URP shaders
   - more spawning methods, perhaps procedural terrain spawning
   - create a user friendly interface + gizmos
@@ -36,7 +37,7 @@ Features
   - idk im sure ill think of something
 
  Project info:
-  - created on unity 2021.2.1f1 HDRP 12.1.0
+  - created on unity 2021.2.1f1 HDRP 12.1.0 (tested as low as HDRP 10)
 
 ![walking](https://user-images.githubusercontent.com/59656122/143317319-14eb5d2f-3adf-45b2-9dfd-b1ea95af971b.gif)
 
