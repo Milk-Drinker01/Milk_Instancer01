@@ -56,10 +56,9 @@ public class MilkInstancer : MonoBehaviour
     [Range(00.00f, .05f)] public float detailCullingPercentage = 0.005f;
 
     Camera mainCam;
-    bool texIs2DArray;
-    public Texture HDRPDepthTexture;
+    //public Texture HDRPDepthTexture;
     public RenderTexture hiZDepthTexture;
-    public RenderTexture[] hiZMipTextures;
+    //public RenderTexture[] hiZMipTextures;
 
     [Header("Compute Shaders")]
     public ComputeShader createDrawDataBufferCS;
@@ -68,7 +67,6 @@ public class MilkInstancer : MonoBehaviour
     public ComputeShader scanInstancesCS;
     public ComputeShader scanGroupSumsCS;
     public ComputeShader copyInstanceDataCS;
-    public ComputeShader textureShader;
 
     [Header("Data")]
     [ReadOnly] public List<IndirectInstanceCSInput> instancesInputData = new List<IndirectInstanceCSInput>();
@@ -79,7 +77,6 @@ public class MilkInstancer : MonoBehaviour
     public bool scanDebug;
     public bool groupScanDebug;
     public bool sortDebug;
-    public RawImage depthTex;
     
 #endif
 
@@ -243,9 +240,7 @@ public class MilkInstancer : MonoBehaviour
     }
     private void OnEnable()
     {
-        //initCS();
-
-        UnityEngine.Rendering.RenderPipelineManager.endCameraRendering += renderingDone;
+        //UnityEngine.Rendering.RenderPipelineManager.endCameraRendering += renderingDone;
         UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering += preRender;
 #if UNITY_EDITOR
         SceneView.onSceneGUIDelegate += OnScene;
@@ -253,7 +248,7 @@ public class MilkInstancer : MonoBehaviour
     }
     private void OnDisable()
     {
-        UnityEngine.Rendering.RenderPipelineManager.endCameraRendering -= renderingDone;
+        //UnityEngine.Rendering.RenderPipelineManager.endCameraRendering -= renderingDone;
         UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= preRender;
         if (hiZDepthTexture != null)
         {
@@ -267,17 +262,17 @@ public class MilkInstancer : MonoBehaviour
         //    tempDepthTextureForArray = null;
         //}
 
-        if (hiZMipTextures != null)
-        {
-            for (int i = 0; i < hiZMipTextures.Length; i++)
-            {
-                if (hiZMipTextures[i] != null)
-                {
-                    hiZMipTextures[i].Release();
-                }
-            }
-            hiZMipTextures = null;
-        }
+        //if (hiZMipTextures != null)
+        //{
+        //    for (int i = 0; i < hiZMipTextures.Length; i++)
+        //    {
+        //        if (hiZMipTextures[i] != null)
+        //        {
+        //            hiZMipTextures[i].Release();
+        //        }
+        //    }
+        //    hiZMipTextures = null;
+        //}
 #if UNITY_EDITOR
         SceneView.onSceneGUIDelegate -= OnScene;
 #endif
@@ -306,7 +301,7 @@ public class MilkInstancer : MonoBehaviour
             CalculateVisibleInstances(cam);
             Profiler.EndSample();
         }
-        checkDebugLOD();
+        //checkDebugLOD();
         if (drawInstances)
         {
             Profiler.BeginSample("DrawInstances()");
@@ -321,30 +316,30 @@ public class MilkInstancer : MonoBehaviour
             Profiler.EndSample();
         }
     }
-    private const string DEBUG_SHADER_LOD_KEYWORD = "_INDIRECT_DEBUG_LOD_ON";
-    public bool debugDrawLOD;
-    void checkDebugLOD()
-    {
-        if (debugDrawLOD != m_debugLastDrawLOD)
-        {
-            m_debugLastDrawLOD = debugDrawLOD;
+    //private const string DEBUG_SHADER_LOD_KEYWORD = "_INDIRECT_DEBUG_LOD_ON";
+    //public bool drawLodDebug;
+    //void checkDebugLOD()
+    //{
+    //    if (drawLodDebug != m_debugLastDrawLOD)
+    //    {
+    //        m_debugLastDrawLOD = drawLodDebug;
 
-            if (debugDrawLOD)
-            {
-                for (int i = 0; i < indirectMeshes.Length; i++)
-                {
-                    indirectMeshes[i].material[0].EnableKeyword(DEBUG_SHADER_LOD_KEYWORD);
-                }
-            }
-            else
-            {
-                for (int i = 0; i < indirectMeshes.Length; i++)
-                {
-                    indirectMeshes[i].material[0].DisableKeyword(DEBUG_SHADER_LOD_KEYWORD);
-                }
-            }
-        }
-    }
+    //        if (drawLodDebug)
+    //        {
+    //            for (int i = 0; i < indirectMeshes.Length; i++)
+    //            {
+    //                indirectMeshes[i].material[0].EnableKeyword(DEBUG_SHADER_LOD_KEYWORD);
+    //            }
+    //        }
+    //        else
+    //        {
+    //            for (int i = 0; i < indirectMeshes.Length; i++)
+    //            {
+    //                indirectMeshes[i].material[0].DisableKeyword(DEBUG_SHADER_LOD_KEYWORD);
+    //            }
+    //        }
+    //    }
+    //}
     //[HideInInspector] public ShadowCastingMode[] instanceShadowCastingModes;
     [HideInInspector] public bool[] instanceShadowCastingModes;
     private void DrawInstances()
@@ -590,7 +585,8 @@ public class MilkInstancer : MonoBehaviour
         camPosition = Camera.main.transform.position;
         m_bounds.center = Vector3.zero;
         m_bounds.extents = Vector3.one * 10000;
-        createDepthTexture();
+        //createDepthTexture();
+        hiZDepthTexture = getDepthTexture();
         indirectMeshes = new IndirectRenderingMesh[m_numberOfInstanceTypes];
         
         m_args = new uint[m_numberOfInstanceTypes * NUMBER_OF_ARGS_PER_INSTANCE_TYPE];
@@ -867,7 +863,7 @@ public class MilkInstancer : MonoBehaviour
         //occlusionCS.SetInt(_ShouldOnlyUseLOD02Shadows, enableOnlyLOD02Shadows ? 1 : 0);
         occlusionCS.SetFloat(_ShadowDistance, QualitySettings.shadowDistance);
         occlusionCS.SetFloat(_DetailCullingScreenPercentage, detailCullingPercentage);
-        occlusionCS.SetVector(_HiZTextureSize, screenSize);
+        occlusionCS.SetVector(_HiZTextureSize, new Vector2(hiZDepthTexture.width, hiZDepthTexture.height));
         occlusionCS.SetBuffer(m_occlusionKernelID, _InstanceDataBuffer, m_instanceDataBuffer);
         occlusionCS.SetBuffer(m_occlusionKernelID, _ArgsBuffer, m_instancesArgsBuffer);
         occlusionCS.SetBuffer(m_occlusionKernelID, _ShadowArgsBuffer, m_shadowArgsBuffer);
@@ -1184,246 +1180,12 @@ public class MilkInstancer : MonoBehaviour
         yield return new WaitForSeconds(.1f);
         DestroyImmediate(obj);
     }
-#endregion
-#region compute shader setup
-    //public bool doDepthCalculations = true;
-    void renderingDone(UnityEngine.Rendering.ScriptableRenderContext context, Camera camera)
+    #endregion
+    public RenderTexture depthTexture;
+    public RenderTexture getDepthTexture()
     {
-        if ((Application.isPlaying))
-        {
-            if (camera != Camera.main)
-            {
-                return;
-            }
-        }
-        else
-        {
-#if UNITY_EDITOR
-            if (camera.name != "SceneCamera")
-            {
-                return;
-            }
-#endif
-        }
-        //Debug.Log(camera.name);
-        if (!enableOcclusionCulling)
-        {
-            return;
-        }
-        checkScreenSizeChange(camera);
-        if (HDRPDepthTexture == null)
-        {
-            HDRPDepthTexture = Shader.GetGlobalTexture("_CameraDepthTexture");
-#if UNITY_EDITOR
-            if (depthTex)
-            {
-                depthTex.texture = hiZDepthTexture;
-                depthTex.texture = HDRPDepthTexture;
-            }
-#endif
-            CopyTextureWithComputeShader(HDRPDepthTexture, hiZDepthTexture, 0);
-            //occlusionCS.SetTexture(m_occlusionKernelID, _HiZMap, HDRPDepthTexture);
-            return;
-            if (HDRPDepthTexture != null && HDRPDepthTexture.dimension == UnityEngine.Rendering.TextureDimension.Tex2DArray)
-            {
-                texIs2DArray = true;
-            }
-            else
-            {
-                texIs2DArray = false;
-            }
-        }
-        //if (texIs2DArray && HDRPDepthTexture != null && tempDepthTextureForArray == null)
-        //{
-        //    tempDepthTextureForArray = new RenderTexture(HDRPDepthTexture.width, HDRPDepthTexture.height, 24, HDRPDepthTexture.graphicsFormat);
-        //    tempDepthTextureForArray.dimension = UnityEngine.Rendering.TextureDimension.Tex2D;
-        //    tempDepthTextureForArray.Create();
-        //}
-        if (HDRPDepthTexture != null && hiZDepthTexture != null)
-        {
-            updateDepthTexture(0);
-        }
+        return depthTexture;
     }
-    void updateDepthTexture(int o)
-    {
-        if (texIs2DArray)
-        {
-            CopyTextureArrayWithComputeShader(HDRPDepthTexture, hiZDepthTexture, o);
-            //Graphics.CopyTexture(HDRPDepthTexture, 0, 0, tempDepthTextureForArray, 0, 0);
-            //CopyTextureWithComputeShader(tempDepthTextureForArray, hiZDepthTexture, o);
-        }
-        else
-        {
-            CopyTextureWithComputeShader(HDRPDepthTexture, hiZDepthTexture, o);
-        }
-        for (int i = 0; i < mipLevels - 1; ++i)
-        {
-            RenderTexture tempRT = hiZMipTextures[i];
-
-            if (i == 0)
-            {
-                ReduceTextureWithComputeShader(hiZDepthTexture, tempRT, o);
-            }
-            else
-            {
-                ReduceTextureWithComputeShader(hiZMipTextures[i - 1], tempRT, o);
-            }
-
-            CopyTextureWithComputeShader(tempRT, hiZDepthTexture, o, 0, i + 1, false);
-        }
-    }
-    int copyTextureID;
-    void initCS()
-    {
-        copyTextureID = textureShader.FindKernel("CSCopyTexture");
-    }
-    public static readonly int SOURCE_TEXTURE = Shader.PropertyToID("source");
-    public static readonly int SOURCE_TEXTURE_ARRAY = Shader.PropertyToID("textureArray");
-    public static readonly int DESTINATION_TEXTURE = Shader.PropertyToID("destination");
-    public static readonly int OFFSET_X = Shader.PropertyToID("offsetX");
-    public static readonly int SOURCE_SIZE_X = Shader.PropertyToID("sourceSizeX");
-    public static readonly int SOURCE_SIZE_Y = Shader.PropertyToID("sourceSizeY");
-    public static readonly int DESTINATION_SIZE_X = Shader.PropertyToID("destinationSizeX");
-    public static readonly int DESTINATION_SIZE_Y = Shader.PropertyToID("destinationSizeY");
-    public static readonly int REVERSE_Z = Shader.PropertyToID("reverseZ");
-    public static float COMPUTE_SHADER_THREAD_COUNT_2D = 16;
-    void CopyTextureWithComputeShader(Texture source, Texture destination, int offsetX, int sourceMip = 0, int destinationMip = 0, bool reverseZ = true)
-    {
-        textureShader.SetTexture(copyTextureID, SOURCE_TEXTURE, source, sourceMip);
-        textureShader.SetTexture(copyTextureID, DESTINATION_TEXTURE, destination, destinationMip);
-
-        textureShader.SetInt(OFFSET_X, offsetX);
-        textureShader.SetInt(SOURCE_SIZE_X, source.width);
-        textureShader.SetInt(SOURCE_SIZE_Y, source.height);
-        textureShader.SetBool(REVERSE_Z, reverseZ);
-
-        textureShader.Dispatch(copyTextureID,
-            Mathf.CeilToInt(source.width / COMPUTE_SHADER_THREAD_COUNT_2D),
-            Mathf.CeilToInt(source.height / COMPUTE_SHADER_THREAD_COUNT_2D), 1);
-    }
-    public void CopyTextureArrayWithComputeShader(Texture source, Texture destination, int offsetX, int sourceMip = 0, int destinationMip = 0, bool reverseZ = true)
-    {
-        textureShader.SetTexture(2, SOURCE_TEXTURE_ARRAY, source, sourceMip);
-        textureShader.SetTexture(2, DESTINATION_TEXTURE, destination, destinationMip);
-
-        textureShader.SetInt(OFFSET_X, offsetX);
-        textureShader.SetInt(SOURCE_SIZE_X, source.width);
-        textureShader.SetInt(SOURCE_SIZE_Y, source.height);
-        textureShader.SetBool(REVERSE_Z, reverseZ);
-
-        textureShader.Dispatch(2,
-            Mathf.CeilToInt(source.width / COMPUTE_SHADER_THREAD_COUNT_2D),
-            Mathf.CeilToInt(source.height / COMPUTE_SHADER_THREAD_COUNT_2D), 1);
-    }
-
-    void ReduceTextureWithComputeShader(Texture source, Texture destination, int offsetX)
-    {
-        textureShader.SetTexture(1, SOURCE_TEXTURE, source);
-        textureShader.SetTexture(1, DESTINATION_TEXTURE, destination);
-
-        textureShader.SetInt(OFFSET_X, offsetX);
-        textureShader.SetInt(SOURCE_SIZE_X, source.width);
-        textureShader.SetInt(SOURCE_SIZE_Y, source.height);
-        textureShader.SetInt(DESTINATION_SIZE_X, destination.width);
-        textureShader.SetInt(DESTINATION_SIZE_Y, destination.height);
-
-        textureShader.Dispatch(1, Mathf.CeilToInt(destination.width / COMPUTE_SHADER_THREAD_COUNT_2D),
-            Mathf.CeilToInt(destination.height / COMPUTE_SHADER_THREAD_COUNT_2D), 1);
-    }
-
-
-    public Vector2 screenSize = Vector2.zero;
-    int mipLevels;
-    public bool createDepthTexture()
-    {
-        mipLevels = (int)Mathf.Floor(Mathf.Log(screenSize.x, 2f));
-
-        if (screenSize.x <= 0 || screenSize.y <= 0 || mipLevels == 0)
-        {
-            if (hiZDepthTexture != null)
-            {
-                hiZDepthTexture.Release();
-                hiZDepthTexture = null;
-            }
-            return false;
-        }
-
-        if (hiZDepthTexture != null)
-        {
-            hiZDepthTexture.Release();
-        }
-
-        int width = (int)screenSize.x;
-        int height = (int)screenSize.y;
-
-        hiZDepthTexture = new RenderTexture(width, height, 0, RenderTextureFormat.RFloat, RenderTextureReadWrite.Linear);
-        hiZDepthTexture.name = "depthTexture";
-        hiZDepthTexture.filterMode = FilterMode.Point;
-        hiZDepthTexture.useMipMap = true;
-        hiZDepthTexture.autoGenerateMips = false;
-        hiZDepthTexture.enableRandomWrite = true;
-        hiZDepthTexture.Create();
-        hiZDepthTexture.hideFlags = HideFlags.HideAndDontSave;
-        hiZDepthTexture.GenerateMips();
-
-        if (hiZMipTextures != null)
-        {
-            for (int i = 0; i < hiZMipTextures.Length; i++)
-            {
-                if (hiZMipTextures[i] != null)
-                {
-                    hiZMipTextures[i].Release();
-                }
-            }
-        }
-
-        hiZMipTextures = new RenderTexture[mipLevels];
-
-        for (int i = 0; i < mipLevels; ++i)
-        {
-            width = width >> 1;
-
-            height = height >> 1;
-
-            if (width == 0)
-                width = 1;
-
-            if (height == 0)
-                height = 1;
-
-            hiZMipTextures[i] = new RenderTexture(width, height, 0, RenderTextureFormat.RFloat, RenderTextureReadWrite.Linear);
-            hiZMipTextures[i].name = "hiZDepthTex" + i;
-            hiZMipTextures[i].filterMode = FilterMode.Point;
-            hiZMipTextures[i].useMipMap = false;
-            hiZMipTextures[i].autoGenerateMips = false;
-            hiZMipTextures[i].enableRandomWrite = true;
-            hiZMipTextures[i].Create();
-            hiZMipTextures[i].hideFlags = HideFlags.HideAndDontSave;
-        }
-
-        occlusionCS.SetTexture(m_occlusionKernelID, _HiZMap, hiZDepthTexture);
-        return true;
-    }
-    public void checkScreenSizeChange(Camera cam)
-    {
-        if (screenSize != getScreenSize(cam))
-        {
-            screenSize = getScreenSize(cam);
-            createDepthTexture();
-            //if (texIs2DArray && HDRPDepthTexture != null && tempDepthTextureForArray != null &&
-            //        (HDRPDepthTexture.width != tempDepthTextureForArray.width || HDRPDepthTexture.height != tempDepthTextureForArray.height))
-            //{
-            //    tempDepthTextureForArray.Release();
-            //    tempDepthTextureForArray = null;
-            //}
-        }
-    }
-    Vector2 getScreenSize(Camera cam)
-    {
-        return new Vector2(cam.pixelWidth, cam.pixelHeight);
-    }
-#endregion
-
 #if UNITY_EDITOR
     void OnScene(SceneView scene)
     {
