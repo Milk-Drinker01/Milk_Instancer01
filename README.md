@@ -1,6 +1,8 @@
 # Milk_Instancer01
  Unity indirect GPU instancing & painting with occlusion culling, frustum culling, and LODs
  
+ WARNING - THERE IS A MAJOR UPDATE COMING SOON WHICH ADDS A BUNCH OF FEATURES, BUT BREAKS THE CURRENT SETUP USED WITH THE PROJECT VERION IN THIS REPOSITORY. WHEN THIS UPDATE IS COMPLETE, I WILL RELEASE A VIDEO TUTORIAL, AND LINK IT HERE.
+ 
  ![painting (2)](https://user-images.githubusercontent.com/59656122/150681820-37e0c5b9-d7b3-4eaa-9f09-4b6b49b648e5.gif)
 
  This project is a vastly improved version of elliomans indirect rendering with compute shaders. https://github.com/ellioman/Indirect-Rendering-With-Compute-Shaders
