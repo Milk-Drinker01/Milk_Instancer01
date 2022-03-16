@@ -49,6 +49,7 @@ cbuffer CB
 // Structured Buffers
 //--------------------------------------------------------------------------------------
 
+StructuredBuffer<uint> _perTypeOcclusionCull;
 StructuredBuffer<InstanceData> _InstanceDataBuffer;
 RWStructuredBuffer<uint> _ArgsBuffer;
 RWStructuredBuffer<uint> _IsVisibleBuffer;
@@ -228,7 +229,8 @@ inline void CSMain (
         isVisible *= _ShouldFrustumCull ? isInFrustum : 1;
 
         // Do we pass the occlusion culling...?
-        isVisible *= (_ShouldOcclusionCull * isVisible > 0) ? IsVisibleAfterOcclusionCulling(instance, clipMinX, clipMaxX, clipMinY, clipMaxY, clipMinZ) : 1;
+        //isVisible *= (_ShouldOcclusionCull * isVisible > 0) ? IsVisibleAfterOcclusionCulling(instance, clipMinX, clipMaxX, clipMinY, clipMaxY, clipMinZ) : 1;
+        isVisible *= (_perTypeOcclusionCull[drawCall / 15] * isVisible > 0) ? IsVisibleAfterOcclusionCulling(instance, clipMinX, clipMaxX, clipMinY, clipMaxY, clipMinZ) : 1;
 
         // // // Do we pass the detail (screen size) culling...?
         isVisible *= (_ShouldDetailCull * isVisible > 0) ? IsVisibleAfterDetailCulling(clipMinX, clipMaxX, clipMinY, clipMaxY) : 1;

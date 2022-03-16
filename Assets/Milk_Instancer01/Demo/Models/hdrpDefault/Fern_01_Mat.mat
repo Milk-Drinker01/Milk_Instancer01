@@ -322,6 +322,10 @@ Material:
         m_Texture: {fileID: 2800000, guid: 6da591420c95bbe4bb43b39c060602d6, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _bent_normal_map:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _maskmap:
         m_Texture: {fileID: 2800000, guid: 5cc84c9d58469314e83fe0a784b51fdb, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -344,7 +348,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - SmoothnessRemapMax: 0.675
+    - SmoothnessRemapMax: 0.36
     - SmoothnessRemapMin: 0
     - _AOMax: 1
     - _AOMin: 0
@@ -516,7 +520,7 @@ Material:
     - _ThicknessMax: 0.525
     - _ThicknessMin: 0
     - _ThicknessMultiplier: 1
-    - _ThicknessRemapMax: 1
+    - _ThicknessRemapMax: 0.525
     - _ThicknessRemapMin: 0
     - _TransmissionEnable: 1
     - _TransmissionSelfOcclusion: 1

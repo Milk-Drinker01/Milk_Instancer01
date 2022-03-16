@@ -318,6 +318,10 @@ Material:
         m_Texture: {fileID: 2800000, guid: 9bf68c6e5059e7549b60e91ca11987a6, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _bent_normal_map:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _maskmap:
         m_Texture: {fileID: 2800000, guid: 928d30e76ec15754e88711474217737e, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -348,8 +352,8 @@ Material:
     - Vector1_ea94c92fec7a441eb68cacd0eef8e37e_2: 0.75
     - _AOMax: 1
     - _AOMin: 0.662
-    - _AORemapMax: 0.9999999
-    - _AORemapMin: 0.6934435
+    - _AORemapMax: 1
+    - _AORemapMin: 0.662
     - _ATDistance: 1
     - _AddPrecomputedVelocity: 0
     - _AlbedoAffectEmissive: 0
@@ -460,7 +464,7 @@ Material:
     - _MotionVectorScale: 1
     - _MotionVectorsWorldspaceScaled: 0
     - _NormalMapSpace: 0
-    - _NormalScale: 5
+    - _NormalScale: 1
     - _OcclusionStrength: 0
     - _OpaqueCullMode: 2
     - _PPDLodThreshold: 5
@@ -580,10 +584,10 @@ Material:
     - Color_e2e3f8be3d5b47b2b08e310eda1e260f: {r: 0.5115637, g: 0.6415094, b: 0.28141677, a: 1}
     - Color_e519dd38f0284671addb65918fb74053: {r: 0.45510185, g: 0.6509434, b: 0.37152898, a: 1}
     - _BackfaceBaseColorScale: {r: 1, g: 1, b: 1, a: 1}
-    - _BaseColor: {r: 0.7960573, g: 0.80477035, b: 0.8396226, a: 1}
+    - _BaseColor: {r: 0.94509804, g: 0.94509804, b: 0.94509804, a: 1}
     - _BaseColorMap_MipInfo: {r: 0, g: 0, b: 0, a: 0}
     - _BaseColorRandomize: {r: 0, g: 0, b: 0, a: 0.05}
-    - _Color: {r: 0.7960573, g: 0.80477035, b: 0.8396226, a: 1}
+    - _Color: {r: 0.945098, g: 0.945098, b: 0.945098, a: 1}
     - _DiffusionProfileAsset: {r: 2.2888926e+38, g: 1.2389358e-26, b: 7.69327e-37, a: 0.00018220427}
     - _DiffusionProfile_Asset: {r: 2.2888926e+38, g: 1.2389358e-26, b: 7.69327e-37, a: 0.00018220427}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}

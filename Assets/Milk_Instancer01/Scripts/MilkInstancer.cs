@@ -55,7 +55,7 @@ public class MilkInstancer : MonoBehaviour
     public float lod1Range = 50;
     [Range(00.00f, .05f)] public float detailCullingPercentage = 0.005f;
 
-    Camera mainCam;
+    [HideInInspector] public Camera mainCam;
     //public Texture HDRPDepthTexture;
     public RenderTexture hiZDepthTexture;
     //public RenderTexture[] hiZMipTextures;
@@ -69,8 +69,8 @@ public class MilkInstancer : MonoBehaviour
     public ComputeShader copyInstanceDataCS;
 
     [Header("Data")]
-    [ReadOnly] public List<IndirectInstanceCSInput> instancesInputData = new List<IndirectInstanceCSInput>();
-    [ReadOnly] public IndirectRenderingMesh[] indirectMeshes;
+    [ReadOnly] List<IndirectInstanceCSInput> instancesInputData = new List<IndirectInstanceCSInput>();
+    [ReadOnly] IndirectRenderingMesh[] indirectMeshes;
 
     [Header("debug")]
 #if UNITY_EDITOR
@@ -103,6 +103,8 @@ public class MilkInstancer : MonoBehaviour
     private ComputeBuffer m_shadowCulledMatrixRows01;
     private ComputeBuffer m_shadowCulledMatrixRows23;
     private ComputeBuffer m_shadowCulledMatrixRows45;
+
+    private ComputeBuffer occCulPerType;
 #endregion
 #region command buffers
     private CommandBuffer m_sortingCommandBuffer;
@@ -158,7 +160,9 @@ public class MilkInstancer : MonoBehaviour
     private static readonly int _InstancesCulledMatrixRows01 = Shader.PropertyToID("_InstancesCulledMatrixRows01");
     private static readonly int _InstancesCulledMatrixRows23 = Shader.PropertyToID("_InstancesCulledMatrixRows23");
     private static readonly int _InstancesCulledMatrixRows45 = Shader.PropertyToID("_InstancesCulledMatrixRows45");
-#endregion
+
+    private static readonly int _CullingPerType = Shader.PropertyToID("_perTypeOcclusionCull");
+    #endregion
     private int m_numberOfInstanceTypes;
     private int m_numberOfInstances;
     private int m_occlusionGroupX;
@@ -177,11 +181,12 @@ public class MilkInstancer : MonoBehaviour
 
     private void OnValidate()
     {
-
+        checkIfOnlyInstance();
     }
     float maxShadowDistance = 150;
     private void Awake()
     {
+        checkIfOnlyInstance();
         if (QualitySettings.renderPipeline == null)
         {
             maxShadowDistance = QualitySettings.shadowDistance;
@@ -190,11 +195,8 @@ public class MilkInstancer : MonoBehaviour
         {
             foreach (Volume pr in GameObject.FindObjectsOfType<Volume>())
             {
-                VolumeProfile v;
-                v = pr.GetComponent<Volume>().profile;
-
                 HDShadowSettings s;
-                v.TryGet(out s);
+                pr.sharedProfile.TryGet(out s);
                 if (s != null)
                 {
                     maxShadowDistance = (float)s.maxShadowDistance;
@@ -203,7 +205,7 @@ public class MilkInstancer : MonoBehaviour
         }
         mainCam = Camera.main;
     }
-    private void Update()
+    private void LateUpdate()
     {
         renderInstances(mainCam);
     }
@@ -563,11 +565,12 @@ public class MilkInstancer : MonoBehaviour
         }
     }
     [HideInInspector] public bool initialized;
-    public void Initialize(ref IndirectInstanceData[] _instances)
+    public void Initialize(ref PaintablePrefab[] _instances)
     {
         initialized = InitializeRenderer(ref _instances);
     }
-    public bool InitializeRenderer(ref IndirectInstanceData[] _instances)
+    public uint[] cullingPerType;
+    public bool InitializeRenderer(ref PaintablePrefab[] _instances)
     {
         if (!TryGetKernels())
         {
@@ -595,14 +598,23 @@ public class MilkInstancer : MonoBehaviour
         List<Vector3> rotations = new List<Vector3>();
         List<SortingData> sortingData = new List<SortingData>();
 
+        cullingPerType = new uint[m_numberOfInstanceTypes];
+        uint forceCullingOff = (uint)(enableOcclusionCulling ? 1 : 0);
+        //for (int i = 0; i < cullingPerType.Length; i++)
+        //{
+        //    cullingPerType[i] = 1 * forceCullingOff;
+        //}
+
         int currentInstanceType = 0;
         for (int i = 0; i < _instances.Length; i++)
         {
             int max = Mathf.Max(_instances[i].lodMaterialIndexes[0].workaround.Length, _instances[i].lodMaterialIndexes[1].workaround.Length, _instances[i].lodMaterialIndexes[2].workaround.Length);
-            IndirectInstanceData iid = _instances[i];
+            PaintablePrefab iid = _instances[i];
             for (int t = 0; t < max; t++)
             {
-                instanceShadowCastingModes[currentInstanceType] = iid.shadowCastingMode;
+                instanceShadowCastingModes[currentInstanceType] = iid.instanceShadowCastingMode;
+                cullingPerType[currentInstanceType] = (uint)(iid.EnableOcclusionCulling ? 1 : 0) * forceCullingOff;
+
                 IndirectRenderingMesh irm = new IndirectRenderingMesh();
 
                 irm.lod0Material = iid.lodMaterialIndexes[0].workaround[0];
@@ -630,7 +642,7 @@ public class MilkInstancer : MonoBehaviour
                 }
 
                 irm.mesh = new Mesh();
-                irm.mesh.name = iid.prefab.name;
+                irm.mesh.name = iid.prefabToPaint.name;
                 irm.mesh.CombineMeshes(
                     new CombineInstance[] {
                     new CombineInstance() { mesh = iid.LODMeshes[0], subMeshIndex = t},
@@ -669,27 +681,28 @@ public class MilkInstancer : MonoBehaviour
 
                 // Materials
                 irm.material = iid.indirectMaterial;//new Material(iid.indirectMaterial);
-                Bounds originalBounds = CalculateBounds(iid.prefab);
+                Bounds originalBounds = CalculateBounds(iid.prefabToPaint);
 
                 // Add the instance data (positions, rotations, scaling, bounds...)
-                for (int j = 0; j < iid.positions.Length; j++)
+                for (int j = 0; j < iid.transformData.positions.Length; j++)
                 {
-                    positions.Add(iid.positions[j]);
-                    rotations.Add(iid.rotations[j]);
-                    scales.Add(iid.scales[j]);
+                    positions.Add(iid.transformData.positions[j]);
+                    rotations.Add(iid.transformData.rotations[j]);
+                    scales.Add(iid.transformData.scales[j]);
 
                     //Debug.Log(((((uint)i * NUMBER_OF_ARGS_PER_INSTANCE_TYPE) << 16) + ((uint)m_numberOfInstances)) >> 16);
                     sortingData.Add(new SortingData()
                     {
                         drawCallInstanceIndex = ((((uint)currentInstanceType * NUMBER_OF_ARGS_PER_INSTANCE_TYPE) << 16) + ((uint)m_numberOfInstances)),
-                        distanceToCam = Vector3.Distance(iid.positions[j], camPosition)
+                        //distanceToCam = Vector3.Distance(iid.transformData.positions[j], camPosition)
+                        distanceToCam = 0
                     });
 
                     // Calculate the renderer bounds
                     Bounds b = new Bounds();
-                    b.center = iid.positions[j];
+                    b.center = iid.transformData.positions[j];
                     Vector3 s = originalBounds.size;
-                    s.Scale(iid.scales[j]);
+                    s.Scale(iid.transformData.scales[j]);
                     b.size = s;
 
                     instancesInputData.Add(new IndirectInstanceCSInput()
@@ -856,11 +869,16 @@ public class MilkInstancer : MonoBehaviour
         //m_scanThreadGroupsGroupX = 1;
         //m_copyInstanceDataGroupX = Mathf.Max(1, Mathf.CeilToInt((float)m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE)));
 
+        occCulPerType = new ComputeBuffer(m_numberOfInstanceTypes, sizeof(uint), ComputeBufferType.Default);
+        occCulPerType.SetData(cullingPerType);
+        occlusionCS.SetBuffer(m_occlusionKernelID, _CullingPerType, occCulPerType);
+
         occlusionCS.SetInt(_ShouldFrustumCull, enableFrustumCulling ? 1 : 0);
-        occlusionCS.SetInt(_ShouldOcclusionCull, enableOcclusionCulling ? 1 : 0);
+        //occlusionCS.SetInt(_ShouldOcclusionCull, enableOcclusionCulling ? 1 : 0);
         occlusionCS.SetInt(_ShouldDetailCull, enableDetailCulling ? 1 : 0);
         occlusionCS.SetInt(_ShouldLOD, enableLOD ? 1 : 0);
         //occlusionCS.SetInt(_ShouldOnlyUseLOD02Shadows, enableOnlyLOD02Shadows ? 1 : 0);
+        occlusionCS.SetFloat(_ShadowDistance, QualitySettings.shadowDistance);
         occlusionCS.SetFloat(_ShadowDistance, QualitySettings.shadowDistance);
         occlusionCS.SetFloat(_DetailCullingScreenPercentage, detailCullingPercentage);
         occlusionCS.SetVector(_HiZTextureSize, new Vector2(hiZDepthTexture.width, hiZDepthTexture.height));
@@ -888,6 +906,14 @@ public class MilkInstancer : MonoBehaviour
 
         CreateCommandBuffers();
 
+        if (mainCam)
+        {
+            if (runCompute)
+            {
+                //Calculate an extra time to avoid incorrect sorting when switching zones
+                CalculateVisibleInstances(mainCam);
+            }
+        }
         return true;
     }
     int nextPowerOfTwo = 0;
@@ -1123,6 +1149,8 @@ public class MilkInstancer : MonoBehaviour
         ReleaseComputeBuffer(ref m_shadowCulledMatrixRows01);
         ReleaseComputeBuffer(ref m_shadowCulledMatrixRows23);
         ReleaseComputeBuffer(ref m_shadowCulledMatrixRows45);
+
+        ReleaseComputeBuffer(ref occCulPerType);
     }
     private static void ReleaseComputeBuffer(ref ComputeBuffer _buffer)
     {
@@ -1194,6 +1222,10 @@ public class MilkInstancer : MonoBehaviour
     }
     public void checkIfOnlyInstance()
     {
+        if (gameObject.scene.name != "Null")
+        {
+            return;
+        }
         if (instance != this)
         {
             if (instance == null)
@@ -1257,7 +1289,12 @@ class InstancingEditor : Editor
     {
         base.OnInspectorGUI();
         MilkInstancer comp = (MilkInstancer)target;
-        comp.checkIfOnlyInstance();
+        //Debug.Log(comp.gameObject.scene);
+        //Debug.Log(comp.gameObject.scene.name);
+        if (comp.gameObject.scene.name != "Null")
+        {
+            //comp.checkIfOnlyInstance();
+        }
         //if (GUILayout.Button("ranomize"))
         //{
             

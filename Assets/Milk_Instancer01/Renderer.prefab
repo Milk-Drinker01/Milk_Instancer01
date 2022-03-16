@@ -1,0 +1,188 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8538580250085272565
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8538580250085272564}
+  m_Layer: 0
+  m_Name: rotation helper
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8538580250085272564
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8538580250085272565}
+  m_LocalRotation: {x: 0, y: 0.9704189, z: 0, w: 0.2414275}
+  m_LocalPosition: {x: -1.07, y: 0.31, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8538580250770911144}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8538580250770911145
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8538580250770911144}
+  - component: {fileID: 8538580250770911142}
+  - component: {fileID: 3345481388957845723}
+  - component: {fileID: 8538580250770911143}
+  - component: {fileID: 8538580250770911141}
+  m_Layer: 0
+  m_Name: Renderer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8538580250770911144
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8538580250770911145}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.07, y: -0.31, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8538580250085272564}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8538580250770911142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8538580250770911145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc0af008bc7b92b4a915076a926d7aa2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numToAdd: 65536
+  areaSize: 250
+  indirectRenderer: {fileID: 8538580250770911143}
+  zoneManager: {fileID: 3345481388957845723}
+  disableInstancingAtRunTime: 0
+  rayCastLayerMask:
+    serializedVersion: 2
+    m_Bits: 1024
+  _prefabs:
+  - {fileID: 6092797552228260671, guid: 3099630b8fc62c741a4bd66919c299ef, type: 3}
+  rand:
+    state: 1723462759
+--- !u!114 &3345481388957845723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8538580250770911145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3752f8200226e444b9491b99aac28105, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  instanceTypes: []
+  zoneSize: 15
+  countTotalInstances: 0
+  countActiveInstances: 0
+  totalInstances: 0
+  totalActiveInstances: 0
+  _prefabs: []
+  positionsx: 
+  xAxisData: []
+  oldCountTotalInstances: 0
+  nonEmpty: 
+--- !u!114 &8538580250770911143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8538580250770911145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f6233746c87a0a428bcb04363fcce1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  runCompute: 1
+  drawInstances: 1
+  drawInstanceShadows: 0
+  enableFrustumCulling: 1
+  enableOcclusionCulling: 1
+  enableDetailCulling: 1
+  enableLOD: 1
+  lod0Range: 15
+  lod1Range: 50
+  detailCullingPercentage: 0.005
+  mainCam: {fileID: 0}
+  hiZDepthTexture: {fileID: 0}
+  createDrawDataBufferCS: {fileID: 7200000, guid: ec8dc736dcd73488db5f21571d3708f7, type: 3}
+  sortingCS: {fileID: 7200000, guid: a1f2c510a1f1080449fb69718c7f7826, type: 3}
+  occlusionCS: {fileID: 7200000, guid: 4aeff498554ed42f289ac4c6051b7dba, type: 3}
+  scanInstancesCS: {fileID: 7200000, guid: 8d1519117e824406eb9f6db7e9f6d3a7, type: 3}
+  scanGroupSumsCS: {fileID: 7200000, guid: 8f8e810ba77054780b3f030b49d12500, type: 3}
+  copyInstanceDataCS: {fileID: 7200000, guid: fdb14c3f77a774768b35472d4d5444de, type: 3}
+  scanDebug: 0
+  groupScanDebug: 0
+  sortDebug: 0
+  instanceShadowCastingModes: 00
+  initialized: 0
+  cullingPerType: 
+  depthTexture: {fileID: 8400000, guid: 9e22611eb25038641908c337da361dd7, type: 2}
+--- !u!114 &8538580250770911141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8538580250770911145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26d6499a6bd256e47b859377446493a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsGlobal: 1
+  fadeRadius: 0
+  priority: 0
+  customPasses:
+  - rid: 6072082922734354434
+  injectionPoint: 4
+  m_TargetCamera: {fileID: 0}
+  useTargetCamera: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 6072082922734354434
+      type: {class: DepthPass, ns: , asm: Assembly-CSharp}
+      data:
+        m_Name: Depth
+        enabled: 1
+        targetColorBuffer: 0
+        targetDepthBuffer: 0
+        clearFlags: 0
+        passFoldout: 0
+        m_Version: 0
+        outputRenderTexture: {fileID: 8400000, guid: 9e22611eb25038641908c337da361dd7, type: 2}
+        customCopyShader: {fileID: 4800000, guid: 247f17c56ca52d245890a623d4453c20, type: 3}

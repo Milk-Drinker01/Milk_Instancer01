@@ -373,6 +373,7 @@ Material:
     - _ATDistance: 1
     - _AddPrecomputedVelocity: 0
     - _AlbedoAffectEmissive: 0
+    - _AlphaClipThreshold: 0.181
     - _AlphaCutoff: 0.181
     - _AlphaCutoffEnable: 1
     - _AlphaCutoffPostpass: 0.5

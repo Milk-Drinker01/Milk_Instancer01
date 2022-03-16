@@ -612,7 +612,7 @@ Material:
     - _ZTestModeDistortion: 8
     - _ZTestTransparent: 4
     - _ZWrite: 1
-    - _maxHeight: 0.5
+    - _maxHeight: 0.48
     - _normal_strength: 1
     m_Colors:
     - _BackfaceBaseColorScale: {r: 1, g: 1, b: 1, a: 1}
