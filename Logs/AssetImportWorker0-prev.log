@@ -15,7 +15,7 @@ D:/Unity/Projects/Milk_Instancer01
 -logFile
 Logs/AssetImportWorker0.log
 -srvPort
-58467
+53738
 Successfully changed project path to: D:/Unity/Projects/Milk_Instancer01
 D:/Unity/Projects/Milk_Instancer01
 [UnityMemory] Configuration Parameters - Can be set up in boot.config
@@ -47,7 +47,7 @@ D:/Unity/Projects/Milk_Instancer01
     "memorysetup-temp-allocator-size-cloud-worker=32768"
     "memorysetup-temp-allocator-size-gi-baking-worker=262144"
     "memorysetup-temp-allocator-size-gfx=262144"
-Refreshing native plugins compatible for Editor in 148.32 ms, found 3 plugins.
+Refreshing native plugins compatible for Editor in 143.99 ms, found 3 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Initialize engine version: 2021.2.7f1 (6bd9e232123f)
 [Subsystems] Discovering subsystems at path D:/Unity/Editors/2021.2.7f1/Editor/Data/Resources/UnitySubsystems
@@ -63,76 +63,76 @@ Initialize mono
 Mono path[0] = 'D:/Unity/Editors/2021.2.7f1/Editor/Data/Managed'
 Mono path[1] = 'D:/Unity/Editors/2021.2.7f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-win32'
 Mono config path = 'D:/Unity/Editors/2021.2.7f1/Editor/Data/MonoBleedingEdge/etc'
-Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56108
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56448
 Begin MonoManager ReloadAssembly
 Registering precompiled unity dll's ...
 Register platform support module: D:/Unity/Editors/2021.2.7f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
-Registered in 0.002996 seconds.
+Registered in 0.003096 seconds.
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 149.24 ms, found 3 plugins.
+Refreshing native plugins compatible for Editor in 143.28 ms, found 3 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Mono: successfully reloaded assembly
-- Completed reload, in  0.627 seconds
+- Completed reload, in  0.639 seconds
 Domain Reload Profiling:
-	ReloadAssembly (627ms)
-		BeginReloadAssembly (54ms)
+	ReloadAssembly (640ms)
+		BeginReloadAssembly (64ms)
 			ExecutionOrderSort (0ms)
 			DisableScriptedObjects (0ms)
 			BackupInstance (0ms)
 			ReleaseScriptingObjects (0ms)
 			CreateAndSetChildDomain (1ms)
-		EndReloadAssembly (508ms)
-			LoadAssemblies (52ms)
+		EndReloadAssembly (505ms)
+			LoadAssemblies (62ms)
 			RebuildTransferFunctionScriptingTraits (0ms)
-			SetupTypeCache (89ms)
+			SetupTypeCache (99ms)
 			ReleaseScriptCaches (0ms)
-			RebuildScriptCaches (25ms)
-			SetupLoadedEditorAssemblies (347ms)
+			RebuildScriptCaches (24ms)
+			SetupLoadedEditorAssemblies (332ms)
 				LogAssemblyErrors (0ms)
-				InitializePlatformSupportModulesInManaged (14ms)
+				InitializePlatformSupportModulesInManaged (13ms)
 				SetLoadedEditorAssemblies (0ms)
-				RefreshPlugins (149ms)
+				RefreshPlugins (143ms)
 				BeforeProcessingInitializeOnLoad (1ms)
-				ProcessInitializeOnLoadAttributes (140ms)
-				ProcessInitializeOnLoadMethodAttributes (42ms)
+				ProcessInitializeOnLoadAttributes (133ms)
+				ProcessInitializeOnLoadMethodAttributes (41ms)
 				AfterProcessingInitializeOnLoad (0ms)
 				EditorAssembliesLoaded (0ms)
 			ExecutionOrderSort2 (0ms)
 			AwakeInstancesAfterBackupRestoration (0ms)
 Platform modules already initialized, skipping
 Registering precompiled user dll's ...
-Registered in 0.005252 seconds.
+Registered in 0.005650 seconds.
 Begin MonoManager ReloadAssembly
 Symbol file LoadedFromMemory doesn't match image D:\Unity\Projects\Milk_Instancer01\Library\PackageCache\com.unity.visualscripting@1.7.6\Editor\VisualScripting.Core\Dependencies\YamlDotNet\Unity.VisualScripting.YamlDotNet.dll
 Symbol file LoadedFromMemory doesn't match image D:\Unity\Projects\Milk_Instancer01\Library\PackageCache\com.unity.visualscripting@1.7.6\Editor\VisualScripting.Core\Dependencies\DotNetZip\Unity.VisualScripting.IonicZip.dll
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 150.73 ms, found 3 plugins.
+Refreshing native plugins compatible for Editor in 151.35 ms, found 3 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Mono: successfully reloaded assembly
-- Completed reload, in  2.019 seconds
+- Completed reload, in  2.067 seconds
 Domain Reload Profiling:
-	ReloadAssembly (2019ms)
-		BeginReloadAssembly (98ms)
+	ReloadAssembly (2068ms)
+		BeginReloadAssembly (99ms)
 			ExecutionOrderSort (0ms)
 			DisableScriptedObjects (5ms)
 			BackupInstance (0ms)
 			ReleaseScriptingObjects (0ms)
-			CreateAndSetChildDomain (20ms)
-		EndReloadAssembly (1831ms)
-			LoadAssemblies (81ms)
+			CreateAndSetChildDomain (19ms)
+		EndReloadAssembly (1866ms)
+			LoadAssemblies (93ms)
 			RebuildTransferFunctionScriptingTraits (0ms)
-			SetupTypeCache (356ms)
+			SetupTypeCache (358ms)
 			ReleaseScriptCaches (1ms)
-			RebuildScriptCaches (109ms)
-			SetupLoadedEditorAssemblies (1239ms)
+			RebuildScriptCaches (115ms)
+			SetupLoadedEditorAssemblies (1258ms)
 				LogAssemblyErrors (0ms)
 				InitializePlatformSupportModulesInManaged (10ms)
 				SetLoadedEditorAssemblies (0ms)
 				RefreshPlugins (151ms)
-				BeforeProcessingInitializeOnLoad (118ms)
-				ProcessInitializeOnLoadAttributes (825ms)
-				ProcessInitializeOnLoadMethodAttributes (131ms)
-				AfterProcessingInitializeOnLoad (5ms)
+				BeforeProcessingInitializeOnLoad (121ms)
+				ProcessInitializeOnLoadAttributes (849ms)
+				ProcessInitializeOnLoadMethodAttributes (121ms)
+				AfterProcessingInitializeOnLoad (4ms)
 				EditorAssembliesLoaded (0ms)
 			ExecutionOrderSort2 (0ms)
 			AwakeInstancesAfterBackupRestoration (5ms)
@@ -140,12 +140,12 @@ Platform modules already initialized, skipping
 ========================================================================
 Worker process is ready to serve import requests
 Launched and connected shader compiler UnityShaderCompiler.exe after 0.06 seconds
-Refreshing native plugins compatible for Editor in 1.57 ms, found 3 plugins.
+Refreshing native plugins compatible for Editor in 2.01 ms, found 3 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Unloading 7401 Unused Serialized files (Serialized files now loaded: 0)
 Unloading 76 unused Assets / (4.3 MB). Loaded Objects now: 7858.
-Memory consumption went from 357.5 MB to 353.2 MB.
-Total: 6.982500 ms (FindLiveObjects: 1.023000 ms CreateObjectMapping: 1.278200 ms MarkObjects: 3.743300 ms  DeleteObjects: 0.936900 ms)
+Memory consumption went from 357.4 MB to 353.1 MB.
+Total: 8.520300 ms (FindLiveObjects: 1.025800 ms CreateObjectMapping: 1.237000 ms MarkObjects: 4.705600 ms  DeleteObjects: 1.550400 ms)
 
 AssetImportParameters requested are different than current active one (requested -> active):
   custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
@@ -160,109 +160,61 @@ AssetImportParameters requested are different than current active one (requested
   custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
 ========================================================================
 Received Import Request.
-  Time since last request: 341262.358961 seconds.
-  path: Assets/Milk_Instancer01/Demo/Prefabs/shader graph/Meadow_Grass_01 1.mat
-  artifactKey: Guid(0875e36126e741e4b9de25a361734831) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Milk_Instancer01/Demo/Prefabs/shader graph/Meadow_Grass_01 1.mat using Guid(0875e36126e741e4b9de25a361734831) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '9f74348cc7f4dd8fefa30a939b906fdc') in 1.282558 seconds 
+  Time since last request: 341948.104364 seconds.
+  path: Assets/Milk_Instancer01/Demo/Prefabs/Fern_01.prefab
+  artifactKey: Guid(0a1b602fab799994198f1ac6c6a0d2de) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Milk_Instancer01/Demo/Prefabs/Fern_01.prefab using Guid(0a1b602fab799994198f1ac6c6a0d2de) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '99c535b4133ddfdb745a639d0ace94ef') in 0.967131 seconds 
 ========================================================================
 Received Import Request.
-  Time since last request: 49.813864 seconds.
-  path: Assets/Milk_Instancer01/Demo/Prefabs/Bush_01.prefab
-  artifactKey: Guid(55fb4d7d07bc4ed48b7461359c111300) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Milk_Instancer01/Demo/Prefabs/Bush_01.prefab using Guid(55fb4d7d07bc4ed48b7461359c111300) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '5855686847a81296c07aaa0a0ff40691') in 0.049605 seconds 
-========================================================================
-Received Import Request.
-  Time since last request: 0.000031 seconds.
-  path: Assets/Milk_Instancer01/Demo/Prefabs/grass.prefab
-  artifactKey: Guid(0b8557e82aa9d494e8fd854a9c3ba672) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Milk_Instancer01/Demo/Prefabs/grass.prefab using Guid(0b8557e82aa9d494e8fd854a9c3ba672) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'b418aa7ba45c584eada805f1dab876bd') in 0.020272 seconds 
-========================================================================
-Received Import Request.
-  Time since last request: 0.000030 seconds.
-  path: Assets/Milk_Instancer01/Demo/Prefabs/Meadow_Grass_01_Var4_Prefab.prefab
-  artifactKey: Guid(05ecad73249ff144b91b04ac697efd3a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Milk_Instancer01/Demo/Prefabs/Meadow_Grass_01_Var4_Prefab.prefab using Guid(05ecad73249ff144b91b04ac697efd3a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '1b8a828980b232ee67899192a0e83730') in 0.021190 seconds 
-========================================================================
-Received Import Request.
-  Time since last request: 0.000029 seconds.
-  path: Assets/Milk_Instancer01/Demo/Prefabs/pine_007_01.prefab
-  artifactKey: Guid(af8b4e4cf381a70479fb6ea54448d2b1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Milk_Instancer01/Demo/Prefabs/pine_007_01.prefab using Guid(af8b4e4cf381a70479fb6ea54448d2b1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '8d7d97da2693700a6ea7e0068d52d525') in 0.054778 seconds 
-========================================================================
-Received Import Request.
-  Time since last request: 50.286069 seconds.
-  path: Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Meadow_Grass_01_Var1_Prefab.prefab
-  artifactKey: Guid(26555b26396cb3e4c98a3fe5b98ad384) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Meadow_Grass_01_Var1_Prefab.prefab using Guid(26555b26396cb3e4c98a3fe5b98ad384) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '3bf1283ffd793bb001b23683ace83e71') in 0.021731 seconds 
-========================================================================
-Received Import Request.
-  Time since last request: 0.000030 seconds.
-  path: Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Meadow_Grass_01_Var5_Prefab.prefab
-  artifactKey: Guid(3307d021f8c7f6d41bd96741ce7ac05e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Meadow_Grass_01_Var5_Prefab.prefab using Guid(3307d021f8c7f6d41bd96741ce7ac05e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'fa8917fb507e532d458a08fe3ce61bcd') in 0.025098 seconds 
-========================================================================
-Received Import Request.
-  Time since last request: 0.000025 seconds.
-  path: Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Meadow_Grass_01_Var4_Prefab.prefab
-  artifactKey: Guid(10828e5ac37bd8d4da40f0e24eedc4e6) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Meadow_Grass_01_Var4_Prefab.prefab using Guid(10828e5ac37bd8d4da40f0e24eedc4e6) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'cf212498631d21d13a170a50346da966') in 0.015399 seconds 
-========================================================================
-Received Import Request.
-  Time since last request: 0.337932 seconds.
-  path: Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Materials/Meadow_Grass_01.mat
-  artifactKey: Guid(2022d5be69b5bf145b4605d7613cd115) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Materials/Meadow_Grass_01.mat using Guid(2022d5be69b5bf145b4605d7613cd115) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '4404cd450ae217f2e6189a534c0b41d5') in 0.019161 seconds 
-========================================================================
-Received Import Request.
-  Time since last request: 46.406668 seconds.
-  path: Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Materials/Meadow_Grass_01.mat
-  artifactKey: Guid(2022d5be69b5bf145b4605d7613cd115) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Materials/Meadow_Grass_01.mat using Guid(2022d5be69b5bf145b4605d7613cd115) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a61f295202ab29be840e540034241865') in 0.018840 seconds 
-========================================================================
-Received Import Request.
-  Time since last request: 0.992305 seconds.
-  path: Assets/Milk_Instancer01/Demo/Scenes/NaturePostProcessing 1.asset
-  artifactKey: Guid(940be91cac9e55f4faa42ce982c5590e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Milk_Instancer01/Demo/Scenes/NaturePostProcessing 1.asset using Guid(940be91cac9e55f4faa42ce982c5590e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'ba89e94cba5d49da02f96792971e1dc5') in 0.006752 seconds 
-========================================================================
-Received Import Request.
-  Time since last request: 59.866364 seconds.
-  path: Assets/Milk_Instancer01/Demo/Models/hdrpDefault/Bush_01.fbx
-  artifactKey: Guid(b75e331c16b1d094692ffdc1afe41612) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Milk_Instancer01/Demo/Models/hdrpDefault/Bush_01.fbx using Guid(b75e331c16b1d094692ffdc1afe41612) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'cf1f7f4a4ca6326bd5d6f5edd29f9396') in 0.089995 seconds 
-========================================================================
-Received Import Request.
-  Time since last request: 16.402196 seconds.
-  path: Assets/Milk_Instancer01/Demo/Prefabs/grass.prefab
-  artifactKey: Guid(0b8557e82aa9d494e8fd854a9c3ba672) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Milk_Instancer01/Demo/Prefabs/grass.prefab using Guid(0b8557e82aa9d494e8fd854a9c3ba672) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'f7045814363aa69e1b79ae1f1adf8c88') in 0.022719 seconds 
-========================================================================
-Received Import Request.
-  Time since last request: 31.886348 seconds.
-  path: Assets/Milk_Instancer01/Demo/Prefabs/grass.prefab
-  artifactKey: Guid(0b8557e82aa9d494e8fd854a9c3ba672) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Milk_Instancer01/Demo/Prefabs/grass.prefab using Guid(0b8557e82aa9d494e8fd854a9c3ba672) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '3320a94cc0de845c212681249330865b') in 0.026636 seconds 
-========================================================================
-Received Import Request.
-  Time since last request: 72.166035 seconds.
+  Time since last request: 28.655760 seconds.
   path: Assets/Milk_Instancer01/Demo/Prefabs/shader graph/grass_SG.mat
   artifactKey: Guid(6b38a793f9da7a840a50878248a410ef) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Milk_Instancer01/Demo/Prefabs/shader graph/grass_SG.mat using Guid(6b38a793f9da7a840a50878248a410ef) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '46a2dc8913917bc0f719232337a1d4da') in 0.037304 seconds 
+Start importing Assets/Milk_Instancer01/Demo/Prefabs/shader graph/grass_SG.mat using Guid(6b38a793f9da7a840a50878248a410ef) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '39f729ce19974011d7682ed57dff2e7a') in 0.354538 seconds 
 ========================================================================
 Received Import Request.
-  Time since last request: 13.272961 seconds.
+  Time since last request: 53.678790 seconds.
+  path: Assets/Milk_Instancer01/Demo/Scenes/NaturePostProcessing 1.asset
+  artifactKey: Guid(940be91cac9e55f4faa42ce982c5590e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Milk_Instancer01/Demo/Scenes/NaturePostProcessing 1.asset using Guid(940be91cac9e55f4faa42ce982c5590e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '0936a3a4c6d92acc5e4887706e62c9d1') in 0.003961 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 28.518705 seconds.
+  path: Assets/Milk_Instancer01/Demo/Scenes/02_NatureDemo.unity
+  artifactKey: Guid(462c6efcac35ded4eb5ce9ff5e57f121) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Milk_Instancer01/Demo/Scenes/02_NatureDemo.unity using Guid(462c6efcac35ded4eb5ce9ff5e57f121) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '4ca6335b204624bb55d7cd45ccffdbac') in 0.002228 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 77.956124 seconds.
+  path: Assets/Milk_Instancer01/Demo/Scenes/02_NatureDemo.unity
+  artifactKey: Guid(462c6efcac35ded4eb5ce9ff5e57f121) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Milk_Instancer01/Demo/Scenes/02_NatureDemo.unity using Guid(462c6efcac35ded4eb5ce9ff5e57f121) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '766b8c629d9f99b4ca8b093524badca9') in 0.001666 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 23.920691 seconds.
+  path: Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadTree/billboard007.mat
+  artifactKey: Guid(7a0b2ee26b48b1048ba821ceb132f4ae) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadTree/billboard007.mat using Guid(7a0b2ee26b48b1048ba821ceb132f4ae) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '975f8bb930d0241e49b8fe5e7c003deb') in 1.005125 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 86.006173 seconds.
   path: Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Materials/Meadow_Grass_01.mat
   artifactKey: Guid(2022d5be69b5bf145b4605d7613cd115) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Materials/Meadow_Grass_01.mat using Guid(2022d5be69b5bf145b4605d7613cd115) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '336f16c86498ecd37a6504f78a95b83f') in 0.018687 seconds 
+Start importing Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Materials/Meadow_Grass_01.mat using Guid(2022d5be69b5bf145b4605d7613cd115) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '9400d1bd35ecb0e40ac7b897a9ff68df') in 0.020577 seconds 
 ========================================================================
 Received Import Request.
-  Time since last request: 5.372727 seconds.
-  path: Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Meadow_Grass_01_Var1_Prefab.prefab
-  artifactKey: Guid(26555b26396cb3e4c98a3fe5b98ad384) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Meadow_Grass_01_Var1_Prefab.prefab using Guid(26555b26396cb3e4c98a3fe5b98ad384) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '46f9b886a9420573840cee6bfb21392c') in 0.020455 seconds 
+  Time since last request: 71.659230 seconds.
+  path: Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Materials/Meadow_Grass_01.mat
+  artifactKey: Guid(2022d5be69b5bf145b4605d7613cd115) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Materials/Meadow_Grass_01.mat using Guid(2022d5be69b5bf145b4605d7613cd115) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'f9c3ac6acc3e01de2bba46e8b37876d5') in 0.020970 seconds 
 ========================================================================
 Received Import Request.
-  Time since last request: 0.000029 seconds.
-  path: Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Meadow_Grass_01_Var5_Prefab.prefab
-  artifactKey: Guid(3307d021f8c7f6d41bd96741ce7ac05e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Milk_Instancer01/Demo/Models/bookOfTheDeadGrass/Meadow_Grass_01_Var5_Prefab.prefab using Guid(3307d021f8c7f6d41bd96741ce7ac05e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'def1ea6d621c3a2032ed8630db14c2df') in 0.022927 seconds 
+  Time since last request: 187.211259 seconds.
+  path: Assets/AmplifyShaderEditor/Examples
+  artifactKey: Guid(425c3aed47dd05444960ca41af18e591) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/AmplifyShaderEditor/Examples using Guid(425c3aed47dd05444960ca41af18e591) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '4e5000dd35aa9e25b2b3acc03654fea5') in 0.015636 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 3.029668 seconds.
+  path: Assets/AmplifyShaderEditor/Plugins
+  artifactKey: Guid(3306ce0ede814a84c8d289893da72b7a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/AmplifyShaderEditor/Plugins using Guid(3306ce0ede814a84c8d289893da72b7a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '4d49e33a4f80c0a5b8ea0193e6e0b08c') in 0.004398 seconds 
