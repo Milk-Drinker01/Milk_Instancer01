@@ -40,6 +40,8 @@ Features
  Project info:
   - created on unity 2021.2.7f1 HDRP 12.1.0 (tested as low as HDRP 10)
 
+if you find this project useful to you in any way, even if for just the wind system and not the GPU instancing, feel free to leave it a star, or subscribe to my youtube. it helps me out alot! https://www.youtube.com/c/MilkDrinker01
+
 ![walking](https://user-images.githubusercontent.com/59656122/143317319-14eb5d2f-3adf-45b2-9dfd-b1ea95af971b.gif)
 
 ![grass](https://user-images.githubusercontent.com/59656122/142703484-4bb21330-5e90-4cea-a69a-ff53977d595f.gif)
