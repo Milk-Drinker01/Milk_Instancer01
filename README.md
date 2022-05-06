@@ -1,7 +1,7 @@
 # Milk_Instancer01
  Unity indirect GPU instancing & painting with occlusion culling, frustum culling, and LODs
  
- WARNING - THERE IS A MAJOR UPDATE COMING SOON WHICH ADDS A BUNCH OF FEATURES, BUT BREAKS THE CURRENT SETUP USED WITH THE PROJECT VERION IN THIS REPOSITORY. WHEN THIS UPDATE IS COMPLETE, I WILL RELEASE A VIDEO TUTORIAL, AND LINK IT HERE.
+ VIDEO TUTORIAL, URP SUPPORT, AND BUILT IN RENDERER SUPPORT COMING SOON
  
  ![painting (2)](https://user-images.githubusercontent.com/59656122/150681820-37e0c5b9-d7b3-4eaa-9f09-4b6b49b648e5.gif)
 
@@ -27,19 +27,20 @@ Features
   - ShaderGraph examples
   - wind shader example (ASE and SG)
   - Multi-Material Prefab support (for things like trees)
+  - world streaming/detail zones
 
 
  What am I still working on?
   - find and fix bugs
-  - world streaming/detail zones
   - URP shaders
   - more spawning methods, perhaps procedural terrain spawning
-  - create a user friendly interface + gizmos
   - built in renderer support
   - idk im sure ill think of something
 
  Project info:
-  - created on unity 2021.2.1f1 HDRP 12.1.0 (tested as low as HDRP 10)
+  - created on unity 2021.2.7f1 HDRP 12.1.0 (tested as low as HDRP 10)
+
+if you find this project useful to you in any way, even if for just the wind system and not the GPU instancing, feel free to leave it a star, or subscribe to my youtube. it helps me out alot! https://www.youtube.com/c/MilkDrinker01
 
 ![walking](https://user-images.githubusercontent.com/59656122/143317319-14eb5d2f-3adf-45b2-9dfd-b1ea95af971b.gif)
 
