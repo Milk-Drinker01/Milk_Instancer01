@@ -38,7 +38,7 @@ Features
   - idk im sure ill think of something
 
  Project info:
-  - created on unity 2021.2.7f1 HDRP 12.1.0 (tested as low as HDRP 10)
+  - created on unity 2021.3.1f1 HDRP 12.1.0 (tested as low as HDRP 10)
 
 if you find this project useful to you in any way, even if for just the wind system and not the GPU instancing, feel free to leave it a star, or subscribe to my youtube. it helps me out alot! https://www.youtube.com/c/MilkDrinker01
 
