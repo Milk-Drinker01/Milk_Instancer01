@@ -4484,7 +4484,7 @@ Shader "Milk_Instancer/Lit"
 }
 /*ASEBEGIN
 Version=18921
--2281;1230;1754;862;1029.509;341.7323;1;True;True
+799;222;1754;850;1029.509;335.7323;1;True;True
 Node;AmplifyShaderEditor.FunctionNode;11;-260.9839,14.46393;Inherit;False;StandardShading;0;;1;5e7e2ae5299f0b54ea8330c3cad1f8cb;0;0;7;COLOR;24;FLOAT3;23;FLOAT3;26;FLOAT;20;FLOAT;19;FLOAT;18;FLOAT;22
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;1;0,0;Float;False;False;-1;2;Rendering.HighDefinition.LightingShaderGraphGUI;0;2;New Amplify Shader;53b46d85872c5b24c8f4f0a1c3fe4c87;True;META;0;1;META;0;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;True;7;d3d11;metal;vulkan;xboxone;xboxseries;playstation;switch;0;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;2;False;-1;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;1;LightMode=Meta;False;False;0;;0;0;Standard;0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;2;0,0;Float;False;False;-1;2;Rendering.HighDefinition.LightingShaderGraphGUI;0;2;New Amplify Shader;53b46d85872c5b24c8f4f0a1c3fe4c87;True;ShadowCaster;0;2;ShadowCaster;0;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;3;RenderPipeline=HDRenderPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;5;True;7;d3d11;metal;vulkan;xboxone;xboxseries;playstation;switch;0;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;0;True;-27;False;True;False;False;False;False;0;False;-1;False;False;False;False;False;False;False;False;False;True;1;False;-1;True;3;False;-1;False;True;1;LightMode=ShadowCaster;False;False;0;;0;0;Standard;0;False;0
@@ -4505,4 +4505,4 @@ WireConnection;0;7;11;19
 WireConnection;0;8;11;18
 WireConnection;0;9;11;22
 ASEEND*/
-//CHKSM=9BDF0CD78F67E42EFE475EB80A1BABC226A05D64
+//CHKSM=7D3E05A8336DBFA2377917689DCA5E7396078301

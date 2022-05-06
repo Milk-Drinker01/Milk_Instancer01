@@ -30,7 +30,7 @@ public class ZoneManager : MonoBehaviour
 
     int lastX = int.MinValue;
     int lastZ = int.MinValue;
-    void resetPos()
+    public void resetPos()
     {
         lastX = int.MinValue;
         lastZ = int.MinValue;

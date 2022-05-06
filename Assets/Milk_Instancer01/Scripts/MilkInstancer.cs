@@ -242,6 +242,10 @@ public class MilkInstancer : MonoBehaviour
     }
     private void OnEnable()
     {
+        if (GetComponent<ZoneManager>())
+        {
+            GetComponent<ZoneManager>().resetPos();
+        }
         //UnityEngine.Rendering.RenderPipelineManager.endCameraRendering += renderingDone;
         UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering += preRender;
 #if UNITY_EDITOR
@@ -250,6 +254,7 @@ public class MilkInstancer : MonoBehaviour
     }
     private void OnDisable()
     {
+        ReleaseBuffers();
         //UnityEngine.Rendering.RenderPipelineManager.endCameraRendering -= renderingDone;
         UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= preRender;
         if (hiZDepthTexture != null)
@@ -281,7 +286,7 @@ public class MilkInstancer : MonoBehaviour
     }
     private void OnDestroy()
     {
-        //ReleaseBuffers();
+        ReleaseBuffers();
     }
     Vector3 camPosition;
     Matrix4x4 m_MVP;
@@ -569,7 +574,7 @@ public class MilkInstancer : MonoBehaviour
     {
         initialized = InitializeRenderer(ref _instances);
     }
-    public uint[] cullingPerType;
+    [HideInInspector] public uint[] cullingPerType;
     public bool InitializeRenderer(ref PaintablePrefab[] _instances)
     {
         if (!TryGetKernels())
@@ -585,7 +590,6 @@ public class MilkInstancer : MonoBehaviour
         }
         instanceShadowCastingModes = new bool[m_numberOfInstanceTypes];
         m_numberOfInstances = 0;
-        camPosition = Camera.main.transform.position;
         m_bounds.center = Vector3.zero;
         m_bounds.extents = Vector3.one * 10000;
         //createDepthTexture();
@@ -729,7 +733,7 @@ public class MilkInstancer : MonoBehaviour
         m_instancesArgsBuffer = new ComputeBuffer(m_numberOfInstanceTypes * NUMBER_OF_ARGS_PER_INSTANCE_TYPE, sizeof(uint), ComputeBufferType.IndirectArguments);
         m_instanceDataBuffer = new ComputeBuffer(m_numberOfInstances, computeShaderInputSize, ComputeBufferType.Default);
         m_instancesSortingData = new ComputeBuffer(m_numberOfInstances, computeSortingDataSize, ComputeBufferType.Default);
-        m_instancesSortingDataTemp = new ComputeBuffer(m_numberOfInstances, computeSortingDataSize, ComputeBufferType.Default);
+        //m_instancesSortingDataTemp = new ComputeBuffer(m_numberOfInstances, computeSortingDataSize, ComputeBufferType.Default);
         m_instancesMatrixRows01 = new ComputeBuffer(m_numberOfInstances, computeShaderDrawMatrixSize, ComputeBufferType.Default);
         m_instancesMatrixRows23 = new ComputeBuffer(m_numberOfInstances, computeShaderDrawMatrixSize, ComputeBufferType.Default);
         m_instancesMatrixRows45 = new ComputeBuffer(m_numberOfInstances, computeShaderDrawMatrixSize, ComputeBufferType.Default);
@@ -1134,6 +1138,7 @@ public class MilkInstancer : MonoBehaviour
         ReleaseComputeBuffer(ref m_instancesSortingData);
         ReleaseComputeBuffer(ref m_instancesSortingDataTemp);
         ReleaseComputeBuffer(ref m_instancesMatrixRows01);
+        //ReleaseComputeBuffer(m_instancesMatrixRows01);
         ReleaseComputeBuffer(ref m_instancesMatrixRows23);
         ReleaseComputeBuffer(ref m_instancesMatrixRows45);
         ReleaseComputeBuffer(ref m_instancesCulledMatrixRows01);
@@ -1151,7 +1156,21 @@ public class MilkInstancer : MonoBehaviour
         ReleaseComputeBuffer(ref m_shadowCulledMatrixRows45);
 
         ReleaseComputeBuffer(ref occCulPerType);
+        ReleaseComputeBuffer(ref m_paddingBuffer); 
+        ReleaseComputeBuffer(ref m_keysBuffer); 
+        ReleaseComputeBuffer(ref m_tempBuffer); 
+        ReleaseComputeBuffer(ref m_valuesBuffer);
     }
+    //private void ReleaseComputeBuffer(ComputeBuffer _buffer)
+    //{
+    //    if (_buffer == null)
+    //    {
+    //        return;
+    //    }
+
+    //    _buffer.Release();
+    //    _buffer = null;
+    //}
     private static void ReleaseComputeBuffer(ref ComputeBuffer _buffer)
     {
         if (_buffer == null)
