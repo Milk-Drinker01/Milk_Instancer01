@@ -1,5 +1,5 @@
 # Milk_Instancer01
- Unity indirect GPU instancing & painting with occlusion culling, frustum culling, and LODs
+ Unity indirect GPU instancing & painting with occlusion culling, frustum culling, and LODs in HDRP
  
  VIDEO TUTORIAL, URP SUPPORT, AND BUILT IN RENDERER SUPPORT COMING SOON
  
