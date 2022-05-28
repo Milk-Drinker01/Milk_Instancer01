@@ -11,6 +11,8 @@ StructuredBuffer<Indirect2x2Matrix> _InstancesDrawMatrixRows01;
 StructuredBuffer<Indirect2x2Matrix> _InstancesDrawMatrixRows23;
 StructuredBuffer<Indirect2x2Matrix> _InstancesDrawMatrixRows45;
 
+#define unity_ObjectToWorld unity_ObjectToWorld
+#define unity_WorldToObject unity_WorldToObject
 void setup()
 {
 #if defined(SHADER_API_METAL)
@@ -22,8 +24,7 @@ void setup()
     Indirect2x2Matrix rows23 = _InstancesDrawMatrixRows23[index];
     Indirect2x2Matrix rows45 = _InstancesDrawMatrixRows45[index];
 
-#define unity_ObjectToWorld unity_ObjectToWorld
-#define unity_WorldToObject unity_WorldToObject
+
 
     unity_ObjectToWorld = float4x4(rows01.row0, rows01.row1, rows23.row0, float4(0, 0, 0, 1));
     unity_WorldToObject = float4x4(rows23.row1, rows45.row0, rows45.row1, float4(0, 0, 0, 1));

@@ -761,8 +761,8 @@ public class MilkInstancer : MonoBehaviour
         m_instanceDataBuffer.SetData(instancesInputData);
 
         // Setup the Material Property blocks for our meshes...
-        int _Whatever = Shader.PropertyToID("_Whatever");
-        int _DebugLODEnabled = Shader.PropertyToID("_DebugLODEnabled");
+        //int _Whatever = Shader.PropertyToID("_Whatever");
+        //int _DebugLODEnabled = Shader.PropertyToID("_DebugLODEnabled");
         for (int i = 0; i < indirectMeshes.Length; i++)
         {
             IndirectRenderingMesh irm = indirectMeshes[i];
