@@ -49,6 +49,9 @@ cbuffer CB
 // Structured Buffers
 //--------------------------------------------------------------------------------------
 
+StructuredBuffer<float> _perTypeLod0Range;
+StructuredBuffer<float> _perTypeLod1Range;
+StructuredBuffer<float> _perTypeRenderDistance;
 StructuredBuffer<uint> _perTypeOcclusionCull;
 StructuredBuffer<InstanceData> _InstanceDataBuffer;
 RWStructuredBuffer<uint> _ArgsBuffer;
@@ -142,7 +145,10 @@ inline uint IsVisibleAfterFrustumCulling(float4 clipPos)
             || clipPos.y > clipPos.w) 
             ? 0 : 1;
 }
-
+inline uint isWithinDistance(float dist, float maxDist)
+{
+    return maxDist >= dist;
+}
 //--------------------------------------------------------------------------------------
 // Kernels
 //--------------------------------------------------------------------------------------
@@ -228,6 +234,8 @@ inline void CSMain (
         // Do we pass the frustum culling...?
         isVisible *= _ShouldFrustumCull ? isInFrustum : 1;
 
+        isVisible *= isWithinDistance(minDistanceToCamera, _perTypeRenderDistance[drawCall / 15]);
+        
         // Do we pass the occlusion culling...?
         //isVisible *= (_ShouldOcclusionCull * isVisible > 0) ? IsVisibleAfterOcclusionCulling(instance, clipMinX, clipMaxX, clipMinY, clipMaxY, clipMinZ) : 1;
         isVisible *= (_perTypeOcclusionCull[drawCall / 15] * isVisible > 0) ? IsVisibleAfterOcclusionCulling(instance, clipMinX, clipMaxX, clipMinY, clipMaxY, clipMinZ) : 1;
@@ -238,8 +246,8 @@ inline void CSMain (
 
     // Calculate the correct index to the arguments buffers
     uint argsIndex = drawCall + 1;    
-    argsIndex += 5 * (minDistanceToCamera > LOD00_RANGE);
-    argsIndex += 5 * (minDistanceToCamera > LOD01_RANGE);
+    argsIndex += 5 * (minDistanceToCamera > _perTypeLod0Range[drawCall / 15]);
+    argsIndex += 5 * (minDistanceToCamera > _perTypeLod1Range[drawCall / 15]);
     argsIndex = _ShouldLOD * argsIndex + ((_ShouldLOD == 0) * (drawCall + 11));
     
     uint shadowArgsIndex = argsIndex;//_ShouldOnlyUseLOD02Shadows ? drawCall + 11 : argsIndex;

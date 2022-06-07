@@ -104,6 +104,9 @@ public class MilkInstancer : MonoBehaviour
     private ComputeBuffer m_shadowCulledMatrixRows23;
     private ComputeBuffer m_shadowCulledMatrixRows45;
 
+    private ComputeBuffer lod0RangePerTypeBuffer;
+    private ComputeBuffer lod1RangePerTypeBuffer;
+    private ComputeBuffer distancePerTypeBuffer;
     private ComputeBuffer occCulPerType;
 #endregion
 #region command buffers
@@ -162,6 +165,9 @@ public class MilkInstancer : MonoBehaviour
     private static readonly int _InstancesCulledMatrixRows45 = Shader.PropertyToID("_InstancesCulledMatrixRows45");
 
     private static readonly int _CullingPerType = Shader.PropertyToID("_perTypeOcclusionCull");
+    private static readonly int _Lod0RangePerType = Shader.PropertyToID("_perTypeLod0Range");
+    private static readonly int _Lod1RangePerType = Shader.PropertyToID("_perTypeLod1Range");
+    private static readonly int _DistancePerType = Shader.PropertyToID("_perTypeRenderDistance");
     #endregion
     private int m_numberOfInstanceTypes;
     private int m_numberOfInstances;
@@ -575,6 +581,9 @@ public class MilkInstancer : MonoBehaviour
         initialized = InitializeRenderer(ref _instances);
     }
     [HideInInspector] public uint[] cullingPerType;
+    [HideInInspector] public float[] lod0RangePerType;
+    [HideInInspector] public float[] lod1RangePerType;
+    [HideInInspector] public float[] distancePerType;
     public bool InitializeRenderer(ref PaintablePrefab[] _instances)
     {
         if (!TryGetKernels())
@@ -602,6 +611,9 @@ public class MilkInstancer : MonoBehaviour
         List<Vector3> rotations = new List<Vector3>();
         List<SortingData> sortingData = new List<SortingData>();
 
+        lod0RangePerType = new float[m_numberOfInstanceTypes];
+        lod1RangePerType = new float[m_numberOfInstanceTypes];
+        distancePerType = new float[m_numberOfInstanceTypes];
         cullingPerType = new uint[m_numberOfInstanceTypes];
         uint forceCullingOff = (uint)(enableOcclusionCulling ? 1 : 0);
         //for (int i = 0; i < cullingPerType.Length; i++)
@@ -618,6 +630,9 @@ public class MilkInstancer : MonoBehaviour
             {
                 instanceShadowCastingModes[currentInstanceType] = iid.instanceShadowCastingMode;
                 cullingPerType[currentInstanceType] = (uint)(iid.EnableOcclusionCulling ? 1 : 0) * forceCullingOff;
+                lod0RangePerType[currentInstanceType] = iid.lod0Range;
+                lod1RangePerType[currentInstanceType] = iid.lod1Range;
+                distancePerType[currentInstanceType] = iid.maxRenderRange;
 
                 IndirectRenderingMesh irm = new IndirectRenderingMesh();
 
@@ -872,6 +887,19 @@ public class MilkInstancer : MonoBehaviour
         //m_scanInstancesGroupX = Mathf.Max(1, Mathf.CeilToInt((float)m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE)));
         //m_scanThreadGroupsGroupX = 1;
         //m_copyInstanceDataGroupX = Mathf.Max(1, Mathf.CeilToInt((float)m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE)));
+
+
+        lod0RangePerTypeBuffer = new ComputeBuffer(m_numberOfInstanceTypes, sizeof(float), ComputeBufferType.Default);
+        lod0RangePerTypeBuffer.SetData(lod0RangePerType);
+        occlusionCS.SetBuffer(m_occlusionKernelID, _Lod0RangePerType, lod0RangePerTypeBuffer);
+
+        lod1RangePerTypeBuffer = new ComputeBuffer(m_numberOfInstanceTypes, sizeof(float), ComputeBufferType.Default);
+        lod1RangePerTypeBuffer.SetData(lod1RangePerType);
+        occlusionCS.SetBuffer(m_occlusionKernelID, _Lod1RangePerType, lod1RangePerTypeBuffer);
+
+        distancePerTypeBuffer = new ComputeBuffer(m_numberOfInstanceTypes, sizeof(float), ComputeBufferType.Default);
+        distancePerTypeBuffer.SetData(distancePerType);
+        occlusionCS.SetBuffer(m_occlusionKernelID, _DistancePerType, distancePerTypeBuffer);
 
         occCulPerType = new ComputeBuffer(m_numberOfInstanceTypes, sizeof(uint), ComputeBufferType.Default);
         occCulPerType.SetData(cullingPerType);
@@ -1155,6 +1183,9 @@ public class MilkInstancer : MonoBehaviour
         ReleaseComputeBuffer(ref m_shadowCulledMatrixRows23);
         ReleaseComputeBuffer(ref m_shadowCulledMatrixRows45);
 
+        ReleaseComputeBuffer(ref lod0RangePerTypeBuffer);
+        ReleaseComputeBuffer(ref lod1RangePerTypeBuffer);
+        ReleaseComputeBuffer(ref distancePerTypeBuffer);
         ReleaseComputeBuffer(ref occCulPerType);
         ReleaseComputeBuffer(ref m_paddingBuffer); 
         ReleaseComputeBuffer(ref m_keysBuffer); 

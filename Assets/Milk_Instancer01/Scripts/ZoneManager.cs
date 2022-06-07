@@ -746,6 +746,8 @@ public class PaintablePrefab
     }
 
     [HideInInspector] public bool initialized = true;
+    public float lod0Range = 15;
+    public float lod1Range = 50;
     public float maxRenderRange = 50;
 
     [Range(0, 100)]
