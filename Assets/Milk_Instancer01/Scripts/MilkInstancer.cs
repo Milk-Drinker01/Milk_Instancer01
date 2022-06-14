@@ -108,6 +108,7 @@ public class MilkInstancer : MonoBehaviour
     private ComputeBuffer lod1RangePerTypeBuffer;
     private ComputeBuffer distancePerTypeBuffer;
     private ComputeBuffer occCulPerType;
+    private ComputeBuffer frustCulPerType;
 #endregion
 #region command buffers
     private CommandBuffer m_sortingCommandBuffer;
@@ -164,7 +165,8 @@ public class MilkInstancer : MonoBehaviour
     private static readonly int _InstancesCulledMatrixRows23 = Shader.PropertyToID("_InstancesCulledMatrixRows23");
     private static readonly int _InstancesCulledMatrixRows45 = Shader.PropertyToID("_InstancesCulledMatrixRows45");
 
-    private static readonly int _CullingPerType = Shader.PropertyToID("_perTypeOcclusionCull");
+    private static readonly int _OcclusionCullingPerType = Shader.PropertyToID("_perTypeOcclusionCull");
+    private static readonly int _FrustumCullingPerType = Shader.PropertyToID("_perTypeFrustumCull");
     private static readonly int _Lod0RangePerType = Shader.PropertyToID("_perTypeLod0Range");
     private static readonly int _Lod1RangePerType = Shader.PropertyToID("_perTypeLod1Range");
     private static readonly int _DistancePerType = Shader.PropertyToID("_perTypeRenderDistance");
@@ -185,14 +187,18 @@ public class MilkInstancer : MonoBehaviour
     private const int ARGS_BYTE_SIZE_PER_INSTANCE_TYPE = NUMBER_OF_ARGS_PER_INSTANCE_TYPE * sizeof(uint); // 15args * 4bytes = 60bytes
     private const int SCAN_THREAD_GROUP_SIZE = 64;
 
+#if UNITY_EDITOR
     private void OnValidate()
     {
         checkIfOnlyInstance();
     }
+#endif
     float maxShadowDistance = 150;
     private void Awake()
     {
+#if UNITY_EDITOR
         checkIfOnlyInstance();
+#endif
         if (QualitySettings.renderPipeline == null)
         {
             maxShadowDistance = QualitySettings.shadowDistance;
@@ -443,6 +449,7 @@ public class MilkInstancer : MonoBehaviour
             scanInstancesCS.SetBuffer(m_scanInstancesKernelID, _GroupSumArray, m_instancesGroupSumArrayBuffer);
             scanInstancesCS.SetBuffer(m_scanInstancesKernelID, _ScannedInstancePredicates, m_instancesScannedPredicates);
             scanInstancesCS.Dispatch(m_scanInstancesKernelID, m_scanInstancesGroupX, 1, 1);
+#if UNITY_EDITOR
             if (scanDebug)
             {
                 scanDebug = false;
@@ -453,6 +460,7 @@ public class MilkInstancer : MonoBehaviour
                     Debug.Log(data[i]);
                 }
             }
+#endif
 
             // Shadows
             scanInstancesCS.SetBuffer(m_scanInstancesKernelID, _InstancePredicatesIn, m_shadowsIsVisibleBuffer);
@@ -471,6 +479,7 @@ public class MilkInstancer : MonoBehaviour
             scanGroupSumsCS.SetBuffer(m_scanGroupSumsKernelID, _GroupSumArrayIn, m_instancesGroupSumArrayBuffer);
             scanGroupSumsCS.SetBuffer(m_scanGroupSumsKernelID, _GroupSumArrayOut, m_instancesScannedGroupSumBuffer);
             scanGroupSumsCS.Dispatch(m_scanGroupSumsKernelID, m_scanThreadGroupsGroupX, 1, 1);
+#if UNITY_EDITOR
             if (groupScanDebug)
             {
                 groupScanDebug = false;
@@ -481,6 +490,7 @@ public class MilkInstancer : MonoBehaviour
                     Debug.Log(data[i]);
                 }
             }
+#endif
             // Shadows
             scanGroupSumsCS.SetBuffer(m_scanGroupSumsKernelID, _GroupSumArrayIn, m_shadowGroupSumArrayBuffer);
             scanGroupSumsCS.SetBuffer(m_scanGroupSumsKernelID, _GroupSumArrayOut, m_shadowsScannedGroupSumBuffer);
@@ -527,6 +537,7 @@ public class MilkInstancer : MonoBehaviour
             m_paddingInput[1] = 0;
             m_paddingBuffer.SetData(m_paddingInput);
             Graphics.ExecuteCommandBufferAsync(m_sortingCommandBuffer, ComputeQueueType.Background);
+#if UNITY_EDITOR
             if (sortDebug)
             {
                 sortDebug = false;
@@ -537,7 +548,7 @@ public class MilkInstancer : MonoBehaviour
                     Debug.Log(data[i].distanceToCam);
                 }
             }
-            
+#endif
         }
         Profiler.EndSample();
     }
@@ -580,7 +591,8 @@ public class MilkInstancer : MonoBehaviour
     {
         initialized = InitializeRenderer(ref _instances);
     }
-    [HideInInspector] public uint[] cullingPerType;
+    [HideInInspector] public uint[] FrustumCullingPerType;
+    [HideInInspector] public uint[] OcclusionCullingPerType;
     [HideInInspector] public float[] lod0RangePerType;
     [HideInInspector] public float[] lod1RangePerType;
     [HideInInspector] public float[] distancePerType;
@@ -614,8 +626,10 @@ public class MilkInstancer : MonoBehaviour
         lod0RangePerType = new float[m_numberOfInstanceTypes];
         lod1RangePerType = new float[m_numberOfInstanceTypes];
         distancePerType = new float[m_numberOfInstanceTypes];
-        cullingPerType = new uint[m_numberOfInstanceTypes];
-        uint forceCullingOff = (uint)(enableOcclusionCulling ? 1 : 0);
+        FrustumCullingPerType = new uint[m_numberOfInstanceTypes];
+        OcclusionCullingPerType = new uint[m_numberOfInstanceTypes];
+        uint forceoccCullingOff = (uint)(enableOcclusionCulling ? 1 : 0);
+        uint forcefrusCullingOff = (uint)(enableFrustumCulling ? 1 : 0);
         //for (int i = 0; i < cullingPerType.Length; i++)
         //{
         //    cullingPerType[i] = 1 * forceCullingOff;
@@ -629,7 +643,8 @@ public class MilkInstancer : MonoBehaviour
             for (int t = 0; t < max; t++)
             {
                 instanceShadowCastingModes[currentInstanceType] = iid.instanceShadowCastingMode;
-                cullingPerType[currentInstanceType] = (uint)(iid.EnableOcclusionCulling ? 1 : 0) * forceCullingOff;
+                FrustumCullingPerType[currentInstanceType] = (uint)(iid.EnableFrustumCulling ? 1 : 0) * forcefrusCullingOff;
+                OcclusionCullingPerType[currentInstanceType] = (uint)(iid.EnableOcclusionCulling ? 1 : 0) * forceoccCullingOff;
                 lod0RangePerType[currentInstanceType] = iid.lod0Range;
                 lod1RangePerType[currentInstanceType] = iid.lod1Range;
                 distancePerType[currentInstanceType] = iid.maxRenderRange;
@@ -901,9 +916,13 @@ public class MilkInstancer : MonoBehaviour
         distancePerTypeBuffer.SetData(distancePerType);
         occlusionCS.SetBuffer(m_occlusionKernelID, _DistancePerType, distancePerTypeBuffer);
 
+        frustCulPerType = new ComputeBuffer(m_numberOfInstanceTypes, sizeof(uint), ComputeBufferType.Default);
+        frustCulPerType.SetData(FrustumCullingPerType);
+        occlusionCS.SetBuffer(m_occlusionKernelID, _FrustumCullingPerType, frustCulPerType);
+
         occCulPerType = new ComputeBuffer(m_numberOfInstanceTypes, sizeof(uint), ComputeBufferType.Default);
-        occCulPerType.SetData(cullingPerType);
-        occlusionCS.SetBuffer(m_occlusionKernelID, _CullingPerType, occCulPerType);
+        occCulPerType.SetData(OcclusionCullingPerType);
+        occlusionCS.SetBuffer(m_occlusionKernelID, _OcclusionCullingPerType, occCulPerType);
 
         occlusionCS.SetInt(_ShouldFrustumCull, enableFrustumCulling ? 1 : 0);
         //occlusionCS.SetInt(_ShouldOcclusionCull, enableOcclusionCulling ? 1 : 0);
@@ -1187,6 +1206,7 @@ public class MilkInstancer : MonoBehaviour
         ReleaseComputeBuffer(ref lod1RangePerTypeBuffer);
         ReleaseComputeBuffer(ref distancePerTypeBuffer);
         ReleaseComputeBuffer(ref occCulPerType);
+        ReleaseComputeBuffer(ref frustCulPerType);
         ReleaseComputeBuffer(ref m_paddingBuffer); 
         ReleaseComputeBuffer(ref m_keysBuffer); 
         ReleaseComputeBuffer(ref m_tempBuffer); 
@@ -1258,7 +1278,7 @@ public class MilkInstancer : MonoBehaviour
         yield return new WaitForSeconds(.1f);
         DestroyImmediate(obj);
     }
-    #endregion
+#endregion
     public RenderTexture depthTexture;
     public RenderTexture getDepthTexture()
     {

@@ -53,6 +53,7 @@ StructuredBuffer<float> _perTypeLod0Range;
 StructuredBuffer<float> _perTypeLod1Range;
 StructuredBuffer<float> _perTypeRenderDistance;
 StructuredBuffer<uint> _perTypeOcclusionCull;
+StructuredBuffer<uint> _perTypeFrustumCull;
 StructuredBuffer<InstanceData> _InstanceDataBuffer;
 RWStructuredBuffer<uint> _ArgsBuffer;
 RWStructuredBuffer<uint> _IsVisibleBuffer;
@@ -232,7 +233,7 @@ inline void CSMain (
     if (IsCameraOutsideObjBounds(_CamPosition, minPos, maxPos))
     {
         // Do we pass the frustum culling...?
-        isVisible *= _ShouldFrustumCull ? isInFrustum : 1;
+        isVisible *= _perTypeFrustumCull[drawCall / 15] ? isInFrustum : 1;
 
         isVisible *= isWithinDistance(minDistanceToCamera, _perTypeRenderDistance[drawCall / 15]);
         

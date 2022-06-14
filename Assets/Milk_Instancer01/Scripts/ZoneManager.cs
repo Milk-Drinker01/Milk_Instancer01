@@ -389,6 +389,7 @@ public class ZoneManager : MonoBehaviour
     }
 
     [HideInInspector] public bool oldCountTotalInstances;
+#if UNITY_EDITOR
     private void OnValidate()
     {
         for (int i = 0; i < instanceTypes.Length; i++)
@@ -413,6 +414,7 @@ public class ZoneManager : MonoBehaviour
             countAllInstances();
         }
     }
+#endif
     public void zoneSizeChanged()
     {
         if (Mathf.Approximately(zoneSize, oldZoneSize))
@@ -713,7 +715,7 @@ public class ZoneManager : MonoBehaviour
         }
     }
 }
-
+#if UNITY_EDITOR
 [CustomEditor(typeof(ZoneManager))]
 public class ZoneManagerEditor : Editor
 {
@@ -735,6 +737,7 @@ public class ZoneManagerEditor : Editor
         }
     }
 }
+#endif
 [System.Serializable]
 public class PaintablePrefab
 {
@@ -764,6 +767,7 @@ public class PaintablePrefab
     public float RotateToNormalBias;
     //public ShadowCastingMode instanceShadowCastingMode = ShadowCastingMode.Off;
     public bool instanceShadowCastingMode = false;
+    public bool EnableFrustumCulling = true;
     public bool EnableOcclusionCulling = true;
 
     [HideInInspector] public zoneInstanceData transformData;
