@@ -40,7 +40,6 @@ RWStructuredBuffer<uint> _ScannedInstancePredicates; //result
 //--------------------------------------------------------------------------------------
 
 // Based on Parallel Prefix Sum (Scan) with CUDA by Mark Harris
-int _num;
 [numthreads(THREAD_GROUP_SIZE_X, THREAD_GROUP_SIZE_Y, THREAD_GROUP_SIZE_Z)]
 inline void CSMain (
         in uint3 _dispatchThreadID : SV_DispatchThreadID, // DispatchThreadID  = dot(GroupID, numthreads) + GroupThreadId;
@@ -50,10 +49,6 @@ inline void CSMain (
     )        
 {
     int tID = (int) _dispatchThreadID.x;
-    /*if (2 * tID + 1 >= _num)
-    {
-        return;
-    }*/
     int groupTID = (int) _groupThreadID.x;
     int groupID = (int) _groupID.x;
 

@@ -48,7 +48,6 @@ RWStructuredBuffer<Indirect2x2Matrix> _InstancesCulledMatrixRows45;
 // Kernels & Functions
 //--------------------------------------------------------------------------------------
 
-int _count;
 // Based on Parallel Prefix Sum (Scan) with CUDA by Mark Harris
 [numthreads(THREAD_GROUP_SIZE_X, THREAD_GROUP_SIZE_Y, THREAD_GROUP_SIZE_Z)]
 inline void CSMain (
@@ -59,10 +58,6 @@ inline void CSMain (
     )
 {
     uint tID = _dispatchThreadID.x;
-    if (tID >= (uint)_count)
-    {
-        return;
-    }
     uint groupID = _groupID.x;
     uint groupSum = groupID > 0 ? _GroupSumArray[groupID] : 0;
     //scatter results

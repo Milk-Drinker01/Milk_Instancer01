@@ -51,8 +51,6 @@ public class MilkInstancer : MonoBehaviour
     public bool enableOcclusionCulling = true;
     public bool enableDetailCulling = true;
     public bool enableLOD = true;
-    public float lod0Range = 15;
-    public float lod1Range = 50;
     [Range(00.00f, .05f)] public float detailCullingPercentage = 0.005f;
 
     [HideInInspector] public Camera mainCam;
@@ -526,6 +524,15 @@ public class MilkInstancer : MonoBehaviour
         }
         Profiler.EndSample();
 
+        //temp solution for single pass instanced
+        //uint[] args = new uint[m_instancesArgsBuffer.count];
+        //m_instancesArgsBuffer.GetData(args);
+        //for (int i = 0; i < (args.Length / 5) - 1; i++)
+        //{
+        //    args[(i * 5) + 1] *= 2;
+        //}
+        //m_instancesArgsBuffer.SetData(args);
+
         //////////////////////////////////////////////////////
         // Sort the position buffer based on distance from camera
         //////////////////////////////////////////////////////
@@ -868,17 +875,8 @@ public class MilkInstancer : MonoBehaviour
         createDrawDataBufferCS.SetBuffer(m_createDrawDataBufferKernelID, _InstancesDrawMatrixRows01, m_instancesMatrixRows01);
         createDrawDataBufferCS.SetBuffer(m_createDrawDataBufferKernelID, _InstancesDrawMatrixRows23, m_instancesMatrixRows23);
         createDrawDataBufferCS.SetBuffer(m_createDrawDataBufferKernelID, _InstancesDrawMatrixRows45, m_instancesMatrixRows45);
-        //int groupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
+
         int groupX = Mathf.Max(1, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
-        //int groupX = Mathf.Max(1, Mathf.CeilToInt((float)m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE)));
-
-        createDrawDataBufferCS.SetInt(Shader.PropertyToID("_count"), m_numberOfInstances);
-        scanInstancesCS.SetInt(Shader.PropertyToID("_num"), m_numberOfInstances);
-        copyInstanceDataCS.SetInt(Shader.PropertyToID("_count"), m_numberOfInstances);
-        occlusionCS.SetInt(Shader.PropertyToID("_count"), m_numberOfInstances);
-        occlusionCS.SetFloat(Shader.PropertyToID("LOD00_RANGE"), lod0Range);
-        occlusionCS.SetFloat(Shader.PropertyToID("LOD01_RANGE"), lod1Range);
-
         createDrawDataBufferCS.Dispatch(m_createDrawDataBufferKernelID, groupX, 1, 1);
 
         ReleaseComputeBuffer(ref positionsBuffer);
