@@ -61,6 +61,7 @@ public class ZoneManager : MonoBehaviour
     }
     void enterNewZone(int zonePositionX, int zonePositionZ)
     {
+        Debug.Log(oldZoneSize);
         totalActiveInstances = 0;
         zoneInstanceData[] newData = new zoneInstanceData[instanceTypes.Length];
 

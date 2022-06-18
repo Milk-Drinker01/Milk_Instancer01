@@ -9,6 +9,7 @@
 //--------------------------------------------------------------------------------------
 
 #pragma kernel CSMain
+#pragma kernel SinglePassInstancedSetup
 
 //--------------------------------------------------------------------------------------
 // Constants
@@ -44,6 +45,8 @@ RWStructuredBuffer<Indirect2x2Matrix> _InstancesCulledMatrixRows01;
 RWStructuredBuffer<Indirect2x2Matrix> _InstancesCulledMatrixRows23;
 RWStructuredBuffer<Indirect2x2Matrix> _InstancesCulledMatrixRows45;
 
+int _count;
+
 //--------------------------------------------------------------------------------------
 // Kernels & Functions
 //--------------------------------------------------------------------------------------
@@ -58,6 +61,10 @@ inline void CSMain (
     )
 {
     uint tID = _dispatchThreadID.x;
+    if (tID >= (uint) _count)
+    {
+        return;
+    }
     uint groupID = _groupID.x;
     uint groupSum = groupID > 0 ? _GroupSumArray[groupID] : 0;
     //scatter results
@@ -86,4 +93,10 @@ inline void CSMain (
         }
     }
     
+}
+
+[numthreads(THREAD_GROUP_SIZE_X, 1, 1)]
+void SinglePassInstancedSetup(uint3 id : SV_DispatchThreadID)
+{
+    _DrawcallDataOut[(id.x * 5) + 1] *= 2;
 }

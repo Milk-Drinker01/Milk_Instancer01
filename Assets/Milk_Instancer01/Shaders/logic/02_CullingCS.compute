@@ -154,6 +154,7 @@ inline uint isWithinDistance(float dist, float maxDist)
 // Kernels
 //--------------------------------------------------------------------------------------
 
+int _count;
 [numthreads(THREAD_GROUP_SIZE_X, THREAD_GROUP_SIZE_Y, THREAD_GROUP_SIZE_Z)]
 inline void CSMain (
         in uint3 _dispatchThreadID : SV_DispatchThreadID, // DispatchThreadID  = dot(GroupID, numthreads) + GroupThreadId;
@@ -164,6 +165,10 @@ inline void CSMain (
 {
     // Calculate the instance index
     uint tID = _dispatchThreadID.x;
+    if (tID >= (uint) _count)
+    {
+        return;
+    }
     SortingData sortingData = _SortingData[tID];
     uint drawCall = (sortingData.drawCallInstanceIndex >> 16);
     uint index = (sortingData.drawCallInstanceIndex) & 0xFFFF;
