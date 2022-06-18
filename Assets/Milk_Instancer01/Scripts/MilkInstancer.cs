@@ -889,19 +889,10 @@ public class MilkInstancer : MonoBehaviour
         // InitConstantComputeVariables
         //-----------------------------------
 
-        //m_occlusionGroupX = Mathf.Max(1, m_numberOfInstances / 64);
-        //m_scanInstancesGroupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
-        //m_copyInstanceDataGroupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
-
-        m_occlusionGroupX = Mathf.Max(1, nextPowerOfTwo / 64);
-        m_scanInstancesGroupX = Mathf.Max(1, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
+        m_occlusionGroupX = Mathf.Max(1, m_numberOfInstances / 64);
+        m_scanInstancesGroupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
         m_scanThreadGroupsGroupX = 1;
-        m_copyInstanceDataGroupX = Mathf.Max(1, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
-
-        //m_occlusionGroupX = Mathf.Max(1, Mathf.CeilToInt((float)m_numberOfInstances / 64));
-        //m_scanInstancesGroupX = Mathf.Max(1, Mathf.CeilToInt((float)m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE)));
-        //m_scanThreadGroupsGroupX = 1;
-        //m_copyInstanceDataGroupX = Mathf.Max(1, Mathf.CeilToInt((float)m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE)));
+        m_copyInstanceDataGroupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
 
 
         lod0RangePerTypeBuffer = new ComputeBuffer(m_numberOfInstanceTypes, sizeof(float), ComputeBufferType.Default);
