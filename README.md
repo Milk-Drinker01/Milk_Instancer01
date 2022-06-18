@@ -5,7 +5,7 @@
  
  ![painting (2)](https://user-images.githubusercontent.com/59656122/150681820-37e0c5b9-d7b3-4eaa-9f09-4b6b49b648e5.gif)
 
- This project is a vastly improved version of elliomans indirect rendering with compute shaders. https://github.com/ellioman/Indirect-Rendering-With-Compute-Shaders
+ This project is built off of elliomans indirect rendering with compute shaders. https://github.com/ellioman/Indirect-Rendering-With-Compute-Shaders
  
  What is different in this version?
   - gpu bitonic sorting is now no longer reliant on powers of two (thanks to EmmetOT - https://github.com/EmmetOT/BufferSorter)
@@ -28,12 +28,9 @@ Features
   - wind shader example (ASE and SG)
   - Multi-Material Prefab support (for things like trees)
   - world streaming/detail zones
-
- Upcoming Features
-  - Single Pass Instanced VR rendering support
+  - VR: supports both multi pass and Single Pass Instanced
  
  What am I still working on?
-  - find and fix bugs
   - URP shaders
   - more spawning methods, perhaps procedural terrain spawning
   - built in renderer support
