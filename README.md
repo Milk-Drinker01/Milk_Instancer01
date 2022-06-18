@@ -31,6 +31,7 @@ Features
   - VR: supports both multi pass and Single Pass Instanced
  
  What am I still working on?
+  - recent update broke both occlusion and frustum culling. it will be fixed soon
   - URP shaders
   - more spawning methods, perhaps procedural terrain spawning
   - built in renderer support
