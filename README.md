@@ -29,7 +29,9 @@ Features
   - Multi-Material Prefab support (for things like trees)
   - world streaming/detail zones
 
-
+ Upcoming Features
+  - Single Pass Instanced VR rendering support
+ 
  What am I still working on?
   - find and fix bugs
   - URP shaders
