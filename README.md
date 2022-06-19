@@ -5,6 +5,10 @@
  
  ![painting (2)](https://user-images.githubusercontent.com/59656122/150681820-37e0c5b9-d7b3-4eaa-9f09-4b6b49b648e5.gif)
 
+ NOTE: THIS VERSION IS FOR HDRP
+  Repo for URP: https://github.com/Milk-Drinker01/Milk_Instancer_URP
+  Repo for Built-in: https://github.com/Milk-Drinker01/Milk_Instancer_Standard
+
  This project is built off of elliomans indirect rendering with compute shaders. https://github.com/ellioman/Indirect-Rendering-With-Compute-Shaders
  
  What is different in this version?
