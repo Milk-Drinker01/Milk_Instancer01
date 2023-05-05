@@ -17,14 +17,19 @@ MonoBehaviour:
   m_MaterialReferences: []
 --- !u!21 &2100000
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Meadow_Grass_01
   m_Shader: {fileID: 4800000, guid: 9a7040f63cba5f444b5e29cb70b66156, type: 3}
-  m_ShaderKeywords: _ALPHATEST_ON _DISABLE_SSR_TRANSPARENT _DOUBLESIDED_ON
+  m_ValidKeywords:
+  - _ALPHATEST_ON
+  - _DOUBLESIDED_ON
+  m_InvalidKeywords:
+  - _DISABLE_SSR_TRANSPARENT
+  - _SHOWWINDUV_OFF
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 1
@@ -330,6 +335,10 @@ Material:
         m_Texture: {fileID: 2800000, guid: 9a1568052101f2f48ba76e7342adc3f3, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -344,7 +353,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - SmoothnessRemapMax: 1
+    - SmoothnessRemapMax: 0
     - SmoothnessRemapMin: 0
     - Vector1_BE4DFE71: 1
     - Vector1_ea94c92fec7a441eb68cacd0eef8e37e: 2.5
@@ -414,7 +423,7 @@ Material:
     - _DoubleSidedEnable: 1
     - _DoubleSidedGIMode: 0
     - _DoubleSidedMirrorEnable: 1
-    - _DoubleSidedNormalMode: 1
+    - _DoubleSidedNormalMode: 2
     - _Drag: 1
     - _DstBlend: 0
     - _EmissiveColorMode: 1
@@ -486,6 +495,7 @@ Material:
     - _SSSAndTransmissionType: 2
     - _ShiverDirectionality: 0.5
     - _ShiverDrag: 0.2
+    - _ShowWindUV: 0
     - _Smoothness: 1
     - _SmoothnessMax: 1
     - _SmoothnessMin: 0
@@ -578,19 +588,20 @@ Material:
     - _ZTestModeDistortion: 8
     - _ZTestTransparent: 4
     - _ZWrite: 1
-    - _maxHeight: 0.5
+    - __dirty: 1
+    - _maxHeight: 0.25
     m_Colors:
     - Color_04500f19baa84583836202bf89a0365f: {r: 0.63862437, g: 0.7830188, b: 0.5133945, a: 1}
     - Color_e2e3f8be3d5b47b2b08e310eda1e260f: {r: 0.5115637, g: 0.6415094, b: 0.28141677, a: 1}
     - Color_e519dd38f0284671addb65918fb74053: {r: 0.45510185, g: 0.6509434, b: 0.37152898, a: 1}
     - _BackfaceBaseColorScale: {r: 1, g: 1, b: 1, a: 1}
-    - _BaseColor: {r: 0.94509804, g: 0.94509804, b: 0.94509804, a: 1}
+    - _BaseColor: {r: 0.7607843, g: 0.8, b: 0.69803923, a: 1}
     - _BaseColorMap_MipInfo: {r: 0, g: 0, b: 0, a: 0}
     - _BaseColorRandomize: {r: 0, g: 0, b: 0, a: 0.05}
-    - _Color: {r: 0.945098, g: 0.945098, b: 0.945098, a: 1}
+    - _Color: {r: 0.7607843, g: 0.8, b: 0.69803923, a: 1}
     - _DiffusionProfileAsset: {r: 2.2888926e+38, g: 1.2389358e-26, b: 7.69327e-37, a: 0.00018220427}
     - _DiffusionProfile_Asset: {r: 2.2888926e+38, g: 1.2389358e-26, b: 7.69327e-37, a: 0.00018220427}
-    - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
+    - _DoubleSidedConstants: {r: 1, g: 1, b: 1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _EmissiveColor: {r: 0, g: 0, b: 0, a: 1}
     - _EmissiveColorLDR: {r: 0, g: 0, b: 0, a: 1}
@@ -608,6 +619,7 @@ Material:
     - _UVMappingMask: {r: 1, g: 0, b: 0, a: 0}
     - _UVMappingMaskEmissive: {r: 1, g: 0, b: 0, a: 0}
     - _UVTilingAndOffset: {r: 1, g: 1, b: 0, a: 0}
+    - _Vector1: {r: 0, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &5347188803471470026
 MonoBehaviour:

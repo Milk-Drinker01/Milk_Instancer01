@@ -28,8 +28,8 @@
 
 cbuffer CB
 {
-    uint _ShouldFrustumCull;
-    uint _ShouldOcclusionCull;
+    //uint _ShouldFrustumCull;
+    //uint _ShouldOcclusionCull;
     uint _ShouldDetailCull;
     uint _ShouldLOD;
     uint _ShouldOnlyUseLOD02Shadows;

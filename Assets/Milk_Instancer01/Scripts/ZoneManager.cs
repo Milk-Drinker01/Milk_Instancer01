@@ -32,9 +32,11 @@ public class ZoneManager : MonoBehaviour
     int lastZ = int.MinValue;
     public void resetPos()
     {
+        //Debug.Log("position reset");
         lastX = int.MinValue;
         lastZ = int.MinValue;
     }
+    bool firstTime = true;
     private void Update()
     {
         if (instanceTypes == null)
@@ -54,14 +56,21 @@ public class ZoneManager : MonoBehaviour
         int zonePositionZ = getZone(instancer.mainCam.transform.position.z);
         if (zonePositionX != lastX || zonePositionZ != lastZ)
         {
+            //Debug.Log("entering new zone");
             enterNewZone(zonePositionX, zonePositionZ);
             lastX = zonePositionX;
             lastZ = zonePositionZ;
+            if (firstTime)
+            {
+                //this is a really lazy workaround for stuff not working instancing not loading properly the first time in build
+                firstTime = false;
+                resetPos();
+            }
         }
     }
     void enterNewZone(int zonePositionX, int zonePositionZ)
     {
-        Debug.Log(oldZoneSize);
+        //Debug.Log(oldZoneSize);
         totalActiveInstances = 0;
         zoneInstanceData[] newData = new zoneInstanceData[instanceTypes.Length];
 
@@ -668,7 +677,7 @@ public class ZoneManager : MonoBehaviour
             _prefabs[i] = instanceTypes[i].prefabToPaint;
         }
     }
-    void setInstanceMaterials(int i)
+    public void setInstanceMaterials(int i)
     {
         instanceTypes[i].lodMaterialIndexes = new gayWorkAround[3];
         instanceTypes[i].lodMaterialIndexes[0] = new gayWorkAround();
@@ -724,9 +733,23 @@ public class ZoneManagerEditor : Editor
     {
         base.OnInspectorGUI();
         ZoneManager t = (ZoneManager)target;
-        if (GUILayout.Button("Confirm New Zone Size (could be slow)"))
+        if (GUILayout.Button("Update Instance type Materials"))
         {
-            t.zoneSizeChanged();
+            for (int i = 0; i < t.instanceTypes.Length; i++)
+            {
+                if (t.instanceTypes[i].prefabToPaint != null)
+                {
+                    t.setInstanceMaterials(i);
+                }
+            }
+            t.resetPos();
+        }
+        if (t.zoneSize != t.oldZoneSize)
+        {
+            if (GUILayout.Button("Confirm New Zone Size (could be slow)"))
+            {
+                t.zoneSizeChanged();
+            }
         }
         if (t.countTotalInstances)
         {
@@ -778,7 +801,7 @@ public class PaintablePrefab
     //[HideInInspector] public uint _oldId;
     [HideInInspector] public Mesh[] LODMeshes = new Mesh[3];
 
-    [HideInInspector] public Material[] indirectMaterial;
+    public Material[] indirectMaterial;
 
     [HideInInspector] public gayWorkAround[] lodMaterialIndexes = new gayWorkAround[3];
 }

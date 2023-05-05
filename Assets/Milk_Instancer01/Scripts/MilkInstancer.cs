@@ -220,7 +220,7 @@ public class MilkInstancer : MonoBehaviour
     }
     private void LateUpdate()
     {
-        renderInstances(mainCam);
+        RenderInstances(mainCam);
     }
     bool rendered = false;
     void preRender(UnityEngine.Rendering.ScriptableRenderContext context, Camera camera)
@@ -307,10 +307,10 @@ public class MilkInstancer : MonoBehaviour
     Bounds m_bounds;
 
 #region draw
-    public void renderInstances(Camera cam)
+    public void RenderInstances(Camera cam)
     {
         rendered = false;
-        if (indirectMeshes == null || indirectMeshes.Length == 0 || hiZDepthTexture == null || !initialized)
+        if (indirectMeshes == null || indirectMeshes.Length == 0 || !initialized)
         {
             return;
         }
@@ -623,6 +623,7 @@ public class MilkInstancer : MonoBehaviour
     [HideInInspector] public float[] lod0RangePerType;
     [HideInInspector] public float[] lod1RangePerType;
     [HideInInspector] public float[] distancePerType;
+    Texture2D blankDepthTexture;
     public bool InitializeRenderer(ref PaintablePrefab[] _instances)
     {
         if (!TryGetKernels())
@@ -657,6 +658,13 @@ public class MilkInstancer : MonoBehaviour
         OcclusionCullingPerType = new uint[m_numberOfInstanceTypes];
         uint forceoccCullingOff = (uint)(enableOcclusionCulling ? 1 : 0);
         uint forcefrusCullingOff = (uint)(enableFrustumCulling ? 1 : 0);
+#if UNITY_EDITOR
+        if (Application.isPlaying)
+        {
+            forceoccCullingOff *= 0;
+            forcefrusCullingOff *= 0;
+        }
+#endif
         //for (int i = 0; i < cullingPerType.Length; i++)
         //{
         //    cullingPerType[i] = 1 * forceCullingOff;
@@ -781,7 +789,9 @@ public class MilkInstancer : MonoBehaviour
                 currentInstanceType++;
             }
         }
+
         nextPowerOfTwo = Mathf.NextPowerOfTwo(m_numberOfInstances);
+        //nextPowerOfTwo = (int)Mathf.Pow(2, Mathf.CeilToInt(Mathf.Log(m_numberOfInstances, 2)));
 
         int computeShaderInputSize = Marshal.SizeOf(typeof(IndirectInstanceCSInput));
         int computeShaderDrawMatrixSize = Marshal.SizeOf(typeof(Indirect2x2Matrix));
@@ -887,9 +897,7 @@ public class MilkInstancer : MonoBehaviour
         scaleBuffer.SetData(scales);
         rotationBuffer.SetData(rotations);
 
-
-        //nextPowerOfTwo = (int)Mathf.Pow(2, Mathf.CeilToInt(Mathf.Log(m_numberOfInstances, 2)));
-
+        createDrawDataBufferCS.SetInt(Shader.PropertyToID("_count"), m_numberOfInstances);
         createDrawDataBufferCS.SetBuffer(m_createDrawDataBufferKernelID, _Positions, positionsBuffer);
         createDrawDataBufferCS.SetBuffer(m_createDrawDataBufferKernelID, _Scales, scaleBuffer);
         createDrawDataBufferCS.SetBuffer(m_createDrawDataBufferKernelID, _Rotations, rotationBuffer);
@@ -900,6 +908,9 @@ public class MilkInstancer : MonoBehaviour
         //int groupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
         int groupX = Mathf.Max(1, Mathf.CeilToInt((float)m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE)));
         //groupX = Mathf.Max(1, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
+
+        
+
         createDrawDataBufferCS.Dispatch(m_createDrawDataBufferKernelID, groupX, 1, 1);
 
         ReleaseComputeBuffer(ref positionsBuffer);
@@ -954,7 +965,7 @@ public class MilkInstancer : MonoBehaviour
         occCulPerType.SetData(OcclusionCullingPerType);
         occlusionCS.SetBuffer(m_occlusionKernelID, _OcclusionCullingPerType, occCulPerType);
 
-        occlusionCS.SetInt(_ShouldFrustumCull, enableFrustumCulling ? 1 : 0);
+        //occlusionCS.SetInt(_ShouldFrustumCull, enableFrustumCulling ? 1 : 0);
         //occlusionCS.SetInt(_ShouldOcclusionCull, enableOcclusionCulling ? 1 : 0);
         occlusionCS.SetInt(_ShouldDetailCull, enableDetailCulling ? 1 : 0);
         occlusionCS.SetInt(_ShouldLOD, enableLOD ? 1 : 0);
@@ -962,16 +973,41 @@ public class MilkInstancer : MonoBehaviour
         occlusionCS.SetFloat(_ShadowDistance, QualitySettings.shadowDistance);
         occlusionCS.SetFloat(_ShadowDistance, QualitySettings.shadowDistance);
         occlusionCS.SetFloat(_DetailCullingScreenPercentage, detailCullingPercentage);
-        occlusionCS.SetVector(_HiZTextureSize, new Vector2(hiZDepthTexture.width, hiZDepthTexture.height));
         occlusionCS.SetBuffer(m_occlusionKernelID, _InstanceDataBuffer, m_instanceDataBuffer);
         occlusionCS.SetBuffer(m_occlusionKernelID, _ArgsBuffer, m_instancesArgsBuffer);
         occlusionCS.SetBuffer(m_occlusionKernelID, _ShadowArgsBuffer, m_shadowArgsBuffer);
         occlusionCS.SetBuffer(m_occlusionKernelID, _IsVisibleBuffer, m_instancesIsVisibleBuffer);
         occlusionCS.SetBuffer(m_occlusionKernelID, _ShadowIsVisibleBuffer, m_shadowsIsVisibleBuffer);
-
-        occlusionCS.SetTexture(m_occlusionKernelID, _HiZMap, hiZDepthTexture);
-
         occlusionCS.SetBuffer(m_occlusionKernelID, _SortingData, m_instancesSortingData);
+        //occlusionCS.SetVector(_HiZTextureSize, new Vector2(hiZDepthTexture.width, hiZDepthTexture.height));
+        //occlusionCS.SetTexture(m_occlusionKernelID, _HiZMap, hiZDepthTexture);
+        blankDepthTexture = Resources.Load("EmptyDepth") as Texture2D;
+        if (Application.isPlaying)
+        {
+            //occlusionCS.SetInt(_ShouldFrustumCull, enableFrustumCulling ? 1 : 0);
+            if (enableOcclusionCulling && hiZDepthTexture != null)
+            {
+                occlusionCS.SetVector(_HiZTextureSize, new Vector2(hiZDepthTexture.width, hiZDepthTexture.height));
+                occlusionCS.SetTexture(m_occlusionKernelID, _HiZMap, hiZDepthTexture);
+            }
+            else if (blankDepthTexture)
+            {
+                occlusionCS.SetVector(_HiZTextureSize, Vector2.one);
+                occlusionCS.SetTexture(m_occlusionKernelID, _HiZMap, blankDepthTexture);
+            }
+        }
+        else
+        {
+#if UNITY_EDITOR
+
+            //occlusionCS.SetInt(_ShouldFrustumCull, 0);
+            if (blankDepthTexture != null)
+            {
+                occlusionCS.SetVector(_HiZTextureSize, new Vector2(blankDepthTexture.width, blankDepthTexture.height));
+                occlusionCS.SetTexture(m_occlusionKernelID, _HiZMap, blankDepthTexture);
+            }
+#endif
+        }
 
         //scanGroupSumsCS.SetInt(_NumOfGroups, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
         //scanGroupSumsCS.SetInt(_NumOfGroups, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
