@@ -30,7 +30,7 @@ public class ZoneManager : MonoBehaviour
 
     int lastX = int.MinValue;
     int lastZ = int.MinValue;
-    public void resetPos()
+    public void ResetPosition()
     {
         //Debug.Log("position reset");
         lastX = int.MinValue;
@@ -48,27 +48,27 @@ public class ZoneManager : MonoBehaviour
             TryGetComponent<MilkInstancer>(out instancer);
             return;
         }
-        if (!instancer.mainCam)
+        if (!instancer.GetInstancerCamera())
         {
             return;
         }
-        int zonePositionX = getZone(instancer.mainCam.transform.position.x);
-        int zonePositionZ = getZone(instancer.mainCam.transform.position.z);
+        int zonePositionX = getZone(instancer.GetInstancerCamera().transform.position.x);
+        int zonePositionZ = getZone(instancer.GetInstancerCamera().transform.position.z);
         if (zonePositionX != lastX || zonePositionZ != lastZ)
         {
             //Debug.Log("entering new zone");
-            enterNewZone(zonePositionX, zonePositionZ);
+            EnterNewZone(zonePositionX, zonePositionZ);
             lastX = zonePositionX;
             lastZ = zonePositionZ;
             if (firstTime)
             {
                 //this is a really lazy workaround for stuff not working instancing not loading properly the first time in build
                 firstTime = false;
-                resetPos();
+                ResetPosition();
             }
         }
     }
-    void enterNewZone(int zonePositionX, int zonePositionZ)
+    void EnterNewZone(int zonePositionX, int zonePositionZ)
     {
         //Debug.Log(oldZoneSize);
         totalActiveInstances = 0;
@@ -245,7 +245,7 @@ public class ZoneManager : MonoBehaviour
             positionsx.Clear();
         }
         xAxisData.Clear();
-        resetPos();
+        ResetPosition();
     }
     public void countAllInstances()
     {
@@ -280,7 +280,7 @@ public class ZoneManager : MonoBehaviour
                 xAxisData[xIndex].zAxisData[zIndex].removeData(point, areaSize);
             }
         }
-        resetPos();
+        ResetPosition();
         if (countTotalInstances)
         {
             countAllInstances();
@@ -395,7 +395,7 @@ public class ZoneManager : MonoBehaviour
         {
             countAllInstances();
         }
-        resetPos();
+        ResetPosition();
     }
 
     [HideInInspector] public bool oldCountTotalInstances;
@@ -418,7 +418,7 @@ public class ZoneManager : MonoBehaviour
         {
             //zoneSizeChanged();
         }
-        resetPos();
+        ResetPosition();
         if (countTotalInstances && !oldCountTotalInstances)
         {
             countAllInstances();
@@ -679,10 +679,10 @@ public class ZoneManager : MonoBehaviour
     }
     public void setInstanceMaterials(int i)
     {
-        instanceTypes[i].lodMaterialIndexes = new gayWorkAround[3];
-        instanceTypes[i].lodMaterialIndexes[0] = new gayWorkAround();
-        instanceTypes[i].lodMaterialIndexes[1] = new gayWorkAround();
-        instanceTypes[i].lodMaterialIndexes[2] = new gayWorkAround();
+        instanceTypes[i].lodMaterialIndexes = new WorkAround[3];
+        instanceTypes[i].lodMaterialIndexes[0] = new WorkAround();
+        instanceTypes[i].lodMaterialIndexes[1] = new WorkAround();
+        instanceTypes[i].lodMaterialIndexes[2] = new WorkAround();
 
         List<Material> baseMaterials = new List<Material>();
         List<Material> newMaterials = new List<Material>();
@@ -742,7 +742,7 @@ public class ZoneManagerEditor : Editor
                     t.setInstanceMaterials(i);
                 }
             }
-            t.resetPos();
+            t.ResetPosition();
         }
         if (t.zoneSize != t.oldZoneSize)
         {
@@ -803,10 +803,10 @@ public class PaintablePrefab
 
     public Material[] indirectMaterial;
 
-    [HideInInspector] public gayWorkAround[] lodMaterialIndexes = new gayWorkAround[3];
+    [HideInInspector] public WorkAround[] lodMaterialIndexes = new WorkAround[3];
 }
 [System.Serializable]
-public class gayWorkAround
+public class WorkAround
 {
     public int[] workaround = new int[1];
 }

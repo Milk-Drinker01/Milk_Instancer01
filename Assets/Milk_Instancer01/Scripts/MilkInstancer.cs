@@ -40,6 +40,7 @@ public struct SortingData
 };
 
 [ExecuteInEditMode]
+//[ExecuteAlways]
 public class MilkInstancer : MonoBehaviour
 {
     public static MilkInstancer instance;
@@ -51,14 +52,12 @@ public class MilkInstancer : MonoBehaviour
     public bool enableOcclusionCulling = true;
     public bool enableDetailCulling = true;
     public bool enableLOD = true;
-    public bool isVR;   //this does nothing but make sure idiots dont use single pass instanced when not using vr
+    public bool isVR;   //this does nothing but make sure people dont use single pass instanced when not using vr
     public bool vrRenderingModeIsSinglePassInstanced;
     [Range(00.00f, .05f)] public float detailCullingPercentage = 0.005f;
 
-    [HideInInspector] public Camera mainCam;
-    //public Texture HDRPDepthTexture;
-    public RenderTexture hiZDepthTexture;
-    //public RenderTexture[] hiZMipTextures;
+    private Camera InstancerCamera;
+    public Camera GetInstancerCamera() { return InstancerCamera; }
 
     [Header("Compute Shaders")]
     public ComputeShader createDrawDataBufferCS;
@@ -172,6 +171,8 @@ public class MilkInstancer : MonoBehaviour
     private static readonly int _Lod1RangePerType = Shader.PropertyToID("_perTypeLod1Range");
     private static readonly int _DistancePerType = Shader.PropertyToID("_perTypeRenderDistance");
     #endregion
+
+    private RenderTexture HiZDepthTexture;
     private int m_numberOfInstanceTypes;
     private int m_numberOfInstances;
     private int m_occlusionGroupX;
@@ -180,6 +181,7 @@ public class MilkInstancer : MonoBehaviour
     private int m_copyInstanceDataGroupX;
     private bool m_debugLastDrawLOD = false;
     private uint[] m_args;
+    private Bounds m_bounds;
 
     private const int NUMBER_OF_DRAW_CALLS = 3; // (LOD00 + LOD01 + LOD02)
     private const int NUMBER_OF_ARGS_PER_DRAW = 5; // (indexCount, instanceCount, startIndex, baseVertex, startInstance)
@@ -191,14 +193,14 @@ public class MilkInstancer : MonoBehaviour
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        checkIfOnlyInstance();
+        CheckIfOnlyInstance();
     }
 #endif
     float maxShadowDistance = 150;
     private void Awake()
     {
 #if UNITY_EDITOR
-        checkIfOnlyInstance();
+        CheckIfOnlyInstance();
 #endif
         if (QualitySettings.renderPipeline == null)
         {
@@ -216,100 +218,78 @@ public class MilkInstancer : MonoBehaviour
                 }
             }
         }
-        mainCam = Camera.main;
     }
-    private void LateUpdate()
-    {
-        RenderInstances(mainCam);
-    }
-    bool rendered = false;
-    void preRender(UnityEngine.Rendering.ScriptableRenderContext context, Camera camera)
-    {
-        if (rendered)
-        {
-            return;
-        }
-        rendered = true;
-        if (Application.isPlaying)
-        {
-            if (camera == Camera.main)
-            {
-                //renderInstances(camera);
-                //renderInstances(camera);
-                mainCam = camera;
-            }
-            else if (camera.cameraType == CameraType.SceneView)
-            {
-                //renderInstances(Camera.main);
-                mainCam = Camera.main;
-            }
-        }
-        else
-        {
-            if (camera.cameraType == CameraType.SceneView)
-            {
-                //renderInstances(camera);
-                mainCam = camera;
-            }
-        }
-    }
+    
     private void OnEnable()
     {
         if (GetComponent<ZoneManager>())
         {
-            GetComponent<ZoneManager>().resetPos();
+            GetComponent<ZoneManager>().ResetPosition();
         }
         //UnityEngine.Rendering.RenderPipelineManager.endCameraRendering += renderingDone;
-        UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering += preRender;
+        UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering += PreRender;
 #if UNITY_EDITOR
-        SceneView.onSceneGUIDelegate += OnScene;
+        //SceneView.onSceneGUIDelegate += OnScene;
+        SceneView.duringSceneGui += OnScene;
 #endif
     }
     private void OnDisable()
     {
         ReleaseBuffers();
         //UnityEngine.Rendering.RenderPipelineManager.endCameraRendering -= renderingDone;
-        UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= preRender;
-        if (hiZDepthTexture != null)
+        UnityEngine.Rendering.RenderPipelineManager.beginCameraRendering -= PreRender;
+        if (HiZDepthTexture != null)
         {
-            hiZDepthTexture.Release();
-            hiZDepthTexture = null;
+            HiZDepthTexture.Release();
+            HiZDepthTexture = null;
         }
-
-        //if (tempDepthTextureForArray != null)
-        //{
-        //    tempDepthTextureForArray.Release();
-        //    tempDepthTextureForArray = null;
-        //}
-
-        //if (hiZMipTextures != null)
-        //{
-        //    for (int i = 0; i < hiZMipTextures.Length; i++)
-        //    {
-        //        if (hiZMipTextures[i] != null)
-        //        {
-        //            hiZMipTextures[i].Release();
-        //        }
-        //    }
-        //    hiZMipTextures = null;
-        //}
 #if UNITY_EDITOR
-        SceneView.onSceneGUIDelegate -= OnScene;
+        //SceneView.onSceneGUIDelegate -= OnScene;
+        SceneView.duringSceneGui -= OnScene;
+#endif
+    }
+#if UNITY_EDITOR
+    void OnScene(SceneView scene)
+    {
+        //force unity to repaint the scene view, and trigger an update in edit mode
+        UnityEditor.EditorApplication.QueuePlayerLoopUpdate();
+        UnityEditor.SceneView.RepaintAll();
+    }
+#endif
+    void PreRender(UnityEngine.Rendering.ScriptableRenderContext context, Camera camera)
+    {
+        if (Camera.main)
+            InstancerCamera = Camera.main;
+
+#if UNITY_EDITOR
+        if (!Application.isPlaying)
+        {
+            if (camera.cameraType == CameraType.SceneView)
+                InstancerCamera = camera;
+        }
+        else
+        {
+            if (camera == Camera.main)
+                InstancerCamera = camera;
+            else if (camera.cameraType == CameraType.SceneView)
+                InstancerCamera = Camera.main;
+        }
 #endif
     }
     private void OnDestroy()
     {
         ReleaseBuffers();
     }
-    Vector3 camPosition;
-    Matrix4x4 m_MVP;
 
-    Bounds m_bounds;
+    private void LateUpdate()
+    {
+        RenderInstances(InstancerCamera);
+    }
 
 #region draw
     public void RenderInstances(Camera cam)
     {
-        rendered = false;
+        //Debug.Log(cam.name);
         if (indirectMeshes == null || indirectMeshes.Length == 0 || !initialized)
         {
             return;
@@ -398,6 +378,9 @@ public class MilkInstancer : MonoBehaviour
             }
         }
     }
+
+    Vector3 cameraPosition;
+    Matrix4x4 m_MVP;
     private void CalculateVisibleInstances(Camera cam)
     {
         if (cam == null)
@@ -405,8 +388,8 @@ public class MilkInstancer : MonoBehaviour
             return;
         }
         // Global data
-        camPosition = cam.transform.position;
-        m_bounds.center = camPosition;
+        cameraPosition = cam.transform.position;
+        m_bounds.center = cameraPosition;
 
         //Matrix4x4 m = mainCamera.transform.localToWorldMatrix;
         Matrix4x4 v = cam.worldToCameraMatrix;
@@ -433,7 +416,7 @@ public class MilkInstancer : MonoBehaviour
             // Input
             occlusionCS.SetFloat(_ShadowDistance, maxShadowDistance);
             occlusionCS.SetMatrix(_UNITY_MATRIX_MVP, m_MVP);
-            occlusionCS.SetVector(_CamPosition, camPosition);
+            occlusionCS.SetVector(_CamPosition, cameraPosition);
 
             // Dispatch
             occlusionCS.Dispatch(m_occlusionKernelID, m_occlusionGroupX, 1, 1);
@@ -623,7 +606,6 @@ public class MilkInstancer : MonoBehaviour
     [HideInInspector] public float[] lod0RangePerType;
     [HideInInspector] public float[] lod1RangePerType;
     [HideInInspector] public float[] distancePerType;
-    Texture2D blankDepthTexture;
     public bool InitializeRenderer(ref PaintablePrefab[] _instances)
     {
         if (!TryGetKernels())
@@ -641,8 +623,14 @@ public class MilkInstancer : MonoBehaviour
         m_numberOfInstances = 0;
         m_bounds.center = Vector3.zero;
         m_bounds.extents = Vector3.one * 10000;
-        //createDepthTexture();
-        hiZDepthTexture = getDepthTexture();
+        if (enableOcclusionCulling && TryGetComponent<RenderPipelineSetup>(out RenderPipelineSetup PipelineSetup))
+        {
+            HiZDepthTexture = PipelineSetup.GetDepthTexture();
+        }
+        else
+        {
+            HiZDepthTexture = RenderPipelineSetup.CreateDepthTexture(1,1);
+        }
         indirectMeshes = new IndirectRenderingMesh[m_numberOfInstanceTypes];
         
         m_args = new uint[m_numberOfInstanceTypes * NUMBER_OF_ARGS_PER_INSTANCE_TYPE];
@@ -659,7 +647,7 @@ public class MilkInstancer : MonoBehaviour
         uint forceoccCullingOff = (uint)(enableOcclusionCulling ? 1 : 0);
         uint forcefrusCullingOff = (uint)(enableFrustumCulling ? 1 : 0);
 #if UNITY_EDITOR
-        if (Application.isPlaying)
+        if (!Application.isPlaying)
         {
             forceoccCullingOff *= 0;
             forcefrusCullingOff *= 0;
@@ -769,7 +757,8 @@ public class MilkInstancer : MonoBehaviour
 
                     // Calculate the renderer bounds
                     Bounds b = new Bounds();
-                    b.center = iid.transformData.positions[j];
+                    b.center = iid.transformData.positions[j] + originalBounds.center;
+                    //b.center = originalBounds.center;
                     Vector3 s = originalBounds.size;
                     s.Scale(iid.transformData.scales[j]);
                     b.size = s;
@@ -790,7 +779,7 @@ public class MilkInstancer : MonoBehaviour
             }
         }
 
-        nextPowerOfTwo = Mathf.NextPowerOfTwo(m_numberOfInstances);
+        int nextPowerOfTwo = Mathf.NextPowerOfTwo(m_numberOfInstances);
         //nextPowerOfTwo = (int)Mathf.Pow(2, Mathf.CeilToInt(Mathf.Log(m_numberOfInstances, 2)));
 
         int computeShaderInputSize = Marshal.SizeOf(typeof(IndirectInstanceCSInput));
@@ -905,11 +894,7 @@ public class MilkInstancer : MonoBehaviour
         createDrawDataBufferCS.SetBuffer(m_createDrawDataBufferKernelID, _InstancesDrawMatrixRows23, m_instancesMatrixRows23);
         createDrawDataBufferCS.SetBuffer(m_createDrawDataBufferKernelID, _InstancesDrawMatrixRows45, m_instancesMatrixRows45);
 
-        //int groupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
         int groupX = Mathf.Max(1, Mathf.CeilToInt((float)m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE)));
-        //groupX = Mathf.Max(1, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
-
-        
 
         createDrawDataBufferCS.Dispatch(m_createDrawDataBufferKernelID, groupX, 1, 1);
 
@@ -921,23 +906,10 @@ public class MilkInstancer : MonoBehaviour
         // InitConstantComputeVariables
         //-----------------------------------
 
-        //m_occlusionGroupX = Mathf.Max(1, m_numberOfInstances / 64);
-        //m_scanInstancesGroupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
-        //m_scanThreadGroupsGroupX = 1;
-        //m_copyInstanceDataGroupX = Mathf.Max(1, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
-
         m_occlusionGroupX = Mathf.Max(1, nextPowerOfTwo / 64);
         m_scanInstancesGroupX = Mathf.Max(1, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
         m_scanThreadGroupsGroupX = 1;
         m_copyInstanceDataGroupX = Mathf.Max(1, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
-
-        ////m_occlusionGroupX = Mathf.Max(1, Mathf.NextPowerOfTwo(Mathf.CeilToInt((float)m_numberOfInstances / 64)));
-        //m_occlusionGroupX = Mathf.Max(1, Mathf.CeilToInt((float)m_numberOfInstances / 64));
-        ////m_scanInstancesGroupX = Mathf.Max(1, Mathf.NextPowerOfTwo(Mathf.CeilToInt((float)m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE))));
-        //m_scanInstancesGroupX = Mathf.Max(1, Mathf.CeilToInt((float)m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE)));
-        //m_scanThreadGroupsGroupX = 1;
-        ////m_copyInstanceDataGroupX = Mathf.Max(1, Mathf.NextPowerOfTwo(Mathf.CeilToInt((float)m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE))));
-        //m_copyInstanceDataGroupX = Mathf.Max(1, Mathf.CeilToInt((float)m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE)));
 
         createDrawDataBufferCS.SetInt(Shader.PropertyToID("_count"), m_numberOfInstances);
         occlusionCS.SetInt(Shader.PropertyToID("_count"), m_numberOfInstances);
@@ -965,8 +937,6 @@ public class MilkInstancer : MonoBehaviour
         occCulPerType.SetData(OcclusionCullingPerType);
         occlusionCS.SetBuffer(m_occlusionKernelID, _OcclusionCullingPerType, occCulPerType);
 
-        //occlusionCS.SetInt(_ShouldFrustumCull, enableFrustumCulling ? 1 : 0);
-        //occlusionCS.SetInt(_ShouldOcclusionCull, enableOcclusionCulling ? 1 : 0);
         occlusionCS.SetInt(_ShouldDetailCull, enableDetailCulling ? 1 : 0);
         occlusionCS.SetInt(_ShouldLOD, enableLOD ? 1 : 0);
         //occlusionCS.SetInt(_ShouldOnlyUseLOD02Shadows, enableOnlyLOD02Shadows ? 1 : 0);
@@ -979,40 +949,35 @@ public class MilkInstancer : MonoBehaviour
         occlusionCS.SetBuffer(m_occlusionKernelID, _IsVisibleBuffer, m_instancesIsVisibleBuffer);
         occlusionCS.SetBuffer(m_occlusionKernelID, _ShadowIsVisibleBuffer, m_shadowsIsVisibleBuffer);
         occlusionCS.SetBuffer(m_occlusionKernelID, _SortingData, m_instancesSortingData);
-        //occlusionCS.SetVector(_HiZTextureSize, new Vector2(hiZDepthTexture.width, hiZDepthTexture.height));
-        //occlusionCS.SetTexture(m_occlusionKernelID, _HiZMap, hiZDepthTexture);
-        blankDepthTexture = Resources.Load("EmptyDepth") as Texture2D;
-        if (Application.isPlaying)
-        {
-            //occlusionCS.SetInt(_ShouldFrustumCull, enableFrustumCulling ? 1 : 0);
-            if (enableOcclusionCulling && hiZDepthTexture != null)
-            {
-                occlusionCS.SetVector(_HiZTextureSize, new Vector2(hiZDepthTexture.width, hiZDepthTexture.height));
-                occlusionCS.SetTexture(m_occlusionKernelID, _HiZMap, hiZDepthTexture);
-            }
-            else if (blankDepthTexture)
-            {
-                occlusionCS.SetVector(_HiZTextureSize, Vector2.one);
-                occlusionCS.SetTexture(m_occlusionKernelID, _HiZMap, blankDepthTexture);
-            }
-        }
-        else
-        {
-#if UNITY_EDITOR
 
-            //occlusionCS.SetInt(_ShouldFrustumCull, 0);
-            if (blankDepthTexture != null)
-            {
-                occlusionCS.SetVector(_HiZTextureSize, new Vector2(blankDepthTexture.width, blankDepthTexture.height));
-                occlusionCS.SetTexture(m_occlusionKernelID, _HiZMap, blankDepthTexture);
-            }
-#endif
-        }
+        occlusionCS.SetVector(_HiZTextureSize, new Vector2(HiZDepthTexture.width, HiZDepthTexture.height));
+        occlusionCS.SetTexture(m_occlusionKernelID, _HiZMap, HiZDepthTexture);
+//        if (Application.isPlaying)
+//        {
+//            if (enableOcclusionCulling && HiZDepthTexture != null)
+//            {
+//                occlusionCS.SetVector(_HiZTextureSize, new Vector2(HiZDepthTexture.width, HiZDepthTexture.height));
+//                occlusionCS.SetTexture(m_occlusionKernelID, _HiZMap, HiZDepthTexture);
+//            }
+//            else if (blankDepthTexture)
+//            {
+//                occlusionCS.SetVector(_HiZTextureSize, Vector2.one);
+//                occlusionCS.SetTexture(m_occlusionKernelID, _HiZMap, blankDepthTexture);
+//            }
+//        }
+//        else
+//        {
+//#if UNITY_EDITOR
 
-        //scanGroupSumsCS.SetInt(_NumOfGroups, m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE));
-        //scanGroupSumsCS.SetInt(_NumOfGroups, nextPowerOfTwo / (2 * SCAN_THREAD_GROUP_SIZE));
+//            //occlusionCS.SetInt(_ShouldFrustumCull, 0);
+//            if (blankDepthTexture != null)
+//            {
+//                occlusionCS.SetVector(_HiZTextureSize, new Vector2(blankDepthTexture.width, blankDepthTexture.height));
+//                occlusionCS.SetTexture(m_occlusionKernelID, _HiZMap, blankDepthTexture);
+//            }
+//#endif
+//        }
         scanGroupSumsCS.SetInt(_NumOfGroups, Mathf.NextPowerOfTwo(numScannedGroups));
-        //scanGroupSumsCS.SetInt(_NumOfGroups, Mathf.CeilToInt((float)m_numberOfInstances / (2 * SCAN_THREAD_GROUP_SIZE)));
 
         copyInstanceDataCS.SetInt(_NumOfDrawcalls, m_numberOfInstanceTypes * NUMBER_OF_DRAW_CALLS);
         copyInstanceDataCS.SetBuffer(m_copyInstanceDataKernelID, _InstanceDataBuffer, m_instanceDataBuffer);
@@ -1023,7 +988,7 @@ public class MilkInstancer : MonoBehaviour
 
         CreateCommandBuffers();
 
-        if (mainCam)
+        if (InstancerCamera)
         {
             if (runCompute)
             {
@@ -1031,18 +996,14 @@ public class MilkInstancer : MonoBehaviour
                 //theres gotta be a better way to fix the issue than this shit. ill look into it eventually
                 for (int i = 0; i < 30; i++)
                 {
-                    CalculateVisibleInstances(mainCam);
+                    CalculateVisibleInstances(InstancerCamera);
                 }
             }
         }
         return true;
     }
-    int nextPowerOfTwo = 0;
-    //private void CreateCommandBuffers()
-    //{
-    //    CreateSortingCommandBuffer();
-    //}
 
+    #region INSTANCE SORTING
     private Kernels m_kernels;
     private void CreateCommandBuffers()
     {
@@ -1191,7 +1152,6 @@ public class MilkInstancer : MonoBehaviour
         Debug.Assert(values.count == keys.count, "Value and key buffers must be of the same size.");
 
         m_originalCount = length < 0 ? values.count : length;
-        //m_originalCount = nextPowerOfTwo;
         m_paddedCount = Mathf.NextPowerOfTwo(m_originalCount);
         m_mustTruncateValueBuffer = !Mathf.IsPowerOfTwo(m_originalCount);
         m_externalValuesBuffer = values;
@@ -1242,6 +1202,8 @@ public class MilkInstancer : MonoBehaviour
             }
         }
     }
+    #endregion
+
     public void ReleaseBuffers()
     {
         ReleaseCommandBuffer(ref m_sortingCommandBuffer);
@@ -1255,7 +1217,6 @@ public class MilkInstancer : MonoBehaviour
         ReleaseComputeBuffer(ref m_instancesSortingData);
         ReleaseComputeBuffer(ref m_instancesSortingDataTemp);
         ReleaseComputeBuffer(ref m_instancesMatrixRows01);
-        //ReleaseComputeBuffer(m_instancesMatrixRows01);
         ReleaseComputeBuffer(ref m_instancesMatrixRows23);
         ReleaseComputeBuffer(ref m_instancesMatrixRows45);
         ReleaseComputeBuffer(ref m_instancesCulledMatrixRows01);
@@ -1282,16 +1243,6 @@ public class MilkInstancer : MonoBehaviour
         ReleaseComputeBuffer(ref m_tempBuffer); 
         ReleaseComputeBuffer(ref m_valuesBuffer);
     }
-    //private void ReleaseComputeBuffer(ComputeBuffer _buffer)
-    //{
-    //    if (_buffer == null)
-    //    {
-    //        return;
-    //    }
-
-    //    _buffer.Release();
-    //    _buffer = null;
-    //}
     private static void ReleaseComputeBuffer(ref ComputeBuffer _buffer)
     {
         if (_buffer == null)
@@ -1329,19 +1280,11 @@ public class MilkInstancer : MonoBehaviour
                 b.Encapsulate(rends[r].bounds);
             }
         }
-        b.center = Vector3.zero;
+        //b.center = Vector3.zero;
+        //Debug.Log(b.size);
+        //Debug.Log(b.center);
 
         return b;
-        //if (Application.isPlaying)
-        //{
-        //    Destroy(obj);
-        //}
-        //else
-        //{
-        //    StartCoroutine(Destroy(obj));
-        //}
-
-        //return b;
     }
     IEnumerator Destroy(GameObject obj)
     {
@@ -1349,18 +1292,9 @@ public class MilkInstancer : MonoBehaviour
         DestroyImmediate(obj);
     }
 #endregion
-    public RenderTexture depthTexture;
-    public RenderTexture getDepthTexture()
-    {
-        return depthTexture;
-    }
+    
 #if UNITY_EDITOR
-    void OnScene(SceneView scene)
-    {
-        //checkScreenSizeChange(scene.camera);
-        //renderInstances(scene.camera);
-    }
-    public void checkIfOnlyInstance()
+    public void CheckIfOnlyInstance()
     {
         if (gameObject.scene.name != "Null")
         {
@@ -1407,24 +1341,6 @@ public class IndirectRenderingMesh
 [CustomEditor(typeof(MilkInstancer))]
 class InstancingEditor : Editor
 {
-    //public void OnEnable()
-    //{
-    //    SceneView.onSceneGUIDelegate += CustomOnSceneGUI;
-    //}
-
-    //public void OnDisable()
-    //{
-    //    SceneView.onSceneGUIDelegate -= CustomOnSceneGUI;
-    //}
-
-    //private void CustomOnSceneGUI(SceneView s)
-    //{
-    //    Selection.activeGameObject = ((Component)target).gameObject; //Here! Manually assign the selection to be your object
-    //}
-    //private void OnSceneGUI()
-    //{
-    //    HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
-    //}
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
@@ -1435,10 +1351,6 @@ class InstancingEditor : Editor
         {
             //comp.checkIfOnlyInstance();
         }
-        //if (GUILayout.Button("ranomize"))
-        //{
-            
-        //}
     }
 }
 #endif

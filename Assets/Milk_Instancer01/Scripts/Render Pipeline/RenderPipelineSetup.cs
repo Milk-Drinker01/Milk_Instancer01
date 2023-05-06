@@ -18,16 +18,17 @@ public class RenderPipelineSetup : MonoBehaviour
     public RenderTexture GetDepthTexture()
     {
         if (DepthRenderTexture == null)
-            CreateDepthTexture();
+            DepthRenderTexture = CreateDepthTexture(512,512);
         return DepthRenderTexture;
     }
-    public void CreateDepthTexture()
+    public static RenderTexture CreateDepthTexture(int resX, int resY)
     {
-        DepthRenderTexture = new RenderTexture(512, 512, 0);
-        DepthRenderTexture.Create();
-        RenderTexture.active = DepthRenderTexture;
+        RenderTexture DepthRT = new RenderTexture(resX, resY, 0);
+        DepthRT.Create();
+        RenderTexture.active = DepthRT;
         GL.Begin(GL.TRIANGLES);
         GL.Clear(true, true, new Color(0, 0, 0, 1));
         GL.End();
+        return DepthRT;
     }
 }

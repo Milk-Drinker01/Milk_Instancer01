@@ -14,23 +14,40 @@ public class Character : MonoBehaviour
     {
         camera = transform.GetChild(0);
         cc = GetComponent<CharacterController>();
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        ToggleCursor(false);
+    }
+    void ToggleCursor(bool enabled)
+    {
+        if (enabled)
+        {
+            Cursor.lockState = CursorLockMode.Confined;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
     void Update()
     {
-        transform.Rotate(0, Input.GetAxis("Mouse X"), 0);
-        yRot -= Input.GetAxis("Mouse Y");
-        yRot = Mathf.Clamp(yRot, -80, 80);
-        camera.localEulerAngles = new Vector3(yRot, 0, 0);
-        setInput();
+        if (Input.GetKeyDown(KeyCode.Escape))
+            ToggleCursor(Cursor.lockState == CursorLockMode.Locked);
+        if (Cursor.lockState == CursorLockMode.Locked)
+        {
+            transform.Rotate(0, Input.GetAxis("Mouse X"), 0);
+            yRot -= Input.GetAxis("Mouse Y");
+            yRot = Mathf.Clamp(yRot, -80, 80);
+            camera.localEulerAngles = new Vector3(yRot, 0, 0);
+            SetInput();
+        }
         move();
     }
     Vector2 inputDirection = Vector2.zero;
     Vector2 velocityXZ = Vector2.zero;
     Vector3 velocity = Vector3.zero;
     float speedTarget;
-    public void setInput()
+    public void SetInput()
     {
         bool[] inputs = new bool[]
             {
