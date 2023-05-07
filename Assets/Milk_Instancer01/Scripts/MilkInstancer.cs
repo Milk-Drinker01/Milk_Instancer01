@@ -205,10 +205,6 @@ namespace MilkInstancer
             StopDrawing();
             CheckIfOnlyInstance();
 #endif
-            //if (QualitySettings.renderPipeline == null)
-            //{
-            //    maxShadowDistance = QualitySettings.shadowDistance;
-            //}
         }
 
         private void OnDestroy()
