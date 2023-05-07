@@ -593,6 +593,99 @@ MonoBehaviour:
   m_HighQualityFiltering:
     m_OverrideState: 1
     m_Value: 0
+--- !u!114 &-3644560208001073026
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42ef2681fa3dc8c4fa031f044e68c63f, type: 3}
+  m_Name: GlobalIllumination
+  m_EditorClassIdentifier: 
+  active: 1
+  quality:
+    m_OverrideState: 0
+    m_Value: 1
+  enable:
+    m_OverrideState: 1
+    m_Value: 0
+  tracing:
+    m_OverrideState: 0
+    m_Value: 1
+  rayMiss:
+    m_OverrideState: 0
+    m_Value: 3
+  depthBufferThickness:
+    m_OverrideState: 0
+    m_Value: 0.1
+  fullResolutionSS:
+    m_OverrideState: 0
+    m_Value: 1
+  m_MaxRaySteps:
+    m_OverrideState: 0
+    m_Value: 64
+  m_DenoiseSS:
+    m_OverrideState: 0
+    m_Value: 1
+  m_HalfResolutionDenoiserSS:
+    m_OverrideState: 0
+    m_Value: 0
+  m_DenoiserRadiusSS:
+    m_OverrideState: 0
+    m_Value: 0.5
+  m_SecondDenoiserPassSS:
+    m_OverrideState: 0
+    m_Value: 1
+  lastBounceFallbackHierarchy:
+    m_OverrideState: 0
+    m_Value: 3
+  layerMask:
+    m_OverrideState: 0
+    m_Value:
+      serializedVersion: 2
+      m_Bits: 4294967295
+  textureLodBias:
+    m_OverrideState: 0
+    m_Value: 7
+  m_RayLength:
+    m_OverrideState: 0
+    m_Value: 50
+  m_ClampValue:
+    m_OverrideState: 0
+    m_Value: 1
+  mode:
+    m_OverrideState: 0
+    m_Value: 2
+  m_FullResolution:
+    m_OverrideState: 0
+    m_Value: 0
+  sampleCount:
+    m_OverrideState: 0
+    m_Value: 2
+  bounceCount:
+    m_OverrideState: 0
+    m_Value: 1
+  m_Denoise:
+    m_OverrideState: 0
+    m_Value: 1
+  m_HalfResolutionDenoiser:
+    m_OverrideState: 0
+    m_Value: 0
+  m_DenoiserRadius:
+    m_OverrideState: 0
+    m_Value: 0.6
+  m_SecondDenoiserPass:
+    m_OverrideState: 0
+    m_Value: 1
+  m_MaxMixedRaySteps:
+    m_OverrideState: 0
+    m_Value: 48
+  receiverMotionRejection:
+    m_OverrideState: 0
+    m_Value: 1
 --- !u!114 &-2773425278391507979
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -779,6 +872,7 @@ MonoBehaviour:
   - {fileID: -6444822410840133515}
   - {fileID: -4364951378331742092}
   - {fileID: -6506600289619732102}
+  - {fileID: -3644560208001073026}
 --- !u!114 &3820782447261732596
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1049,7 +1143,7 @@ MonoBehaviour:
   active: 1
   maxShadowDistance:
     m_OverrideState: 1
-    m_Value: 113.8
+    m_Value: 299.65
   directionalTransmissionMultiplier:
     m_OverrideState: 0
     m_Value: 1

@@ -2,11 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RenderPipelineSetup : MonoBehaviour
+public abstract class RenderPipelineSetup : MonoBehaviour
 {
     public static RenderPipelineSetup instance;
 
-    RenderTexture DepthRenderTexture;
+    static RenderTexture DepthRenderTexture;
+
+    public float GetShadowDistance()
+    {
+        return _GetShadowDistance();
+    }
+    protected abstract float _GetShadowDistance();
 
     private void Awake()
     {
@@ -15,7 +21,7 @@ public class RenderPipelineSetup : MonoBehaviour
         else
             Destroy(this);
     }
-    public RenderTexture GetDepthTexture()
+    public static RenderTexture GetDepthTexture()
     {
         if (DepthRenderTexture == null)
             DepthRenderTexture = CreateDepthTexture(512,512);

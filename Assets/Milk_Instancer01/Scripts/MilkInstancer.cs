@@ -172,6 +172,7 @@ public class MilkInstancer : MonoBehaviour
     private static readonly int _DistancePerType = Shader.PropertyToID("_perTypeRenderDistance");
     #endregion
 
+    private RenderPipelineSetup _RenderPipelineSetup;
     private RenderTexture HiZDepthTexture;
     private int m_numberOfInstanceTypes;
     private int m_numberOfInstances;
@@ -196,28 +197,28 @@ public class MilkInstancer : MonoBehaviour
         CheckIfOnlyInstance();
     }
 #endif
-    float maxShadowDistance = 150;
+
     private void Awake()
     {
 #if UNITY_EDITOR
         CheckIfOnlyInstance();
 #endif
-        if (QualitySettings.renderPipeline == null)
-        {
-            maxShadowDistance = QualitySettings.shadowDistance;
-        }
-        else
-        {
-            foreach (Volume pr in GameObject.FindObjectsOfType<Volume>())
-            {
-                HDShadowSettings s;
-                pr.sharedProfile.TryGet(out s);
-                if (s != null)
-                {
-                    maxShadowDistance = (float)s.maxShadowDistance;
-                }
-            }
-        }
+        //if (QualitySettings.renderPipeline == null)
+        //{
+        //    maxShadowDistance = QualitySettings.shadowDistance;
+        //}
+        //else
+        //{
+        //    foreach (Volume pr in GameObject.FindObjectsOfType<Volume>())
+        //    {
+        //        HDShadowSettings s;
+        //        pr.sharedProfile.TryGet(out s);
+        //        if (s != null)
+        //        {
+        //            maxShadowDistance = (float)s.maxShadowDistance;
+        //        }
+        //    }
+        //}
     }
     
     private void OnEnable()
@@ -414,7 +415,7 @@ public class MilkInstancer : MonoBehaviour
         Profiler.BeginSample("02 Occlusion");
         {
             // Input
-            occlusionCS.SetFloat(_ShadowDistance, maxShadowDistance);
+            occlusionCS.SetFloat(_ShadowDistance, _RenderPipelineSetup == null ? 150 : _RenderPipelineSetup.GetShadowDistance());
             occlusionCS.SetMatrix(_UNITY_MATRIX_MVP, m_MVP);
             occlusionCS.SetVector(_CamPosition, cameraPosition);
 
@@ -623,9 +624,17 @@ public class MilkInstancer : MonoBehaviour
         m_numberOfInstances = 0;
         m_bounds.center = Vector3.zero;
         m_bounds.extents = Vector3.one * 10000;
-        if (enableOcclusionCulling && TryGetComponent<RenderPipelineSetup>(out RenderPipelineSetup PipelineSetup))
+        if (!TryGetComponent<RenderPipelineSetup>(out _RenderPipelineSetup))
         {
-            HiZDepthTexture = PipelineSetup.GetDepthTexture();
+            Debug.Log("---------------------------------------------------");
+            Debug.Log("You are not using a Render Pipeline Setup component.");
+            Debug.Log("Occlusion culling will not be used, due to lack of a depth texture.");
+            Debug.Log("A default shadow distance of 150 will be used.");
+            Debug.Log("---------------------------------------------------");
+        }
+        if (enableOcclusionCulling)
+        {
+            HiZDepthTexture = RenderPipelineSetup.GetDepthTexture();
         }
         else
         {
@@ -940,8 +949,7 @@ public class MilkInstancer : MonoBehaviour
         occlusionCS.SetInt(_ShouldDetailCull, enableDetailCulling ? 1 : 0);
         occlusionCS.SetInt(_ShouldLOD, enableLOD ? 1 : 0);
         //occlusionCS.SetInt(_ShouldOnlyUseLOD02Shadows, enableOnlyLOD02Shadows ? 1 : 0);
-        occlusionCS.SetFloat(_ShadowDistance, QualitySettings.shadowDistance);
-        occlusionCS.SetFloat(_ShadowDistance, QualitySettings.shadowDistance);
+        //occlusionCS.SetFloat(_ShadowDistance, QualitySettings.shadowDistance);
         occlusionCS.SetFloat(_DetailCullingScreenPercentage, detailCullingPercentage);
         occlusionCS.SetBuffer(m_occlusionKernelID, _InstanceDataBuffer, m_instanceDataBuffer);
         occlusionCS.SetBuffer(m_occlusionKernelID, _ArgsBuffer, m_instancesArgsBuffer);

@@ -16,7 +16,7 @@ public class DepthPassDrawer : CustomPassDrawer
 
 public class DepthPass : CustomPass
 {
-    public RenderTexture outputRenderTexture;
+    //public RenderTexture outputRenderTexture;
 
     [SerializeField, HideInInspector]
     Shader customCopyShader;
@@ -39,15 +39,15 @@ public class DepthPass : CustomPass
     {
         if (ctx.hdCamera.camera != Camera.main)
             return;
-        if (outputRenderTexture == null || customCopyMaterial == null)
+        if (RenderPipelineSetup.GetDepthTexture() == null || customCopyMaterial == null)
             return;
 
-        SyncRenderTextureAspect(outputRenderTexture, ctx.hdCamera.camera);
+        SyncRenderTextureAspect(RenderPipelineSetup.GetDepthTexture(), ctx.hdCamera.camera);
 
         var scale = RTHandles.rtHandleProperties.rtHandleScale;
         customCopyMaterial.SetVector("_Scale", scale);
 
-        ctx.cmd.Blit(ctx.cameraNormalBuffer, outputRenderTexture, customCopyMaterial, depthPass);
+        ctx.cmd.Blit(ctx.cameraNormalBuffer, RenderPipelineSetup.GetDepthTexture(), customCopyMaterial, depthPass);
     }
 
     void SyncRenderTextureAspect(RenderTexture rt, Camera camera)
