@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2597.6265, g: 2483.879, b: 2346.8652, a: 1}
+  m_IndirectSpecularColor: {r: 2858.4814, g: 2732.7793, b: 2582.2969, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -408,7 +408,7 @@ MonoBehaviour:
   priority: 0
   blendDistance: 0
   weight: 1
-  sharedProfile: {fileID: 11400000, guid: 67d5cb00ca2a9b946b7afc33ce03f098, type: 2}
+  sharedProfile: {fileID: 11400000, guid: cd61abf9ca5da634eaf2ff12536fd630, type: 2}
 --- !u!4 &49129226
 Transform:
   m_ObjectHideFlags: 0
@@ -648,25 +648,13 @@ MonoBehaviour:
   m_IsGlobal: 1
   fadeRadius: 0
   priority: 0
-  customPasses:
-  - rid: 6072082922734354434
+  customPasses: []
   injectionPoint: 4
   m_TargetCamera: {fileID: 0}
   useTargetCamera: 0
   references:
     version: 2
-    RefIds:
-    - rid: 6072082922734354434
-      type: {class: DepthPass, ns: , asm: Assembly-CSharp}
-      data:
-        m_Name: Depth
-        enabled: 1
-        targetColorBuffer: 0
-        targetDepthBuffer: 0
-        clearFlags: 0
-        passFoldout: 0
-        m_Version: 0
-        customCopyShader: {fileID: 4800000, guid: 247f17c56ca52d245890a623d4453c20, type: 3}
+    RefIds: []
 --- !u!114 &121706379
 MonoBehaviour:
   m_ObjectHideFlags: 0

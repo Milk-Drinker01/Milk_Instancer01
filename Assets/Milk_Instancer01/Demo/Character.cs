@@ -7,12 +7,12 @@ public class Character : MonoBehaviour
     public float walkingSpeed = 3;
     public float runningMultiplier = 1.65f;
     public float acceleration = 5;
-    Transform camera;
+    Transform PlayerCamera;
     float yRot;
     CharacterController cc;
     private void Awake()
     {
-        camera = transform.GetChild(0);
+        PlayerCamera = transform.GetChild(0);
         cc = GetComponent<CharacterController>();
         ToggleCursor(false);
     }
@@ -38,7 +38,7 @@ public class Character : MonoBehaviour
             transform.Rotate(0, Input.GetAxis("Mouse X"), 0);
             yRot -= Input.GetAxis("Mouse Y");
             yRot = Mathf.Clamp(yRot, -80, 80);
-            camera.localEulerAngles = new Vector3(yRot, 0, 0);
+            PlayerCamera.localEulerAngles = new Vector3(yRot, 0, 0);
             SetInput();
         }
         move();
