@@ -1,13 +1,9 @@
 # Milk_Instancer01
  Unity indirect GPU instancing & painting with occlusion culling, frustum culling, and LODs in HDRP
  
- VIDEO TUTORIAL, URP SUPPORT, AND BUILT IN RENDERER SUPPORT COMING SOON
+ This Project is undergoing a large refactor.
  
  ![painting (2)](https://user-images.githubusercontent.com/59656122/150681820-37e0c5b9-d7b3-4eaa-9f09-4b6b49b648e5.gif)
-
- NOTE: THIS VERSION IS FOR HDRP
-  - Repo for URP: https://github.com/Milk-Drinker01/Milk_Instancer_URP
-  - Repo for Built-in: https://github.com/Milk-Drinker01/Milk_Instancer_Standard
 
  This project is built off of elliomans indirect rendering with compute shaders. https://github.com/ellioman/Indirect-Rendering-With-Compute-Shaders
  
@@ -20,7 +16,9 @@
   - wind shader example
 
 Features
-  - HDRP instancing
+  - BIRP support (soon)
+  - URP support (soon)
+  - HDRP support
   - instance density control
   - paint prefabs on any object
   - multiple prefab support
@@ -35,11 +33,10 @@ Features
   - VR: supports both multi pass and Single Pass Instanced
  
  What am I still working on?
-  - recent update broke both occlusion and frustum culling. it will be fixed soon
-  - URP shaders
-  - more spawning methods, perhaps procedural terrain spawning
+  - Render Pipeline Consolidation
   - built in renderer support
-  - idk im sure ill think of something
+  - URP support
+  - more spawning methods, perhaps procedural terrain spawning
 
  Project info:
   - created on unity 2021.3.1f1 HDRP 12.1.0 (tested as low as HDRP 10)
