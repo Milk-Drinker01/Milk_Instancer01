@@ -11,7 +11,6 @@
   - gpu bitonic sorting is now no longer reliant on powers of two (thanks to EmmetOT - https://github.com/EmmetOT/BufferSorter)
   - improved user interface
   - instances can now be painted into the scene, much like unitys terrain detail system
-  - this version works in HDRP
   - amplify shader editor examples
   - wind shader example
 
