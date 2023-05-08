@@ -4,10 +4,9 @@ using System.Runtime.InteropServices;
 using Unity.Collections;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Profiling;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.HighDefinition;
 #if UNITY_EDITOR
+using UnityEngine.Profiling;
 using UnityEngine.UI;
 #endif
 
@@ -246,6 +245,10 @@ namespace MilkInstancer
             //force unity to repaint the scene view, and trigger an update in edit mode
             UnityEditor.EditorApplication.QueuePlayerLoopUpdate();
             UnityEditor.SceneView.RepaintAll();
+
+            //set scene camera for BIRP
+            if (UnityEngine.QualitySettings.renderPipeline == null && !Application.isPlaying)
+                InstancerCamera = scene.camera;
         }
 #endif
         void PreRender(UnityEngine.Rendering.ScriptableRenderContext context, Camera camera)
@@ -271,6 +274,8 @@ namespace MilkInstancer
 
         private void LateUpdate()
         {
+            if (InstancerCamera == null && Camera.main)
+                InstancerCamera = Camera.main;
             RenderInstances(InstancerCamera);
         }
 
@@ -386,6 +391,8 @@ namespace MilkInstancer
                         _RenderPipelineSetup.CheckRTSize(cam);
                     SetShadowDistance(_RenderPipelineSetup.GetShadowDistance());
                 }
+                else
+                    SetShadowDistance(150);
 
                 occlusionCS.SetMatrix(_UNITY_MATRIX_MVP, m_MVP);
                 occlusionCS.SetVector(_CamPosition, cameraPosition);

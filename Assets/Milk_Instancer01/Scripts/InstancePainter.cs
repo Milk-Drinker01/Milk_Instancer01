@@ -45,7 +45,11 @@ namespace MilkInstancer
                 //GetComponent<MilkInstancer>().enabled = false;
             }
         }
-        [HideInInspector] public Unity.Mathematics.Random rand = new Unity.Mathematics.Random();
+        //[HideInInspector] public Unity.Mathematics.Random rand = new Unity.Mathematics.Random();
+        float RandomZeroOne()
+        {
+            return UnityEngine.Random.Range(0, 1);
+        }
         public void clearInstances()
         {
             zoneManager.ClearInstances();
@@ -98,10 +102,6 @@ namespace MilkInstancer
         }
         void paintInstances(Vector3 origin, Vector3 point, float distance, Vector3 normal)
         {
-            if (rand.state == 0)
-            {
-                rand.InitState(1298);
-            }
             if (transform.childCount == 0)
             {
                 new GameObject("rotation helper").transform.SetParent(transform);
@@ -124,7 +124,7 @@ namespace MilkInstancer
             }
             for (int i = 0; i < numToAdd; i++)
             {
-                ang = UnityEngine.Random.insideUnitCircle * rand.NextFloat(areaSize * .5f);
+                ang = UnityEngine.Random.insideUnitCircle * UnityEngine.Random.Range(0f, areaSize * .5f);
                 dir = point + Vector3.ProjectOnPlane((UnityEngine.Random.insideUnitSphere * areaSize * .5f), normal);
                 //dir = Vector3.ProjectOnPlane(new Vector3(ang.x, 0, ang.y), normal) + point;
                 dir = dir - origin;
@@ -132,7 +132,7 @@ namespace MilkInstancer
                 //Debug.DrawRay(origin, dir * 50, Color.blue, 15);
                 if (Physics.Raycast(origin, dir, out hit, (areaSize * areaSize) + distance, rayCastLayerMask))
                 {
-                    int type = selectionBias[rand.NextInt(selectionBias.Length)];
+                    int type = selectionBias[UnityEngine.Random.Range(0, selectionBias.Length)];
 
                     bool bad = zoneManager.checkMinDistance(hit.point, type, zoneManager.instanceTypes[type].minDistanceBetweenInstances);
                     //if (instances[type] != null && instances[type].positions != null)
@@ -164,7 +164,10 @@ namespace MilkInstancer
                         points[k] = hit.point;
                         //Quaternion rot = Quaternion.LookRotation(hit.normal) * Quaternion.Euler(90, 0, 0);
 
-                        Quaternion bruh = Quaternion.Euler(rand.NextFloat(parameters.xRotationRange.x, parameters.xRotationRange.y), rand.NextFloat(parameters.yRotationRange.x, parameters.yRotationRange.y), rand.NextFloat(parameters.zRotationRange.x, parameters.zRotationRange.y));
+                        Quaternion bruh = Quaternion.Euler(
+                            UnityEngine.Random.Range(parameters.xRotationRange.x, parameters.xRotationRange.y), 
+                            UnityEngine.Random.Range(parameters.yRotationRange.x, parameters.yRotationRange.y),
+                            UnityEngine.Random.Range(parameters.zRotationRange.x, parameters.zRotationRange.y));
                         transform.rotation = Quaternion.Lerp(Quaternion.identity, Quaternion.FromToRotation(Vector3.up, hit.normal), parameters.RotateToNormalBias);
                         helper.localRotation = bruh;
                         rotations[k] = helper.rotation.eulerAngles;
@@ -195,7 +198,7 @@ namespace MilkInstancer
                     pos[i] = points[k];
                     rot[i] = rotations[k];
                     //rot[i] = rotations[k];
-                    scale[i] = Vector3.one * rand.NextFloat(parameters.scaleRange.x, parameters.scaleRange.y);
+                    scale[i] = Vector3.one * UnityEngine.Random.Range(parameters.scaleRange.x, parameters.scaleRange.y);
                     k++;
                 }
                 data[n].positions = pos;

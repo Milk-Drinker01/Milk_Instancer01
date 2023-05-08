@@ -17,7 +17,7 @@ MonoBehaviour:
   m_AdvancedSettingsExpanded: 1
   m_ScopedRegistriesSettingsExpanded: 1
   m_SeeAllPackageVersions: 0
-  oneTimeWarningShown: 1
+  oneTimeWarningShown: 0
   m_Registries:
   - m_Id: main
     m_Name: 
@@ -28,18 +28,8 @@ MonoBehaviour:
   m_UserSelectedRegistryName: 
   m_UserAddingNewScopedRegistry: 0
   m_RegistryInfoDraft:
-    m_ErrorMessage: 
-    m_Original:
-      m_Id: 
-      m_Name: 
-      m_Url: 
-      m_Scopes: []
-      m_IsDefault: 0
-      m_Capabilities: 0
     m_Modified: 0
-    m_Name: 
-    m_Url: 
-    m_Scopes:
-    - 
-    m_SelectedScopeIndex: 0
+    m_ErrorMessage: 
+    m_UserModificationsInstanceId: -830
+    m_OriginalInstanceId: -832
   m_LoadAssets: 0

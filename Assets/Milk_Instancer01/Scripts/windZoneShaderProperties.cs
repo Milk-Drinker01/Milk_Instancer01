@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -35,9 +34,9 @@ public class windZoneShaderProperties : MonoBehaviour
         //Shader.SetGlobalColor("varColor", grassVariationColor);
         Shader.SetGlobalFloat("min", grassVariationStrength);
     }
-    float2 mainUV = new float2(0,0);
+    Vector2 mainUV = new Vector2(0,0);
     //float windTime;
-    float2 subUV = new float2(0,0);
+    Vector2 subUV = new Vector2(0,0);
     float rad;
     float strengthRemap;
     void Update()

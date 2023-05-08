@@ -24,11 +24,11 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Meadow_Grass_01
   m_Shader: {fileID: 4800000, guid: 9a7040f63cba5f444b5e29cb70b66156, type: 3}
-  m_ValidKeywords:
-  - _ALPHATEST_ON
-  - _DOUBLESIDED_ON
+  m_ValidKeywords: []
   m_InvalidKeywords:
+  - _ALPHATEST_ON
   - _DISABLE_SSR_TRANSPARENT
+  - _DOUBLESIDED_ON
   - _SHOWWINDUV_OFF
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
@@ -588,7 +588,7 @@ Material:
     - _ZTestModeDistortion: 8
     - _ZTestTransparent: 4
     - _ZWrite: 1
-    - __dirty: 1
+    - __dirty: 0
     - _maxHeight: 0.25
     m_Colors:
     - Color_04500f19baa84583836202bf89a0365f: {r: 0.63862437, g: 0.7830188, b: 0.5133945, a: 1}
