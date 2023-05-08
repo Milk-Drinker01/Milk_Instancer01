@@ -15,7 +15,7 @@
   - wind shader example
 
 Features
-  - BIRP support
+  - BIRP support (included in this repo)
   - URP support (soon)
   - HDRP support (https://github.com/Milk-Drinker01/Milk_Instancer_HDRP)
   - instance density control
