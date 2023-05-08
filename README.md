@@ -33,7 +33,7 @@ Features
  
  What am I still working on?
   - Render Pipeline Consolidation
-  - built in renderer support
+  - built in renderer occlusion culling
   - URP support
   - more spawning methods, perhaps procedural terrain spawning
 
