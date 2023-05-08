@@ -746,17 +746,24 @@ namespace MilkInstancer
                         });
 
                         // Calculate the renderer bounds
-                        Bounds b = new Bounds();
-                        b.center = iid.transformData.positions[j] + originalBounds.center;
-                        //b.center = originalBounds.center;
-                        Vector3 s = originalBounds.size;
-                        s.Scale(iid.transformData.scales[j]);
-                        b.size = s;
+                        //Bounds b = new Bounds();
 
+                        Vector3 center = originalBounds.center;
+                        center.Scale(iid.transformData.scales[j]);
+                        //b.center = center;
+                        center += iid.transformData.positions[j];
+                        //b.center += iid.transformData.positions[j];
+
+                        Vector3 extents = originalBounds.extents;
+                        extents.Scale(iid.transformData.scales[j]);
+                        //b.extents = extents;
+                        
+                        //Debug.Log(b.center);
+                        //Debug.Log(b.size);
                         instancesInputData.Add(new IndirectInstanceCSInput()
                         {
-                            boundsCenter = b.center,
-                            boundsExtents = b.extents,
+                            boundsCenter = center,
+                            boundsExtents = extents,
                         });
 
                         m_numberOfInstances++;
